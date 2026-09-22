@@ -1,0 +1,249 @@
+{%- doc -%}
+  Parse benefit bullet lines from legacy product description HTML.
+
+  @param {string} html - Source HTML
+  @returns {string} Pipe-delimited benefit lines (use split: '|||')
+{%- enddoc -%}
+
+{%- liquid
+  assign source = html | default: ''
+  assign benefits_joined = ''
+  assign nl_literal = '\' | append: 'n'
+
+  if source == blank
+    echo ''
+  else
+    assign source_down = source | downcase
+
+    capture section_extracted
+      render 'sg-pdp-extract-section', html: source, section_key: 'benefici'
+    endcapture
+    assign section_html = section_extracted | strip
+
+    if source_down contains 'quali sono i benefici' or source_down contains 'i benefici di'
+      assign quali_markers = 'Quali sono i benefici|QUALI SONO I BENEFICI|I benefici di|I BENEFICI DI' | split: '|'
+      for quali_marker in quali_markers
+        if source contains quali_marker
+          assign after_quali = source | split: quali_marker | last
+          assign quali_chunks = after_quali | split: '</strong>'
+          if quali_chunks.size > 1
+            assign quali_body = quali_chunks[1]
+          else
+            assign quali_body = after_quali
+          endif
+          assign end_markers = '<strong>|<h4>|<h3>|<h2>' | split: '|'
+          for end_marker in end_markers
+            if quali_body contains end_marker
+              assign quali_body = quali_body | split: end_marker | first
+            endif
+          endfor
+          assign quali_plain = quali_body | strip_html | strip
+          assign quali_plain = quali_plain | replace: nl_literal, ' ' | replace: '/n', ' ' | replace: '  ', ' '
+          if quali_plain != blank
+            assign sentences = quali_plain | split: '. '
+            for sentence in sentences
+              assign sentence_trim = sentence | strip
+              if sentence_trim.size > 25
+                assign sentence_down = sentence_trim | downcase
+                unless sentence_down contains 'beauty routine' or sentence_down contains 'si consiglia' or sentence_down contains 'packaging del prodotto' or sentence_down contains 'attivi:'
+                  if benefits_joined != blank
+                    assign benefits_joined = benefits_joined | append: '|||'
+                  endif
+                  unless sentence_trim contains '.'
+                    assign sentence_trim = sentence_trim | append: '.'
+                  endunless
+                  assign benefits_joined = benefits_joined | append: sentence_trim
+                endunless
+              endif
+            endfor
+          endif
+          break
+        endif
+      endfor
+    endif
+
+    if benefits_joined == blank and source_down contains 'benefici' and source contains '<ul'
+      assign after_benefici_word = source | split: 'benefici' | last
+      if after_benefici_word contains '<ul'
+        assign ul_chunk = after_benefici_word | split: '<ul' | last
+        assign ul_chunk = '<ul' | append: ul_chunk
+        assign ul_chunk = ul_chunk | split: '</ul>' | first
+        assign li_parts = ul_chunk | split: '<li'
+        for li_part in li_parts
+          unless forloop.first
+            assign li_item = li_part | split: '</li>' | first | strip_html | strip
+            assign li_item = li_item | replace: nl_literal, ' ' | replace: '/n', ' ' | strip
+            if li_item.size > 3
+              if benefits_joined != blank
+                assign benefits_joined = benefits_joined | append: '|||'
+              endif
+              assign benefits_joined = benefits_joined | append: li_item
+            endif
+          endunless
+        endfor
+      endif
+    endif
+
+    if section_html != blank and section_html contains '<li'
+      assign li_parts = section_html | split: '<li'
+      for li_part in li_parts
+        unless forloop.first
+          assign li_item = li_part | split: '</li>' | first | strip_html | strip
+          assign li_item = li_item | replace: nl_literal, ' ' | replace: '/n', ' ' | strip
+          if li_item.size > 3
+            if benefits_joined != blank
+              assign benefits_joined = benefits_joined | append: '|||'
+            endif
+            assign benefits_joined = benefits_joined | append: li_item
+          endif
+        endunless
+      endfor
+    endif
+
+    if benefits_joined == blank and section_html != blank
+      assign section_plain = section_html | strip_html | strip
+      assign section_plain = section_plain | replace: nl_literal, ' ' | replace: '/n', ' ' | strip
+      if section_plain.size > 20
+        assign benefits_joined = section_plain
+      endif
+    endif
+
+    if benefits_joined == blank and source_down contains 'indicato per'
+      assign indicato_chunks = source | split: 'Indicato per'
+      if indicato_chunks.size > 1
+        assign indicato_body = indicato_chunks[1]
+        assign end_markers = '<strong>|<h4>|Modo d|MODI D|Avvertenze|Ingredienti' | split: '|'
+        for end_marker in end_markers
+          if indicato_body contains end_marker
+            assign indicato_body = indicato_body | split: end_marker | first
+          endif
+        endfor
+        assign li_parts = indicato_body | split: '<li'
+        for li_part in li_parts
+          unless forloop.first
+            assign li_item = li_part | split: '</li>' | first | strip_html | strip
+            if li_item.size > 3
+              if benefits_joined != blank
+                assign benefits_joined = benefits_joined | append: '|||'
+              endif
+              assign benefits_joined = benefits_joined | append: li_item
+            endif
+          endunless
+        endfor
+        if benefits_joined == blank
+          assign indicato_plain = indicato_body | strip_html | strip | replace: nl_literal, ' ' | replace: '/n', ' '
+          assign bullet_lines = indicato_plain | split: '•'
+          for bullet_line in bullet_lines
+            assign bullet_trim = bullet_line | strip
+            if bullet_trim.size > 3
+              if benefits_joined != blank
+                assign benefits_joined = benefits_joined | append: '|||'
+              endif
+              assign benefits_joined = benefits_joined | append: bullet_trim
+            endif
+          endfor
+        endif
+      endif
+    endif
+
+    if benefits_joined == blank and source_down contains 'ideale per'
+      assign ideale_markers = 'Ideale per:|Ideale per|IDEALE PER' | split: '|'
+      for ideale_marker in ideale_markers
+        if source contains ideale_marker
+          assign ideale_body = source | split: ideale_marker | last
+          assign end_markers = '<hr|Modo d|MODI D|Avvertenze|Ingredienti|<h3>|<h4>|<strong>Un approccio' | split: '|'
+          for end_marker in end_markers
+            if ideale_body contains end_marker
+              assign ideale_body = ideale_body | split: end_marker | first
+            endif
+          endfor
+          assign li_parts = ideale_body | split: '<li'
+          for li_part in li_parts
+            unless forloop.first
+              assign li_item = li_part | split: '</li>' | first | strip_html | strip
+              if li_item.size > 3
+                if benefits_joined != blank
+                  assign benefits_joined = benefits_joined | append: '|||'
+                endif
+                assign benefits_joined = benefits_joined | append: li_item
+              endif
+            endunless
+          endfor
+          break
+        endif
+      endfor
+    endif
+
+    if benefits_joined == blank and source_down contains 'azione combinata'
+      assign azione_parts = source | split: 'Azione combinata'
+      if azione_parts.size < 2
+        assign azione_parts = source | split: 'azione combinata'
+      endif
+      if azione_parts.size > 1
+        assign azione_body = azione_parts | last
+        assign end_markers = '<hr|Più convenienza|Modo d|MODI D|<h3>' | split: '|'
+        for end_marker in end_markers
+          if azione_body contains end_marker
+            assign azione_body = azione_body | split: end_marker | first
+          endif
+        endfor
+        assign azione_plain = azione_body | strip_html | strip | replace: nl_literal, ' ' | replace: '/n', ' '
+        assign azione_chunks = azione_plain | split: '. '
+        for azione_chunk in azione_chunks
+          assign line_trim = azione_chunk | strip
+          if line_trim.size > 25
+            unless line_trim contains '.'
+              assign line_trim = line_trim | append: '.'
+            endunless
+            if benefits_joined != blank
+              assign benefits_joined = benefits_joined | append: '|||'
+            endif
+            assign benefits_joined = benefits_joined | append: line_trim
+          endif
+        endfor
+      endif
+    endif
+
+    if benefits_joined == blank
+      assign desc_body = ''
+      assign desc_markers = '<h4>Descrizione</h4>|<strong>Descrizione</strong>|Descrizione' | split: '|'
+      for desc_marker in desc_markers
+        if source contains desc_marker
+          assign after_desc = source | split: desc_marker | last
+          assign end_markers = '<h4>|<strong>|Modo d|MODI D|Ingredienti|Benefici|Avvertenze|Composizione|Attivi' | split: '|'
+          for end_marker in end_markers
+            if after_desc contains end_marker
+              assign after_desc = after_desc | split: end_marker | first
+            endif
+          endfor
+          assign desc_body = after_desc | strip_html | strip | replace: nl_literal, ' ' | replace: '/n', ' '
+          break
+        endif
+      endfor
+      if desc_body != blank
+        assign claim_hints = 'favorisce|aiuta|contribuisce|utile|indicato|supporta|promuove|conferisce|dona|migliora|riduce|stimola|protegge' | split: '|'
+        assign desc_sentences = desc_body | split: '. '
+        for desc_sentence in desc_sentences
+          assign sentence_trim = desc_sentence | strip
+          if sentence_trim.size > 30
+            assign sentence_down = sentence_trim | downcase
+            for claim_hint in claim_hints
+              if sentence_down contains claim_hint
+                if benefits_joined != blank
+                  assign benefits_joined = benefits_joined | append: '|||'
+                endif
+                unless sentence_trim contains '.'
+                  assign sentence_trim = sentence_trim | append: '.'
+                endunless
+                assign benefits_joined = benefits_joined | append: sentence_trim
+                break
+              endif
+            endfor
+          endif
+        endfor
+      endif
+    endif
+
+    echo benefits_joined
+  endif
+-%}

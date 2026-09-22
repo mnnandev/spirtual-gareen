@@ -1,0 +1,30 @@
+{%- doc -%}
+  Removes a prefix from the start of plain text only (case-sensitive exact match).
+
+  @param {string} text - Source text
+  @param {string} prefix - Prefix to remove from the beginning
+{%- enddoc -%}
+
+{%- liquid
+  assign result = text | default: '' | strip
+  assign needle = prefix | default: '' | strip
+
+  if result != blank and needle != blank
+    assign needle_len = needle.size
+    if result.size >= needle_len
+      assign head = result | slice: 0, needle_len
+      if head == needle
+        assign result = result | slice: needle_len, 10000 | strip
+
+        if result != blank
+          assign lead = result | slice: 0, 1
+          if lead == '.' or lead == ',' or lead == ':' or lead == '-' or lead == '·'
+            assign result = result | slice: 1, 10000 | strip
+          endif
+        endif
+      endif
+    endif
+  endif
+
+  echo result
+-%}

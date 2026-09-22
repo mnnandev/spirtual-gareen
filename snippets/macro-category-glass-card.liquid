@@ -1,0 +1,44 @@
+{% doc %}
+  Glass-style category card with icon, number badge, description and CTA.
+
+  @param {string} handle - Collection handle
+  @param {string} title - Category title
+  @param {string} subtitle - Short description
+  @param {number} index - Card index for badge number
+  @param {number} delay - Animation delay index
+  @param {string} [cta_label] - Button label
+{% enddoc %}
+
+{% liquid
+  assign card_cta = cta_label | default: 'Scopri di più'
+  assign card_number = index | prepend: '0' | slice: -2, 2
+%}
+
+{% capture card_url %}{% render 'sg-collection-nav-url', handle: handle %}{% endcapture %}
+<a
+  href="{{ card_url | strip }}"
+  class="macro-category-glass-card sg-animate"
+  data-delay="{{ delay }}"
+  aria-label="{{ title | escape }}"
+>
+  <span class="macro-category-glass-card__number" aria-hidden="true">{{ card_number }}</span>
+
+  <div class="macro-category-glass-card__head">
+    <span class="macro-category-glass-card__icon-wrap" aria-hidden="true">
+      {% render 'category-icons', category: handle, size: 24, class: 'macro-category-glass-card__icon', label: title, decorative: true %}
+    </span>
+    <h3 class="macro-category-glass-card__title">{{ title }}</h3>
+  </div>
+
+  {% if subtitle != blank %}
+    <p class="macro-category-glass-card__text">{{ subtitle }}</p>
+  {% endif %}
+
+  <span class="macro-category-glass-card__cta">
+    <span>{{ card_cta }}</span>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M7 17 17 7"/>
+      <path d="M7 7h10v10"/>
+    </svg>
+  </span>
+</a>

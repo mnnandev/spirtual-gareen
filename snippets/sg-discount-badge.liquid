@@ -1,0 +1,48 @@
+{%- doc -%}
+  Shared sale discount badge: "-X%" over the product image (upper-right).
+  Percentage is calculated from compare_at_price vs price (never hardcoded).
+
+  @param {object} [product] - Product (uses price / compare_at_price_max)
+  @param {object} [variant] - Optional variant override for price pair
+  @param {number} [price] - Current price in cents (if not using product/variant)
+  @param {number} [compare_at_price] - Compare-at price in cents
+  @param {string} [size] - Optional size modifier: "sm" for small media (e.g. bundle)
+  @param {string} [class] - Extra class names
+{%- enddoc -%}
+
+{%- liquid
+  assign sale_price = price | default: 0
+  assign compare_price = compare_at_price | default: 0
+
+  if variant != blank
+    assign sale_price = variant.price | default: 0
+    assign compare_price = variant.compare_at_price | default: 0
+  elsif product != blank
+    assign sale_price = product.price | default: 0
+    assign compare_price = product.compare_at_price_max | default: product.compare_at_price | default: 0
+    assign first_variant = product.selected_or_first_available_variant
+    if first_variant != blank and first_variant.compare_at_price > first_variant.price
+      if compare_price <= sale_price
+        assign sale_price = first_variant.price
+        assign compare_price = first_variant.compare_at_price
+      endif
+    endif
+  endif
+
+  assign discount_pct = 0
+  if compare_price > sale_price and compare_price > 0
+    assign discount_pct = compare_price | minus: sale_price | times: 100.0 | divided_by: compare_price | round
+  endif
+
+  assign badge_class = 'sg-discount-badge'
+  if size == 'sm'
+    assign badge_class = badge_class | append: ' sg-discount-badge--sm'
+  endif
+  if class != blank
+    assign badge_class = badge_class | append: ' ' | append: class
+  endif
+-%}
+
+{%- if discount_pct > 0 -%}
+  <span class="{{ badge_class }}" aria-label="-{{ discount_pct }}%">-{{ discount_pct }}%</span>
+{%- endif -%}

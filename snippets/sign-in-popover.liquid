@@ -1,0 +1,186 @@
+{% doc %}
+  Sign-in popover panel (opens below Sign in button).
+
+  @param {string} login_url - Customer login URL
+  @param {string} popover_id - Unique popover element id
+  @param {string} anchor_name - CSS anchor name for positioning
+{% enddoc %}
+
+<div
+  id="{{ popover_id }}"
+  class="sign-in-popover"
+  ref="popover"
+  popover="auto"
+  style="position-anchor: {{ anchor_name }};"
+>
+  <div class="sign-in-popover__card">
+    <h2 class="sign-in-popover__title">{{ 'spiritual_green.welcome_back' | t }}</h2>
+    <p class="sign-in-popover__subtitle">
+      {{ 'spiritual_green.enter_email_account' | t }}
+    </p>
+
+    <form
+      class="sign-in-popover__form"
+      action="{{ login_url }}"
+      method="get"
+    >
+      <label class="visually-hidden" for="SignInPopoverEmail-{{ popover_id }}">{{ 'spiritual_green.email_address' | t }}</label>
+      <input
+        id="SignInPopoverEmail-{{ popover_id }}"
+        class="sign-in-popover__input"
+        type="email"
+        name="email"
+        autocomplete="email"
+        placeholder="{{ 'spiritual_green.email_address' | t }}"
+        required
+      >
+      <div class="sign-in-popover__actions">
+        <button type="submit" class="sign-in-popover__submit button">
+          {{ 'spiritual_green.continue' | t }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% stylesheet %}
+  .sign-in-popover {
+    --sign-in-popover-spacing: 16px;
+    --sign-in-popover-max-width: 440px;
+    --sign-in-popover-viewport-margin: 16px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    overflow: visible;
+    opacity: 0;
+    translate: 0 12px;
+    transition:
+      opacity 0.22s ease,
+      translate 0.22s ease,
+      overlay 0.22s allow-discrete,
+      display 0.22s allow-discrete;
+  }
+
+  @supports (position-anchor: --sign-in-anchor) {
+    .sign-in-popover {
+      position: fixed;
+      top: anchor(bottom);
+      right: anchor(right);
+      left: auto;
+      margin-top: var(--sign-in-popover-spacing);
+      width: min(var(--sign-in-popover-max-width), calc(100vw - var(--sign-in-popover-viewport-margin) * 2));
+    }
+  }
+
+  @supports not (position-anchor: --sign-in-anchor) {
+    .sign-in-popover {
+      position: fixed;
+      top: calc(var(--anchor-bottom) * 1px + var(--sign-in-popover-spacing));
+      right: calc(var(--anchor-right) * 1px);
+      left: auto;
+      width: min(var(--sign-in-popover-max-width), calc(100vw - var(--sign-in-popover-viewport-margin) * 2));
+    }
+  }
+
+  .sign-in-popover:popover-open {
+    translate: 0 0;
+    opacity: 1;
+  }
+
+  @starting-style {
+    .sign-in-popover:popover-open {
+      translate: 0 12px;
+      opacity: 0;
+    }
+  }
+
+  .sign-in-popover__card {
+    padding: 36px 32px 32px;
+    border-radius: 20px;
+    background: rgb(120 130 118 / 78%);
+    backdrop-filter: blur(24px) saturate(120%);
+    -webkit-backdrop-filter: blur(24px) saturate(120%);
+    border: 1px solid rgb(255 255 255 / 18%);
+    box-shadow: 0 20px 40px rgb(0 0 0 / 16%);
+    color: #ffffff;
+  }
+
+  .sign-in-popover__title {
+    margin: 0 0 10px;
+    font-size: clamp(1.625rem, 3.5vw, 2.125rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+  }
+
+  .sign-in-popover__subtitle {
+    margin: 0 0 24px;
+    font-size: 1rem;
+    line-height: 1.45;
+    color: rgb(255 255 255 / 92%);
+    max-width: 30ch;
+  }
+
+  .sign-in-popover__form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .sign-in-popover__input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 8px;
+    border: 1px solid rgb(255 255 255 / 35%);
+    background: rgb(0 0 0 / 12%);
+    color: #ffffff;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .sign-in-popover__input::placeholder {
+    color: rgb(255 255 255 / 75%);
+  }
+
+  .sign-in-popover__input:focus {
+    outline: 2px solid rgb(255 255 255 / 50%);
+    outline-offset: 2px;
+  }
+
+  .sign-in-popover__actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .sign-in-popover__submit {
+    min-width: 132px;
+    padding: 12px 28px;
+    border-radius: 999px;
+    border: none;
+    background: #f4f6f0;
+    color: #97C48A;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .sign-in-popover__submit:hover {
+    background: #ffffff;
+    color: #97C48A;
+  }
+
+  @media screen and (max-width: 749px) {
+    .sign-in-popover {
+      right: var(--sign-in-popover-viewport-margin);
+      left: var(--sign-in-popover-viewport-margin);
+      width: auto;
+      max-width: none;
+    }
+
+    .sign-in-popover__card {
+      padding: 28px 22px 24px;
+    }
+  }
+{% endstylesheet %}

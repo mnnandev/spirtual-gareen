@@ -1,0 +1,347 @@
+{%- doc -%}
+
+  Return description-only HTML: strips ingredients, benefits, modo d'uso,
+
+  avvertenze, titolazione, contenuto blocks, section labels, and leading quantity lines.
+
+
+
+  @param {string} html - Source HTML
+
+{%- enddoc -%}
+
+
+
+{%- liquid
+
+  assign working = html | default: ''
+
+  assign description_extracted = false
+
+
+
+  if working contains 'descrizione-prodotto'
+
+    assign dp_chunks = working | split: 'descrizione-prodotto'
+
+    if dp_chunks.size > 1
+
+      assign dp_after_open = dp_chunks[1] | split: '>' | slice: 1 | join: '>'
+
+      assign dp_inner = dp_after_open | split: '</div>' | first | strip
+
+      if dp_inner != blank and dp_inner.size > 10
+
+        assign working = dp_inner
+
+        assign description_extracted = true
+
+      endif
+
+    endif
+
+  endif
+
+-%}
+
+
+
+{%- unless description_extracted -%}
+
+  {%- assign contenuto_headers = '<h4>Contenuto</h4>|<h4>CONTENUTO</h4>|<h3>Contenuto</h3>|<h3>CONTENUTO</h3>|<strong>Contenuto</strong>' | split: '|' -%}
+
+  {%- for contenuto_header in contenuto_headers -%}
+
+    {%- if working contains contenuto_header -%}
+
+      {%- assign before_contenuto = working | split: contenuto_header | first -%}
+
+      {%- assign after_contenuto = working | split: contenuto_header | last -%}
+
+      {%- assign tail_after_contenuto = after_contenuto -%}
+
+      {%- assign contenuto_end_markers = "<h4>Modo d'uso</h4>|<h3>Modo d'uso</h3>|<strong>Modo d'uso</strong>|<h4>Ingredienti</h4>|<h3>Ingredienti</h3>|<h4>Benefici</h4>|<h4>Avvertenze</h4>|<h4>Titolazione</h4>|<h4>|<h3>" | split: '|' -%}
+
+      {%- for contenuto_end in contenuto_end_markers -%}
+
+        {%- if tail_after_contenuto contains contenuto_end -%}
+
+          {%- assign tail_after_contenuto = tail_after_contenuto | split: contenuto_end | last -%}
+
+          {%- break -%}
+
+        {%- endif -%}
+
+      {%- endfor -%}
+
+      {%- assign working = before_contenuto | append: tail_after_contenuto | strip -%}
+
+      {%- break -%}
+
+    {%- endif -%}
+
+  {%- endfor -%}
+
+
+
+  {%- if working contains 'contenuto-prodotto' -%}
+
+    {%- assign cp_chunks = working | split: 'contenuto-prodotto' -%}
+
+    {%- assign working = cp_chunks[0] -%}
+
+    {%- if cp_chunks.size > 1 -%}
+
+      {%- assign after_cp = cp_chunks[1] | split: '</div>' | last -%}
+
+      {%- assign working = working | append: after_cp | strip -%}
+
+    {%- endif -%}
+
+  {%- endif -%}
+
+
+
+  {%- liquid
+
+    assign strip_keys = 'benefici|ingredienti|modo_duso|avvertenze|titolazione' | split: '|'
+
+  -%}
+
+
+
+  {%- for strip_key in strip_keys -%}
+
+    {%- assign section_markers = '' -%}
+
+    {%- case strip_key -%}
+
+      {%- when 'benefici' -%}
+
+        {%- assign section_markers = '<h4>Benefici</h4>|<h3>Benefici</h3>|<strong>Benefici</strong>|Benefici:|BENEFICI:|Benefits:|BENEFITS:' | split: '|' -%}
+
+      {%- when 'ingredienti' -%}
+
+        {%- assign section_markers = '<h4>Ingredienti</h4>|<h3>Ingredienti</h3>|<h4>INGREDIENTI</h4>|<strong>Ingredienti</strong>|Ingredienti:|INGREDIENTI:|Ingredients:|INGREDIENTS:' | split: '|' -%}
+
+      {%- when 'modo_duso' -%}
+
+        {%- assign section_markers = "<h4>Modo d'uso</h4>|<h3>Modo d'uso</h3>|<strong>Modo d'uso</strong>|modo-duso-prodotto|Modo d'uso|Modo d uso|MODI D'USO|MODI D USO|Directions for use|DIRECTIONS FOR USE|How to use|HOW TO USE|Come si usa|COME SI USA" | split: '|' -%}
+
+      {%- when 'avvertenze' -%}
+
+        {%- assign section_markers = '<h4>Avvertenze</h4>|<h3>Avvertenze</h3>|<strong>Avvertenze</strong>|Avvertenze:|AVVERTENZE:|Warnings:|WARNINGS:' | split: '|' -%}
+
+      {%- when 'titolazione' -%}
+
+        {%- assign section_markers = '<h4>Titolazione</h4>|<h3>Titolazione</h3>|<strong>Titolazione</strong>|Titolazione:|TITOLAZIONE:|Titration:|TITRATION:' | split: '|' -%}
+
+    {%- endcase -%}
+
+    {%- for marker in section_markers -%}
+
+      {%- if working contains marker -%}
+
+        {%- assign before_block = working | split: marker | first -%}
+
+        {%- assign after_marker = working | split: marker | last -%}
+
+        {%- assign tail = '' -%}
+
+        {%- assign other_markers = "<h4>Ingredienti|<h4>INGREDIENTI|<h4>Modo d'uso|modo-duso-prodotto|Modo d'uso|Modo d uso|MODI D'USO|Directions for use|DIRECTIONS FOR USE|<h4>Avvertenze|Avvertenze:|AVVERTENZE:|<h4>Benefici|Benefici:|BENEFICI:|<h4>Titolazione|Titolazione:|TITOLAZIONE:|<h4>Contenuto|Contenuto</h4>" | split: '|' -%}
+
+        {%- for end_marker in other_markers -%}
+
+          {%- if tail == blank and after_marker contains end_marker -%}
+
+            {%- assign end_parts = after_marker | split: end_marker -%}
+
+            {%- assign tail = end_parts | last -%}
+
+            {%- if tail != blank -%}
+
+              {%- assign tail = end_marker | append: tail -%}
+
+            {%- endif -%}
+
+          {%- endif -%}
+
+        {%- endfor -%}
+
+        {%- assign working = before_block | append: tail | strip -%}
+
+        {%- break -%}
+
+      {%- endif -%}
+
+    {%- endfor -%}
+
+  {%- endfor -%}
+
+
+
+  {%- if working contains 'contenuto-field' -%}
+
+    {%- assign field_chunks = working | split: 'contenuto-field' -%}
+
+    {%- assign working = field_chunks[0] -%}
+
+    {%- if field_chunks.size > 1 -%}
+
+      {%- assign after_field = field_chunks[1] | split: '</p>' | last -%}
+
+      {%- assign working = working | append: after_field -%}
+
+    {%- endif -%}
+
+    {%- assign working = working | strip -%}
+
+  {%- endif -%}
+
+
+
+  {%- liquid
+
+    assign label_markers = '<strong>DESCRIZIONE</strong>|<strong>Descrizione</strong>|<h2>DESCRIZIONE</h2>|<h2>Descrizione</h2>|<h3>DESCRIZIONE</h3>|<h3>Descrizione</h3>|<h4>DESCRIZIONE</h4>|<h4>Descrizione</h4>' | split: '|'
+
+    for label_marker in label_markers
+
+      if working contains label_marker
+
+        assign working = working | split: label_marker | last | strip
+
+        break
+
+      endif
+
+    endfor
+
+
+
+    if working contains 'descrizione-prodotto'
+
+      assign dp_chunks = working | split: 'descrizione-prodotto'
+
+      if dp_chunks.size > 1
+
+        assign dp_after_open = dp_chunks[1] | split: '>' | slice: 1 | join: '>'
+
+        assign dp_inner = dp_after_open | split: '</div>' | first | strip
+
+        if dp_inner != blank
+
+          assign working = dp_inner
+
+        endif
+
+      endif
+
+    endif
+
+
+
+    if working contains 'entry-content'
+
+      assign ec_chunks = working | split: 'entry-content'
+
+      if ec_chunks.size > 1
+
+        assign ec_after_open = ec_chunks[1] | split: '>' | slice: 1 | join: '>'
+
+        if ec_after_open contains '</div>'
+
+          assign working = ec_after_open | split: '</div>' | first | strip
+
+        endif
+
+      endif
+
+    endif
+
+  -%}
+
+{%- endunless -%}
+
+
+
+{%- liquid
+
+  assign plain = working | strip_html | strip
+
+  assign nl_literal = '\' | append: 'n'
+
+  assign first_line = plain | split: nl_literal | first | strip
+
+  if first_line == blank
+
+    assign first_line = plain
+
+  endif
+
+  assign first_down = first_line | downcase
+
+  assign qty_hints = 'capsule|compresse|perle|perla|cpr|tavolette|ovaline|ml|litri|grammi|pezzi|pz.|bustine|bustina|stick|flacone|opercoli|softgel|gocce|caramelle' | split: '|'
+
+  assign looks_like_qty = false
+
+
+
+  if first_down contains 'ingredienti' or first_down contains ' mg' or first_down contains 'mg,' or first_down contains 'inulina'
+
+    assign looks_like_qty = false
+
+  else
+
+    for hint in qty_hints
+
+      if first_down contains hint
+
+        assign looks_like_qty = true
+
+        break
+
+      endif
+
+    endfor
+
+  endif
+
+
+
+  if looks_like_qty and first_line.size < 80
+
+    assign p_wrap = '<p>' | append: first_line | append: '</p>'
+
+    assign working = working | remove: p_wrap | strip
+
+    if working == html
+
+      assign qty_parts = working | split: first_line
+
+      if qty_parts.size > 1
+
+        assign working = qty_parts | last | strip
+
+      endif
+
+    endif
+
+  endif
+
+
+
+  capture artifact_clean
+
+    render 'sg-sanitize-display-artifacts', text: working
+
+  endcapture
+
+  assign working = artifact_clean | strip
+
+-%}
+
+
+
+{{- working -}}
+
+

@@ -1,0 +1,42 @@
+{%- liquid
+  assign current_product = product
+
+  if closest.product != blank
+    assign current_product = closest.product
+  endif
+
+  assign html = current_product.description | default: ''
+  assign mf_descrizione = current_product.metafields.custom.descrizione
+  assign empty_message = empty_message | default: 'Descrizione non disponibile.'
+
+  if mf_descrizione != blank and mf_descrizione.value != blank
+    assign raw_description = mf_descrizione | metafield_tag
+  elsif html != blank
+    assign raw_description = html
+  else
+    assign raw_description = ''
+  endif
+
+  capture raw_clean
+    render 'sg-sanitize-product-html', text: raw_description
+  endcapture
+  assign raw_clean = raw_clean | strip
+  if raw_clean == blank
+    assign raw_clean = raw_description
+  endif
+
+  capture description_body
+    render 'sg-pdp-strip-for-descrizione', html: raw_clean
+  endcapture
+  assign description_body = description_body | strip
+-%}
+
+<div class="product-descrizione-section product-descrizione sg-pdp-panel">
+  {%- if description_body != blank -%}
+    <div class="descrizione-content sg-product-pdp-content sg-pdp-panel__body rte">
+      {%- render 'sg-format-product-html', text: description_body -%}
+    </div>
+  {%- else -%}
+    <p class="descrizione-empty sg-pdp-panel__empty">{{ empty_message }}</p>
+  {%- endif -%}
+</div>

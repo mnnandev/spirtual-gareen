@@ -1,0 +1,75 @@
+{%- doc -%}
+  Spiritual-style "You Might Also Like" row for cart page.
+  @param {collection} collection
+  @param {string} heading
+  @param {number} max_products
+  @param {string} section_id
+{%- enddoc -%}
+
+{% liquid
+  assign upsell_collection = collection
+  assign product_limit = max_products | default: 3
+  assign upsell_heading = heading | default: '' | strip
+  if upsell_heading == blank
+    assign upsell_heading = 'spiritual_green.cart_might_also_like' | t
+  endif
+  assign sid = section_id | default: 'sg-cart'
+  assign upsell_shown = 0
+%}
+
+{% if upsell_collection != blank and upsell_collection.products_count > 0 %}
+  <div class="sg-cart-upsell">
+    <h2 class="sg-cart-upsell__heading">{{ upsell_heading }}</h2>
+    <ul class="sg-cart-upsell__grid list-unstyled" role="list">
+      {% for product in upsell_collection.products %}
+        {% if upsell_shown >= product_limit %}
+          {% break %}
+        {% endif %}
+
+        {% assign in_cart = false %}
+        {% for item in cart.items %}
+          {% if item.product_id == product.id %}
+            {% assign in_cart = true %}
+          {% endif %}
+        {% endfor %}
+
+        {% if in_cart == false %}
+          {% assign upsell_shown = upsell_shown | plus: 1 %}
+          {% assign variant = product.selected_or_first_available_variant %}
+          <li class="sg-cart-upsell__card">
+            <a href="{{ product.url }}" class="sg-cart-upsell__media">
+              {% render 'sg-discount-badge', product: product, variant: variant %}
+              {% if product.featured_image %}
+                {{
+                  product.featured_image
+                  | image_url: width: 400
+                  | image_tag:
+                    class: 'sg-cart-upsell__image',
+                    loading: 'lazy',
+                    widths: '200, 400',
+                    sizes: '200px',
+                    alt: product.featured_image.alt | default: product.title
+                }}
+              {% else %}
+                <div class="sg-cart-upsell__image sg-cart-upsell__placeholder" role="img" aria-label="{{ product.title | escape }}"></div>
+              {% endif %}
+            </a>
+            <div class="sg-cart-upsell__body">
+              <a href="{{ product.url }}" class="sg-cart-upsell__title">{{ product.title }}</a>
+              <div class="sg-cart-upsell__price-row">
+                {% render 'sg-product-card-price-row',
+                  price: variant.price,
+                  compare_at_price: variant.compare_at_price,
+                  compare_class: 'sg-cart-upsell__compare',
+                  sale_class: 'sg-cart-upsell__price',
+                  regular_class: 'sg-cart-upsell__price'
+                %}
+              </div>
+              {% render 'quick-add', product: product, section_id: sid %}
+            </div>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}

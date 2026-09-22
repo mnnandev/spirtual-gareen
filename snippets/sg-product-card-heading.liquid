@@ -1,0 +1,25 @@
+{%- doc -%}
+  Groups title + format/size on listing cards with consistent tight spacing.
+
+  @param {string} title_html - Rendered title markup (already sanitized)
+  @param {string} [format] - Size/format label
+  @param {string} title_class - Class for the title element
+  @param {string} [format_class] - Class for the format element
+  @param {string} [title_tag] - Heading tag (default: h3)
+{%- enddoc -%}
+
+{%- liquid
+  assign heading_tag = title_tag | default: 'h3'
+  assign format_label = format | strip
+-%}
+
+<div class="sg-product-card-heading">
+  <{{ heading_tag }} class="{{ title_class }} sg-product-card-heading__title">
+    {{- title_html -}}
+  </{{ heading_tag }}>
+  {%- if format_class != blank -%}
+    <p class="{{ format_class }} sg-product-card-heading__format{% if format_label == blank %} is-empty{% endif %}">
+      {%- if format_label != blank -%}{{ format_label | escape }}{%- else -%}&nbsp;{%- endif -%}
+    </p>
+  {%- endif -%}
+</div>

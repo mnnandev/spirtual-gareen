@@ -1,0 +1,104 @@
+{%- doc -%}
+  Full-width orange summer-sale banner.
+  Duplicate of the homepage promo panel — all copy is Theme Customizer fields.
+{%- enddoc -%}
+
+{{ 'sg-home-split-hero.css' | asset_url | stylesheet_tag }}
+
+<section
+  class="sg-split-hero sg-split-hero--banner-only"
+  id="SgPromoBanner-{{ section.id }}"
+  style="--sg-split-orange: {{ section.settings.promo_background | default: '#e8913a' }};"
+>
+  <div class="sg-split-hero__wrap">
+    <div class="sg-split-hero__grid">
+      <div class="sg-split-hero__cell sg-split-hero__cell--promo">
+        {% render 'sg-home-promo-panel',
+          background: section.settings.promo_background,
+          image: section.settings.promo_image,
+          kicker: section.settings.promo_kicker,
+          percent: section.settings.promo_percent,
+          subheading: section.settings.promo_subheading,
+          heading: section.settings.promo_heading,
+          link: section.settings.promo_link
+        %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Sconti estivi banner",
+  "tag": "section",
+  "class": "section-sg-promo-banner",
+  "enabled_on": {
+    "templates": ["index"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Same design as the homepage orange sale banner. Change only the headline, big %, and subline here."
+    },
+    {
+      "type": "color",
+      "id": "promo_background",
+      "label": "Background (brand orange)",
+      "default": "#E8913A"
+    },
+    {
+      "type": "image_picker",
+      "id": "promo_image",
+      "label": "Optional background image"
+    },
+    {
+      "type": "text",
+      "id": "promo_kicker",
+      "label": "Headline",
+      "default": "Sconti estivi!"
+    },
+    {
+      "type": "text",
+      "id": "promo_percent",
+      "label": "Large percentage",
+      "default": "20%"
+    },
+    {
+      "type": "text",
+      "id": "promo_subheading",
+      "label": "Subline",
+      "default": "*Tutto al 20%"
+    },
+    {
+      "type": "textarea",
+      "id": "promo_heading",
+      "label": "Fallback promo text",
+      "default": "Sconti estivi! *Tutto al 20%",
+      "info": "Used only if headline, percentage, and subline are empty."
+    },
+    {
+      "type": "url",
+      "id": "promo_link",
+      "label": "Banner link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sconti estivi 20%",
+      "settings": {
+        "promo_kicker": "Sconti estivi!",
+        "promo_percent": "20%",
+        "promo_subheading": "*Tutto al 20%"
+      }
+    },
+    {
+      "name": "Sconti estivi 50%",
+      "settings": {
+        "promo_kicker": "Sconti estivi!",
+        "promo_percent": "50%",
+        "promo_subheading": "*Tutto fino al 50%"
+      }
+    }
+  ]
+}
+{% endschema %}

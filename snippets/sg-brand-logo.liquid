@@ -1,0 +1,99 @@
+{%- doc -%}
+  Spiritual Green brand logo — icon + wordmark.
+
+  @param {string} [variant] - header (default, no tagline) | full (alias of header)
+  @param {string} [tone] - brand = original multi-color | light = white | dark = sage mono
+  @param {string} [class] - Extra CSS classes on the <img>
+  @param {string} [loading] - eager | lazy (default: eager)
+  @param {number} [height_desktop] - Render height on desktop
+  @param {number} [height_mobile] - Render height on mobile
+  @param {number} [max_width_desktop] - Max width desktop in px
+  @param {number} [max_width_mobile] - Max width mobile in px
+{%- enddoc -%}
+
+{%- liquid
+  assign sg_logo_tone = tone | default: 'brand'
+  comment
+    Full-color lockup (icon + SPIRITUAL GREEN + tagline) — header, all viewports.
+  endcomment
+  assign sg_header_logo_cdn = 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/02573d7e-ea25-4da7-b54d-ac578647462b.png?v=1789131471'
+  if sg_logo_tone == 'light'
+    assign sg_brand_logo_url = 'sg-logo-white-header.webp' | asset_url
+    assign sg_brand_logo_aspect = 1.52
+  else
+    assign sg_brand_logo_url = sg_header_logo_cdn
+    assign sg_brand_logo_aspect = 1.044
+  endif
+  assign sg_logo_h_desktop = height_desktop | default: 61
+  assign sg_logo_h_mobile = height_mobile | default: 40
+  assign sg_logo_max_w_desktop = max_width_desktop | default: 180
+  assign sg_logo_max_w_mobile = max_width_mobile | default: 140
+
+  assign sg_logo_w_desktop = sg_logo_h_desktop | times: sg_brand_logo_aspect | round
+  assign sg_logo_w_mobile = sg_logo_h_mobile | times: sg_brand_logo_aspect | round
+  assign sg_logo_loading = loading | default: 'eager'
+  assign sg_logo_alt = 'accessibility.home_logo_alt' | t: store_name: shop.name
+  assign sg_logo_class = 'sg-brand-logo sg-brand-logo--header'
+  if sg_logo_tone == 'dark'
+    assign sg_logo_class = sg_logo_class | append: ' sg-brand-logo--tone-dark'
+  elsif sg_logo_tone == 'light'
+    assign sg_logo_class = sg_logo_class | append: ' sg-brand-logo--tone-light'
+  else
+    assign sg_logo_class = sg_logo_class | append: ' sg-brand-logo--tone-brand'
+  endif
+  if class != blank
+    assign sg_logo_class = sg_logo_class | append: ' ' | append: class
+  endif
+-%}
+
+<img
+  src="{{ sg_brand_logo_url }}"
+  alt="{{ sg_logo_alt | default: shop.name }}"
+  class="{{ sg_logo_class }}"
+  width="{{ sg_logo_w_desktop }}"
+  height="{{ sg_logo_h_desktop }}"
+  style="--sg-logo-h-mobile: {{ sg_logo_h_mobile }}px; --sg-logo-h-desktop: {{ sg_logo_h_desktop }}px; --sg-logo-max-w-mobile: {{ sg_logo_max_w_mobile }}px; --sg-logo-max-w-desktop: {{ sg_logo_max_w_desktop }}px;"
+  loading="{{ sg_logo_loading }}"
+  decoding="async"
+>
+
+{% stylesheet %}
+  .sg-brand-logo {
+    display: block;
+    width: auto !important;
+    max-width: var(--sg-logo-max-w-mobile, 220px) !important;
+    height: var(--sg-logo-h-mobile, 48px) !important;
+    object-fit: contain;
+    object-position: center center;
+    border: none !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+  }
+
+  /* Flat white for dark/green header surfaces */
+  .sg-brand-logo--tone-light {
+    filter: brightness(0) invert(1);
+  }
+
+  /* Sage mono asset — no recolor */
+  .sg-brand-logo--tone-dark {
+    filter: none;
+  }
+
+  /* Original multi-color brand lockup — never flatten */
+  .sg-brand-logo--tone-brand {
+    filter: none !important;
+  }
+
+  @media screen and (min-width: 750px) {
+    .sg-brand-logo {
+      max-width: var(--sg-logo-max-w-desktop, 280px) !important;
+      height: var(--sg-logo-h-desktop, 64px) !important;
+    }
+
+    .sg-brand-logo--header {
+      max-width: var(--sg-logo-max-w-desktop, 220px) !important;
+      height: var(--sg-logo-h-desktop, 72px) !important;
+    }
+  }
+{% endstylesheet %}

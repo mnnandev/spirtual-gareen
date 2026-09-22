@@ -1,0 +1,185 @@
+{%- doc -%}
+  Horizontal top filters — parent categories and subcategory dropdowns.
+
+  @param {collection} collection - Current collection
+  @param {string} section_id - Section ID
+{%- enddoc -%}
+
+{%- liquid
+  assign parent_handles = 'sonno-mente-energia,difese-protezione-respiratorie,intestino-digestione-metabolismo,movimento-dolori-recupero,benessere-ormonale-intimo,bellezza-cura-persona,mondo-zen' | split: ','
+  assign parent_titles = 'Sonno, Mente ed Energia|Difese, protezione e vie respiratorie|Intestino, digestione e metabolismo|Movimento, dolori e recupero|Benessere ormonale e intimo|Bellezza e cura della persona|Mondo Zen' | split: '|'
+
+  capture sg_normalized_handle_raw
+    render 'sg-normalize-macro-handle', handle: collection.handle
+  endcapture
+  assign sg_normalized_handle = sg_normalized_handle_raw | strip
+
+  assign sg_active_parent = ''
+  for parent_handle in parent_handles
+    if collection.handle == parent_handle or sg_normalized_handle == parent_handle
+      assign sg_active_parent = parent_handle
+      break
+    endif
+  endfor
+
+  if sg_active_parent == blank
+    for parent_handle in parent_handles
+      capture sg_subcategory_handles_csv
+        render 'sg-collection-subcategory-meta', parent_handle: parent_handle, output: 'handles'
+      endcapture
+      assign sg_sub_handles = sg_subcategory_handles_csv | strip | split: ','
+      for sg_sub_handle in sg_sub_handles
+        assign sg_sub_handle = sg_sub_handle | strip
+        if collection.handle == sg_sub_handle
+          assign sg_active_parent = parent_handle
+          break
+        endif
+      endfor
+      if sg_active_parent != blank
+        break
+      endif
+    endfor
+  endif
+
+  assign sg_current_sub_handle = ''
+  if current_tags != blank
+    for active_tag in current_tags
+      assign sg_current_sub_handle = active_tag | handle
+      break
+    endfor
+  elsif sg_active_parent != blank and collection.handle != sg_active_parent and sg_normalized_handle != sg_active_parent
+    assign sg_current_sub_handle = collection.handle
+  endif
+-%}
+
+<sg-collection-top-filters class="sg-top-filters" data-section-id="{{ section_id }}">
+  <div class="sg-top-filters__inner">
+    <div class="sg-top-filters__bar">
+      <div class="sg-top-filters__main">
+        <h4 class="sg-top-filters__heading">Categorie</h4>
+
+        <div class="sg-top-filters__categories" data-sg-cats-viewport>
+          <div class="sg-top-filters__cats-stage" data-sg-cats-stage tabindex="-1">
+            <div class="sg-top-filters__cats-track" data-sg-cats-track role="list">
+              {%- for parent_handle in parent_handles -%}
+                {%- assign parent_title = parent_titles[forloop.index0] -%}
+                {%- capture parent_url -%}
+                  {%- render 'sg-collection-nav-url', handle: parent_handle -%}
+                {%- endcapture -%}
+                {%- assign parent_url = parent_url | strip -%}
+
+                {%- assign is_current_parent = false -%}
+                {%- if parent_handle == sg_active_parent or collection.handle == parent_handle or sg_normalized_handle == parent_handle -%}
+                  {%- assign is_current_parent = true -%}
+                {%- endif -%}
+
+                {%- capture subcategory_handles_csv -%}
+                  {%- render 'sg-collection-subcategory-meta', parent_handle: parent_handle, output: 'handles' -%}
+                {%- endcapture -%}
+                {%- capture subcategory_titles_csv -%}
+                  {%- render 'sg-collection-subcategory-meta', parent_handle: parent_handle, output: 'titles' -%}
+                {%- endcapture -%}
+                {%- assign sub_handles = subcategory_handles_csv | strip | split: ',' -%}
+                {%- assign sub_titles = subcategory_titles_csv | strip | split: '|' -%}
+                {%- assign has_subcategories = false -%}
+                {%- if sub_handles.size > 0 and subcategory_handles_csv != blank -%}
+                  {%- assign has_subcategories = true -%}
+                {%- endif -%}
+
+                <div
+                  class="sg-top-filters__cat{% if is_current_parent %} is-active-parent{% endif %}"
+                  data-sg-cat-item
+                  role="listitem"
+                >
+                  {%- if has_subcategories -%}
+                    <button
+                      type="button"
+                      class="sg-top-filters__cat-trigger{% if is_current_parent %} is-active-parent{% endif %}"
+                      data-sg-cat-toggle
+                      aria-expanded="false"
+                      aria-controls="sg-cat-panel-{{ section_id }}-{{ parent_handle }}"
+                    >
+                      <span class="sg-top-filters__cat-icon" aria-hidden="true">
+                        {% render 'category-icons', category: parent_handle, size: 24, label: parent_title, decorative: true %}
+                      </span>
+                      <span class="sg-top-filters__cat-label">{{ parent_title }}</span>
+                      <span class="sg-top-filters__cat-chevron" aria-hidden="true"></span>
+                    </button>
+                    <div
+                      id="sg-cat-panel-{{ section_id }}-{{ parent_handle }}"
+                      class="sg-top-filters__cat-panel"
+                      data-sg-cat-panel
+                      hidden
+                    >
+                      <div class="sg-top-filters__panel-columns">
+                        <a
+                          href="{{ parent_url }}"
+                          class="sg-top-filters__panel-link{% if is_current_parent and current_tags == blank and sg_current_sub_handle == blank %} is-active{% endif %}"
+                          {% if is_current_parent and current_tags == blank and sg_current_sub_handle == blank %}
+                            aria-current="page"
+                          {% endif %}
+                        >
+                          Tutti i prodotti
+                        </a>
+                        {%- for sub_handle in sub_handles -%}
+                          {%- assign sub_index = forloop.index0 -%}
+                          {%- assign sub_title = sub_titles[sub_index] -%}
+                          {%- assign sub_handle = sub_handle | strip -%}
+                          {%- assign tag_active = false -%}
+                          {%- if is_current_parent and sg_current_sub_handle == sub_handle -%}
+                            {%- assign tag_active = true -%}
+                          {%- endif -%}
+                          <a
+                            href="{% render 'sg-subcategory-nav-url', parent_handle: parent_handle, sub_handle: sub_handle %}"
+                            class="sg-top-filters__panel-link{% if tag_active %} is-active{% endif %}"
+                            {% if tag_active %}
+                              aria-current="page"
+                            {% endif %}
+                          >
+                            {{ sub_title }}
+                          </a>
+                        {%- endfor -%}
+                      </div>
+                    </div>
+                  {%- else -%}
+                    <a
+                      href="{{ parent_url }}"
+                      class="sg-top-filters__cat-link{% if is_current_parent %} is-active{% endif %}"
+                      {% if is_current_parent %}
+                        aria-current="page"
+                      {% endif %}
+                    >
+                      <span class="sg-top-filters__cat-icon" aria-hidden="true">
+                        {% render 'category-icons', category: parent_handle, size: 24, label: parent_title, decorative: true %}
+                      </span>
+                      <span class="sg-top-filters__cat-label">{{ parent_title }}</span>
+                    </a>
+                  {%- endif -%}
+                </div>
+              {%- endfor -%}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="sg-top-filters__scroll-btn sg-top-filters__scroll-btn--prev"
+            data-sg-cats-prev
+            aria-label="Scorri categorie indietro"
+            hidden
+          >
+            <span class="sg-top-filters__scroll-icon" aria-hidden="true"></span>
+          </button>
+          <button
+            type="button"
+            class="sg-top-filters__scroll-btn sg-top-filters__scroll-btn--next"
+            data-sg-cats-next
+            aria-label="Scorri categorie avanti"
+            hidden
+          >
+            <span class="sg-top-filters__scroll-icon" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</sg-collection-top-filters>

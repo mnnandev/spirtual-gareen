@@ -1,0 +1,144 @@
+{%- doc -%}
+
+  Spiritual Green — desktop header navigation (Categorie cascade + top-level links).
+
+{%- enddoc -%}
+
+
+
+{% liquid
+  assign nav_side = side | default: 'all'
+
+  capture sg_nav_keys_raw
+    render 'sg-main-nav-config', output: 'keys'
+  endcapture
+
+  capture sg_nav_split_at_raw
+    render 'sg-main-nav-config', output: 'split_at'
+  endcapture
+  assign sg_nav_split_at = sg_nav_split_at_raw | strip | plus: 0
+
+  capture sg_nav_center_key_raw
+    render 'sg-main-nav-config', output: 'center_key'
+  endcapture
+  assign sg_nav_center_key = sg_nav_center_key_raw | strip
+
+  capture sg_nav_translation_keys_raw
+
+    render 'sg-main-nav-config', output: 'translation_keys'
+
+  endcapture
+
+  capture sg_nav_dropdown_keys_raw
+
+    render 'sg-main-nav-config', output: 'dropdown_keys'
+
+  endcapture
+
+  assign sg_nav_keys = sg_nav_keys_raw | strip | split: '|'
+
+  assign sg_nav_translation_keys = sg_nav_translation_keys_raw | strip | split: '|'
+
+  assign sg_nav_dropdown_keys = sg_nav_dropdown_keys_raw | strip | split: '|'
+
+%}
+
+
+
+{% for nav_key in sg_nav_keys %}
+  {% if nav_key == sg_nav_center_key %}
+    {% continue %}
+  {% endif %}
+  {% if nav_side == 'left' and forloop.index > sg_nav_split_at %}
+    {% continue %}
+  {% endif %}
+  {% if nav_side == 'right' and forloop.index <= sg_nav_split_at %}
+    {% continue %}
+  {% endif %}
+
+  {% assign label = sg_nav_translation_keys[forloop.index0] | t %}
+
+  {% capture nav_url %}{% render 'sg-main-nav-url', key: nav_key %}{% endcapture %}
+
+  {% assign nav_url = nav_url | strip %}
+
+  {% assign is_categorie = false %}
+
+  {% if sg_nav_dropdown_keys contains nav_key %}
+
+    {% assign is_categorie = true %}
+
+  {% endif %}
+
+
+
+  <li
+
+    role="presentation"
+
+    class="menu-list__list-item{% if is_categorie %} menu-list__list-item--categorie-dropdown{% endif %}"
+
+    on:focus="/activate"
+
+    on:blur="/deactivate"
+
+    on:pointerenter="/activate"
+
+    on:pointerleave="/deactivate"
+
+  >
+
+    <a
+
+      href="{{ nav_url }}"
+
+      data-skip-node-update="true"
+
+      class="menu-list__link"
+
+      {% if is_categorie %}
+
+        aria-controls="submenu-sg-categorie"
+
+        aria-haspopup="true"
+
+        aria-expanded="false"
+
+      {% endif %}
+
+      ref="menuitem"
+
+    >
+
+      <span class="menu-list__link-title">{{ label }}</span>
+
+    </a>
+
+
+
+    {% if is_categorie %}
+
+      <div class="menu-list__submenu{{ color_scheme_classes }}" ref="submenu[]">
+
+        <div
+
+          id="submenu-sg-categorie"
+
+          class="menu-list__submenu-inner"
+
+          style="{% render 'submenu-font-styles', settings: block_settings %}"
+
+        >
+
+          {% render 'sg-categorie-cascade-menu' %}
+
+        </div>
+
+      </div>
+
+    {% endif %}
+
+  </li>
+
+{% endfor %}
+

@@ -1,0 +1,53 @@
+{%- doc -%}
+  Shared "is this product a best seller?" flag.
+
+  True when:
+  - Product has a bestseller tag (bestseller, best-seller, best seller, piu-venduto, più venduto)
+  - Product handle is in the built-in bestseller handle list
+  - Optional force=true
+
+  Excluded handles never show the badge (overrides tags, hardcoded list, and force).
+  Homepage "Best Sellers" overlay for PEA / Magnesio / Kit is ONLY in
+  sections/sg-home-split-hero.liquid (block setting show_best_sellers_badge).
+
+  Outputs: "true" or blank (capture with strip).
+
+  @param {product} product - Shopify product
+  @param {boolean} [force] - Force show
+{%- enddoc -%}
+
+{%- liquid
+  assign sg_is_bestseller = false
+  assign sg_bestseller_excluded = false
+
+  if product != blank
+    assign exclude_handles = 'pea-1200-complex-stick,pea-1200-complex,pea-complex-1200,pea-1200,pea-complex,magnesio-regio-donna,bioklory-crema-solare-spf-30,kit-intestino-infiammato' | split: ','
+    for h in exclude_handles
+      assign h_clean = h | strip
+      if product.handle == h_clean
+        assign sg_bestseller_excluded = true
+        break
+      endif
+    endfor
+  endif
+
+  unless sg_bestseller_excluded
+    if force == true or force == 'true'
+      assign sg_is_bestseller = true
+    endif
+
+    if product != blank and sg_is_bestseller == false
+      for tag in product.tags
+        assign tag_down = tag | downcase | strip
+        if tag_down == 'bestseller' or tag_down == 'best-seller' or tag_down == 'best seller' or tag_down == 'piu-venduto' or tag_down == 'più venduto' or tag_down == 'piu venduto'
+          assign sg_is_bestseller = true
+          break
+        endif
+      endfor
+    endif
+  endunless
+
+  if sg_is_bestseller
+    echo 'true'
+  endif
+-%}

@@ -1,0 +1,28 @@
+{%- doc -%}
+  Mobile drawer child links for Shop macro-categories.
+{%- enddoc -%}
+
+{% liquid
+  assign sg_category_handles = 'sonno-mente-energia,difese-protezione-respiratorie,intestino-digestione-metabolismo,movimento-dolori-recupero,benessere-ormonale-intimo,bellezza-cura-persona,mondo-zen' | split: ','
+  assign sg_category_titles = 'Sonno, Mente ed Energia|Difese, Protezione e Vie Respiratorie|Intestino, Digestione e Metabolismo|Movimento, Dolori e Recupero|Benessere Ormonale e Intimo|Bellezza e Cura della Persona|Mondo Zen' | split: '|'
+%}
+
+{% for handle in sg_category_handles %}
+  {% assign link_title = sg_category_titles[forloop.index0] %}
+  {% capture link_url %}{% render 'sg-collection-nav-url', handle: handle %}{% endcapture %}
+  <li
+    class="menu-drawer__list-item"
+    style="--menu-drawer-animation-index: {{ forloop.index }};"
+  >
+    <a
+      id="HeaderDrawer-shop-{{ handle }}"
+      href="{{ link_url | strip }}"
+      class="menu-drawer__menu-item menu-drawer__menu-item--child menu-drawer__animated-element focus-inset"
+    >
+      <span class="menu-drawer__menu-item-icon" aria-hidden="true">
+        {% render 'category-icons', category: handle, size: 20, label: link_title, decorative: true %}
+      </span>
+      <span class="menu-drawer__menu-item-text wrap-text">{{ link_title | escape }}</span>
+    </a>
+  </li>
+{% endfor %}

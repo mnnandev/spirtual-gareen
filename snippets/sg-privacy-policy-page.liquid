@@ -1,0 +1,24 @@
+{% liquid
+  assign privacy_heading_default = 'spiritual_green.legal_privacy_policy' | t
+%}
+{% render 'sg-legal-page-shell', active_tab: 'privacy', heading: heading, default: 'info@spiritualgreen.it', last_updated: last_updated, intro_heading: intro_heading, contact_email: contact_email, content_snippet: 'sg-legal-spiritual-content' %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: |-
+    {% render 'sg-legal-page-shell',
+      active_tab: 'privacy',
+      heading: heading | default: privacy_heading_default,
+      last_updated: last_updated | default: 'Ultimo aggiornamento: 23 gennaio 2026',
+      intro_heading: intro_heading | default: 'Introduzione',
+      contact_email: contact_email | default: 'info@spiritualgreen.it',
+      content_snippet: 'sg-legal-spiritual-content'
+    %}
+  to: "{% render 'sg-legal-page-shell', active_tab: 'privacy', heading: heading, default:
+    'info@spiritualgreen.it', last_updated: last_updated, intro_heading: intro_heading,
+    contact_email: contact_email, content_snippet: 'sg-legal-spiritual-content' %}"
+  position: 91..336
+{% endcomment %}

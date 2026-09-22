@@ -1,0 +1,39 @@
+{%- doc -%}
+  Renders Spiritual Green legal page shell for virtual/fallback routes.
+
+  @param {string} legal_type - terms | cookie | refund | privacy
+  @param {string} [contact_email] - Contact email override
+{%- enddoc -%}
+
+{% liquid
+  assign legal_type = legal_type | default: 'terms'
+  assign email = contact_email | default: 'info@spiritualgreen.it'
+  assign updated_line = 'Ultimo aggiornamento: Giugno 2026'
+
+  case legal_type
+    when 'cookie'
+      assign shell_heading = 'spiritual_green.legal_cookie_policy' | t
+      assign shell_tab = 'cookie'
+      assign shell_snippet = 'sg-legal-cookie-content'
+    when 'refund'
+      assign shell_heading = 'spiritual_green.legal_refund' | t
+      assign shell_tab = 'refund'
+      assign shell_snippet = 'sg-legal-refund-content'
+    when 'privacy'
+      assign shell_heading = 'spiritual_green.legal_privacy_policy' | t
+      assign shell_tab = 'privacy'
+      assign shell_snippet = 'sg-legal-spiritual-content'
+    else
+      assign shell_heading = 'spiritual_green.legal_terms' | t
+      assign shell_tab = 'terms'
+      assign shell_snippet = 'sg-legal-terms-content'
+  endcase
+%}
+
+{% render 'sg-legal-page-shell',
+  active_tab: shell_tab,
+  heading: shell_heading,
+  last_updated: updated_line,
+  contact_email: email,
+  content_snippet: shell_snippet
+%}

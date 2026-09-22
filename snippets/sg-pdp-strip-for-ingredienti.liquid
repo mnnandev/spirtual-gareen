@@ -1,0 +1,66 @@
+{%- doc -%}
+  Keep ingredienti-only HTML: remove description, benefits, modo d'uso, avvertenze,
+  titolazione, and legacy nested accordion blocks that belong in other PDP tabs.
+
+  @param {string} html - Source HTML
+{%- enddoc -%}
+
+{%- liquid
+  assign working = html | default: '' | strip
+
+  if working == blank
+    echo ''
+  else
+    assign strip_keys = 'benefici|modo_duso|avvertenze|titolazione|descrizione' | split: '|'
+
+    for strip_key in strip_keys
+      assign section_markers = '' | split: '|'
+
+      case strip_key
+        when 'benefici'
+          assign section_markers = '<h4>Benefici</h4>|<h3>Benefici</h3>|<strong>Benefici</strong>|Benefici:|BENEFICI:|Benefits:|BENEFITS:|<h4>Benefits</h4>|<h3>Benefits</h3>|<strong>Benefits</strong>' | split: '|'
+        when 'modo_duso'
+          assign section_markers = "<h4>Modo d'uso</h4>|<h3>Modo d'uso</h3>|<strong>Modo d'uso</strong>|modo-duso-prodotto|Modo d'uso|Modo d uso|MODI D'USO|MODI D USO|Directions for use|DIRECTIONS FOR USE|How to use|HOW TO USE|Come si usa|COME SI USA|<h4>How to use</h4>|<h3>How to use</h3>|<strong>How to use</strong>" | split: '|'
+        when 'avvertenze'
+          assign section_markers = '<h4>Avvertenze</h4>|<h3>Avvertenze</h3>|<strong>Avvertenze</strong>|Avvertenze:|AVVERTENZE:|Warnings:|WARNINGS:|<h4>Warnings</h4>|<h3>Warnings</h3>|<strong>Warnings</strong>' | split: '|'
+        when 'titolazione'
+          assign section_markers = '<h4>Titolazione</h4>|<h3>Titolazione</h3>|<strong>Titolazione</strong>|Titolazione:|TITOLAZIONE:|Titration:|TITRATION:|<h4>Titration</h4>|<h3>Titration</h3>' | split: '|'
+        when 'descrizione'
+          assign section_markers = '<h4>Descrizione</h4>|<h3>Descrizione</h3>|<strong>Descrizione</strong>|Descrizione:|DESCRIZIONE:|<h4>Description</h4>|<h3>Description</h3>|<strong>Description</strong>|Description:|DESCRIPTION:' | split: '|'
+      endcase
+
+      for marker in section_markers
+        if working contains marker
+          assign before_block = working | split: marker | first
+          assign after_marker = working | split: marker | last
+          assign tail = ''
+          assign end_markers = '<h4>Ingredienti|<h4>INGREDIENTI|<h4>Ingredients|<h4>INGREDIENTS|Nutritional Information|NUTRITIONAL INFORMATION|Informazioni nutrizionali|<h4>Modo d|<h4>Avvertenze|<h4>Warnings|<h4>Benefici|<h4>Benefits|<h4>Titolazione|<h4>Description|<h4>Descrizione|<h4>Contenuto|Contenuto</h4>' | split: '|'
+
+          for end_marker in end_markers
+            if tail == blank and after_marker contains end_marker
+              assign end_parts = after_marker | split: end_marker
+              assign tail = end_parts | last
+              if tail != blank
+                assign tail = end_marker | append: tail
+              endif
+            endif
+          endfor
+
+          assign working = before_block | append: tail | strip
+          break
+        endif
+      endfor
+    endfor
+
+    assign description_cut_markers = 'descrizione-prodotto|<h4>Descrizione</h4>|<h4>DESCRIZIONE</h4>|<h3>Descrizione</h3>|<h3>DESCRIZIONE</h3>|<h2>Descrizione</h2>|<h2>DESCRIZIONE</h2>|<strong>Descrizione</strong>|<strong>DESCRIZIONE</strong>|Descrizione:|DESCRIZIONE:|<h4>Description</h4>|<h4>DESCRIPTION</h4>|<h3>Description</h3>|<h3>DESCRIPTION</h3>|<h2>Description</h2>|<h2>DESCRIPTION</h2>|<strong>Description</strong>|<strong>DESCRIPTION</strong>|Description:|DESCRIPTION:|<summary>Description|<summary>DESCRIPTION|>Description</summary>|>DESCRIPTION</summary>' | split: '|'
+
+    for cut_marker in description_cut_markers
+      if working contains cut_marker
+        assign working = working | split: cut_marker | first | strip
+        break
+      endif
+    endfor
+
+    echo working
+  endif
+-%}

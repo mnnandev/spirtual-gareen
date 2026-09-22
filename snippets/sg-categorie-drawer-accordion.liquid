@@ -1,0 +1,74 @@
+{%- doc -%}
+  Mobile drawer — Categorie accordion with nested subcategory panels.
+{%- enddoc -%}
+
+{% liquid
+  assign sg_category_handles = 'sonno-mente-energia,difese-protezione-respiratorie,intestino-digestione-metabolismo,movimento-dolori-recupero,benessere-ormonale-intimo,bellezza-cura-persona,mondo-zen' | split: ','
+  assign sg_category_titles = 'Sonno, Mente ed Energia|Difese, Protezione e Vie Respiratorie|Intestino, Digestione e Metabolismo|Movimento, Dolori e Recupero|Benessere Ormonale e Intimo|Bellezza e Cura della Persona|Mondo Zen' | split: '|'
+%}
+
+<ul
+  class="menu-drawer__menu menu-drawer__menu--childlist menu-drawer__animated-element details-content sg-categorie-drawer"
+  role="list"
+  tabindex="-1"
+>
+  {% for handle in sg_category_handles %}
+    {% assign title = sg_category_titles[forloop.index0] %}
+    {% capture parent_url %}{% render 'sg-collection-nav-url', handle: handle %}{% endcapture %}
+    {% capture sub_handles_raw %}{% render 'sg-collection-subcategory-meta', parent_handle: handle, output: 'handles' %}{% endcapture %}
+    {% capture sub_titles_raw %}{% render 'sg-collection-subcategory-meta', parent_handle: handle, output: 'titles' %}{% endcapture %}
+    {% assign sub_handles = sub_handles_raw | strip | split: ',' %}
+    {% assign sub_titles = sub_titles_raw | strip | split: '|' %}
+
+    <li
+      class="menu-drawer__list-item sg-categorie-drawer__item"
+      style="--menu-drawer-animation-index: {{ forloop.index }};"
+    >
+      {% if sub_handles.size > 0 %}
+        <details class="sg-categorie-drawer__category" id="Details-drawer-categorie-{{ handle }}">
+          <summary class="menu-drawer__menu-item menu-drawer__menu-item--child menu-drawer__animated-element focus-inset">
+            <span class="menu-drawer__menu-item-icon" aria-hidden="true">
+              {% render 'category-icons', category: handle, size: 20, label: title, decorative: true %}
+            </span>
+            <span class="menu-drawer__menu-item-text wrap-text">{{ title | escape }}</span>
+            <span class="svg-wrapper icon-plus">
+              {{- 'icon-plus.svg' | inline_asset_content -}}
+            </span>
+          </summary>
+          <ul class="menu-drawer__menu menu-drawer__menu--grandchildlist sg-categorie-drawer__sublist" role="list">
+            {% for sub_handle in sub_handles %}
+              {% assign sub_title = sub_titles[forloop.index0] %}
+              {% capture sub_url %}{% render 'sg-subcategory-nav-url', parent_handle: handle, sub_handle: sub_handle %}{% endcapture %}
+              <li class="menu-drawer__list-item">
+                <a
+                  href="{{ sub_url | strip }}"
+                  class="menu-drawer__menu-item menu-drawer__menu-item--grandchild menu-drawer__animated-element focus-inset"
+                >
+                  <span class="menu-drawer__menu-item-text wrap-text">{{ sub_title | escape }}</span>
+                </a>
+              </li>
+            {% endfor %}
+            <li class="menu-drawer__list-item">
+              <a
+                href="{{ parent_url | strip }}"
+                class="menu-drawer__menu-item menu-drawer__menu-item--grandchild menu-drawer__menu-item--view-all menu-drawer__animated-element focus-inset"
+              >
+                <span class="menu-drawer__menu-item-text wrap-text">{{ 'spiritual_green.nav.view_all_category' | t: category: title }}</span>
+              </a>
+            </li>
+          </ul>
+        </details>
+      {% else %}
+        <a
+          href="{{ parent_url | strip }}"
+          class="menu-drawer__menu-item menu-drawer__menu-item--child menu-drawer__animated-element focus-inset"
+        >
+          <span class="menu-drawer__menu-item-icon" aria-hidden="true">
+            {% render 'category-icons', category: handle, size: 20, label: title, decorative: true %}
+          </span>
+          <span class="menu-drawer__menu-item-text wrap-text">{{ title | escape }}</span>
+        </a>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>

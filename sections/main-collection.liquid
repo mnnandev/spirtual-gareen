@@ -1,0 +1,422 @@
+
+
+<script
+  src="{{ 'results-list.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+
+{% javascript %}
+  const url = new URL(window.location.href);
+  if (url.hash) {
+    document.addEventListener(
+      'DOMContentLoaded',
+      () => {
+        const card = document.getElementById(url.hash.slice(1));
+        if (card) {
+          card.scrollIntoView({ behavior: 'instant' });
+        }
+      },
+      { once: true }
+    );
+  }
+{% endjavascript %}
+
+{% comment %} We always render this full-width, as the child blocks have width: page/full settings {% endcomment %}
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<results-list
+  id="collection-products"
+  class="section product-grid-container color-{{ section.settings.color_scheme }}"
+  style="--padding-block-start: {{ section.settings.padding-block-start }}px; --padding-block-end: {{ section.settings.padding-block-end }}px;"
+  section-id="{{ section.id }}"
+  {% if section.settings.enable_infinite_scroll %}
+    infinite-scroll="true"
+  {% endif %}
+>
+  {% render 'skip-to-content-link', href: '#ResultsList', text: 'accessibility.skip_to_results_list' %}
+
+  <div
+    class="collection-wrapper grid gap-style{% if section.settings.product_grid_width == 'full-width' %} collection-wrapper--grid-full-width{% endif %}"
+  >
+    {% assign products_per_page = 24 %}
+
+    {% if section.settings.enable_infinite_scroll == false %}
+      {% assign products_per_page = section.settings.products_per_page %}
+    {% endif %}
+
+    {%- liquid
+      capture sg_normalized_handle_raw
+        render 'sg-normalize-macro-handle', handle: collection.handle
+      endcapture
+      assign sg_normalized_handle = sg_normalized_handle_raw | strip
+
+      assign sg_parent_handles = 'sonno-mente-energia,difese-protezione-respiratorie,intestino-digestione-metabolismo,movimento-dolori-recupero,benessere-ormonale-intimo,bellezza-cura-persona,mondo-zen' | split: ','
+      assign sg_is_parent_category = false
+      for sg_parent_handle in sg_parent_handles
+        if sg_normalized_handle == sg_parent_handle
+          assign sg_is_parent_category = true
+          break
+        endif
+      endfor
+
+      assign sg_use_macro_merge = false
+      if sg_is_parent_category and current_tags == blank
+        assign sg_use_macro_merge = true
+      endif
+
+      capture sg_price_filter_active_raw
+        render 'sg-collection-price-filter-active', collection: collection
+      endcapture
+      assign sg_price_filter_active_raw = sg_price_filter_active_raw | strip
+      assign sg_price_filter_active = false
+      if sg_price_filter_active_raw == 'true'
+        assign sg_price_filter_active = true
+      endif
+
+      assign sg_results_size = collection.products_count
+
+      if sg_use_macro_merge
+        capture sg_merged_count_raw
+          render 'sg-macro-merged-product-count', parent_handle: sg_normalized_handle, collection: collection
+        endcapture
+        assign sg_merged_count = sg_merged_count_raw | strip | plus: 0
+        assign sg_results_size = sg_merged_count
+      endif
+    -%}
+
+    {% content_for 'block',
+      type: 'filters',
+      id: 'filters',
+      results: collection,
+      results_size: sg_results_size
+    %}
+
+    {% if sg_use_macro_merge %}
+      {% capture children %}
+        {% render 'sg-macro-merged-product-list',
+          parent_handle: sg_normalized_handle,
+          section: section,
+          collection: collection
+        %}
+      {% endcapture %}
+
+      {% render 'product-grid',
+        section: section,
+        children: children,
+        products: collection.products,
+        sg_product_count_override: sg_merged_count,
+        sg_hide_pagination: true,
+        enable_infinite_scroll: false,
+        enable_load_more_button: false
+      %}
+    {% else %}
+    {% paginate collection.products by products_per_page %}
+      {% capture children %}
+        {% for product in collection.products %}
+          {% if sg_price_filter_active %}
+            {% capture sg_in_range_raw %}
+              {% render 'sg-product-in-price-range', product: product, collection: collection %}
+            {% endcapture %}
+            {% assign sg_in_range = sg_in_range_raw | strip %}
+            {% unless sg_in_range == 'true' %}
+              {% continue %}
+            {% endunless %}
+          {% endif %}
+          <li
+            id="{{ section.id }}-{{ product.id }}"
+            class="product-grid__item product-grid__item--{{ forloop.index0 }}"
+            data-page="{{ paginate.current_page }}"
+            data-product-id="{{ product.id }}"
+            ref="cards[]"
+          >
+            <product-card class="product-card sg-collection-product-card-wrap" data-product-id="{{ product.id }}">
+              <div class="product-card__content product-grid__card spacing-style border-style">
+                {% render 'sg-collection-product-card', product: product, settings: section.settings %}
+              </div>
+            </product-card>
+          </li>
+        {% endfor %}
+      {% endcapture %}
+
+      {%- liquid
+        assign sg_grid_count = 0
+        if sg_price_filter_active
+          assign sg_grid_count = collection.products_count
+          assign sg_children_stripped = children | strip
+          if sg_children_stripped == blank
+            assign sg_grid_count = 0
+          endif
+        endif
+      -%}
+
+      {% if sg_price_filter_active %}
+        {% render 'product-grid',
+          section: section,
+          children: children,
+          products: collection.products,
+          paginate: paginate,
+          sg_product_count_override: sg_grid_count,
+          enable_infinite_scroll: section.settings.enable_infinite_scroll,
+          enable_load_more_button: section.settings.enable_load_more_button,
+          load_more_label: section.settings.load_more_label
+        %}
+      {% else %}
+        {% render 'product-grid',
+          section: section,
+          children: children,
+          products: collection.products,
+          paginate: paginate,
+          enable_infinite_scroll: section.settings.enable_infinite_scroll,
+          enable_load_more_button: section.settings.enable_load_more_button,
+          load_more_label: section.settings.load_more_label
+        %}
+      {% endif %}
+
+    {% endpaginate %}
+    {% endif %}
+  </div>
+</results-list>
+
+{% schema %}
+{
+  "name": "t:names.collection_container",
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout_type",
+      "label": "t:settings.type",
+      "options": [
+        {
+          "value": "grid",
+          "label": "t:options.grid"
+        },
+        {
+          "value": "organic",
+          "label": "t:options.editorial"
+        }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "select",
+      "id": "product_card_size",
+      "label": "t:settings.card_size",
+      "options": [
+        {
+          "value": "small",
+          "label": "t:options.small"
+        },
+        {
+          "value": "medium",
+          "label": "t:options.medium"
+        },
+        {
+          "value": "large",
+          "label": "t:options.large"
+        },
+        {
+          "value": "extra-large",
+          "label": "t:options.extra_large"
+        }
+      ],
+      "default": "medium",
+      "visible_if": "{{ section.settings.layout_type == 'grid' }}"
+    },
+    {
+      "type": "select",
+      "id": "mobile_product_card_size",
+      "label": "t:settings.mobile_card_size",
+      "options": [
+        {
+          "value": "small",
+          "label": "t:options.small"
+        },
+        {
+          "value": "large",
+          "label": "t:options.large"
+        }
+      ],
+      "default": "small"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_infinite_scroll",
+      "label": "t:settings.auto_load_products",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "t:settings.products_per_page",
+      "min": 8,
+      "max": 36,
+      "step": 4,
+      "default": 24,
+      "visible_if": "{{ section.settings.enable_infinite_scroll == false }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_load_more_button",
+      "label": "Show more button (loads next page)",
+      "default": false,
+      "visible_if": "{{ section.settings.enable_infinite_scroll == false }}"
+    },
+    {
+      "type": "text",
+      "id": "load_more_label",
+      "label": "Show more button label",
+      "default": "Mostra di più",
+      "visible_if": "{{ section.settings.enable_infinite_scroll == false and section.settings.enable_load_more_button }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "select",
+      "id": "product_grid_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "centered",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "centered"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width_on_mobile",
+      "label": "t:settings.full_width_on_mobile",
+      "default": true,
+      "visible_if": "{{ section.settings.product_grid_width != 'full-width' }}"
+    },
+    {
+      "type": "range",
+      "id": "columns_gap_horizontal",
+      "label": "t:settings.horizontal_gap",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "columns_gap_vertical",
+      "label": "t:settings.vertical_gap",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "t:content.section_layout"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "SG product cards"
+    },
+    {
+      "type": "range",
+      "id": "description_limit",
+      "label": "Description length",
+      "min": 60,
+      "max": 280,
+      "step": 10,
+      "default": 140
+    },
+    {
+      "type": "checkbox",
+      "id": "show_new_badge",
+      "label": "Show New badge for tagged products",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "new_label",
+      "label": "New badge label",
+      "default": "Novità"
+    },
+    {
+      "type": "text",
+      "id": "chip_text",
+      "label": "Code chip (optional)"
+    },
+    {
+      "type": "text",
+      "id": "bundle_badge_prefix",
+      "label": "Sale badge prefix",
+      "default": "Pacchetto + Risparmia"
+    },
+    {
+      "type": "text",
+      "id": "learn_label",
+      "label": "Learn more label",
+      "default": "Scopri di più"
+    },
+    {
+      "type": "text",
+      "id": "cart_label",
+      "label": "Add to cart label",
+      "default": "Aggiungi al carrello"
+    }
+  ],
+  "presets": []
+}
+{% endschema %}

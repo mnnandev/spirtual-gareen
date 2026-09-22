@@ -1,0 +1,93 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "sg_shop_hero": {
+      "type": "sg-shop-hero",
+      "settings": {
+        "background_asset": "sg-erboristeria-hero-bg.png",
+        "overlay_style": "erboristeria",
+        "heading": "Erboristeria Tradizionale",
+        "subheading": "Piante officinali e olii essenziali",
+        "description": "<p>Prodotti naturali e consulenze specialistiche per il tuo benessere quotidiano. Scopri la nostra selezione di erbe, integratori e trattamenti personalizzati.</p>",
+        "show_cta": false,
+        "cta_label": "Scopri la selezione",
+        "cta_link": "",
+        "banner_height": 70,
+        "text_alignment": "left"
+      }
+    },
+    "macro_categories": {
+      "type": "macro-categories",
+      "settings": {
+        "heading": "Le Nostre Categorie",
+        "subheading": "Trova ciò di cui hai bisogno"
+      }
+    },
+    "main": {
+      "type": "main-collection",
+      "blocks": {
+        "filters": {
+          "type": "filters",
+          "static": true,
+          "settings": {
+            "enable_filtering": false,
+            "filter_style": "horizontal",
+            "filter_width": "centered",
+            "text_label_case": "default",
+            "show_swatch_label": false,
+            "show_filter_label": false,
+            "enable_sorting": true,
+            "enable_grid_density": true,
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "padding-block-start": 8,
+            "padding-block-end": 8,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0,
+            "facets_margin_bottom": 8,
+            "facets_margin_right": 20
+          },
+          "blocks": {}
+        }
+      },
+      "settings": {
+        "layout_type": "grid",
+        "product_card_size": "large",
+        "mobile_product_card_size": "small",
+        "enable_infinite_scroll": false,
+        "products_per_page": 12,
+        "enable_load_more_button": false,
+        "load_more_label": "Mostra di più",
+        "product_grid_width": "full-width",
+        "full_width_on_mobile": true,
+        "columns_gap_horizontal": 24,
+        "columns_gap_vertical": 24,
+        "padding-inline-start": 0,
+        "padding-inline-end": 0,
+        "color_scheme": "scheme-6",
+        "padding-block-start": 24,
+        "padding-block-end": 48,
+        "description_limit": 110,
+        "show_new_badge": true,
+        "new_label": "Novità",
+        "chip_text": "",
+        "bundle_badge_prefix": "Pacchetto + Risparmia",
+        "learn_label": "Scopri di più",
+        "cart_label": "Aggiungi al carrello"
+      }
+    }
+  },
+  "order": [
+    "sg_shop_hero",
+    "macro_categories",
+    "main"
+  ]
+}

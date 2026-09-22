@@ -1,0 +1,106 @@
+{%- comment -%}
+  Single review card for SG reviews list.
+  @param review_id {string} required
+  @param author {string}
+  @param country {string}
+  @param verified {boolean}
+  @param date_display {string}
+  @param date {string} ISO date for sorting
+  @param rating {number}
+  @param text {string}
+  @param show_product_image {boolean}
+  @param helpful_yes {number}
+  @param helpful_no {number}
+  @param review_image {image}
+  @param verified_label {string}
+  @param helpful_label {string}
+  @param shopify_attributes {string} optional
+{%- endcomment -%}
+
+{%- liquid
+  assign review_has_media = false
+  if show_product_image and review_image != blank
+    assign review_has_media = true
+  endif
+  assign star_rating = rating | default: 5 | round
+-%}
+
+<article
+  class="sg-reviews-list__item"
+  data-sg-review-item
+  data-review-id="{{ review_id }}"
+  data-review-text="{{ text | strip_html | escape }}"
+  data-rating="{{ rating | default: 5 }}"
+  data-date="{{ date }}"
+  data-verified="{% if verified %}1{% else %}0{% endif %}"
+  data-has-media="{% if review_has_media %}1{% else %}0{% endif %}"
+  {{ shopify_attributes }}
+>
+  <div class="sg-reviews-list__sidebar">
+    <p class="sg-reviews-list__name">
+      {{ author -}}
+      <span class="sg-reviews-list__country">{{ country }}</span>
+    </p>
+    {% if verified %}
+      <p class="sg-reviews-list__verified">
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" focusable="false">
+          <circle cx="7" cy="7" r="7" fill="#5aad5a"/>
+          <path d="M4 7.2L6.1 9.2L10 5.2" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {{ verified_label }}
+      </p>
+    {% endif %}
+  </div>
+
+  <div class="sg-reviews-list__main">
+    <div class="sg-reviews-list__rating-row">
+      <div class="sg-reviews-list__stars" aria-label="{{ star_rating }} su 5">
+        {%- for i in (1..5) -%}
+          <svg class="sg-reviews-list__star" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
+            <path
+              fill="{% if i <= star_rating %}#eeb44f{% else %}#e8e4dc{% endif %}"
+              d="M10 1.5l2.47 5.01 5.53.8-4 3.9.94 5.5L10 14.2l-4.94 2.6.94-5.5-4-3.9 5.53-.8L10 1.5z"
+            />
+          </svg>
+        {%- endfor -%}
+      </div>
+      <time class="sg-reviews-list__date" datetime="{{ date }}">{{ date_display }}</time>
+    </div>
+
+    <p class="sg-reviews-list__text">
+      {%- capture clean_review_text -%}
+        {%- render 'sg-sanitize-line-breaks', text: text, mode: 'plain' -%}
+      {%- endcapture -%}
+      {{- clean_review_text | strip -}}
+    </p>
+
+    {% if review_has_media %}
+      <div class="sg-reviews-list__thumb">
+        {{
+          review_image
+          | image_url: width: 200
+          | image_tag:
+            loading: 'lazy',
+            widths: '96, 120, 200',
+            sizes: '96px',
+            class: 'sg-reviews-list__thumb-img',
+            alt: product.title
+        }}
+      </div>
+    {% endif %}
+
+    <footer class="sg-reviews-list__helpful">
+      <span class="sg-reviews-list__helpful-label">{{ helpful_label }}</span>
+      <div class="sg-reviews-list__votes" data-sg-votes>
+        <button type="button" class="sg-reviews-list__vote" data-sg-vote="yes" aria-label="Utile">
+          <span class="sg-reviews-list__vote-icon">{% render 'sg-review-thumb-icon', direction: 'up' %}</span>
+          <span class="sg-reviews-list__vote-count" data-sg-vote-number>{{ helpful_yes | default: 0 }}</span>
+        </button>
+        <button type="button" class="sg-reviews-list__vote" data-sg-vote="no" aria-label="Non utile">
+          <span class="sg-reviews-list__vote-icon">{% render 'sg-review-thumb-icon', direction: 'down' %}</span>
+          <span class="sg-reviews-list__vote-count" data-sg-vote-number>{{ helpful_no | default: 0 }}</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+</article>

@@ -1,0 +1,23 @@
+
+{% render 'sg-product-descrizione', empty_message: block.settings.empty_message %}
+
+{% schema %}
+{
+  "name": "SG Product Descrizione",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "empty_message",
+      "label": "Empty state message",
+      "default": "Descrizione non disponibile."
+    }
+  ],
+  "presets": [
+    {
+      "name": "SG Product Descrizione",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

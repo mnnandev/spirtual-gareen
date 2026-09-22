@@ -1,0 +1,14 @@
+{% doc %}
+  Returns "1" when a navigation link should be excluded from legacy menu fallbacks.
+
+  @param {link} link - Shopify navigation link object
+{% enddoc %}
+
+{% liquid
+  assign link_title_down = link.title | strip | downcase
+  if link_title_down == 'prodotti' or link_title_down contains 'prodotti' or link.handle == 'prodotti' or link.handle contains 'prodotti'
+    echo '1'
+  elsif link_title_down contains 'visite specialistiche' or link.handle contains 'visite-specialistiche'
+    echo '1'
+  endif
+%}

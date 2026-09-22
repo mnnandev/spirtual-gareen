@@ -1,0 +1,15 @@
+{%- doc -%}
+  Theme page URL with sensible fallback.
+
+  @param {string} page_handle - Shopify page handle
+{%- enddoc -%}
+
+{% liquid
+  assign target_page = pages[page_handle]
+
+  if target_page != blank
+    echo target_page.url
+  else
+    echo '/pages/' | append: page_handle
+  endif
+%}

@@ -1,0 +1,30 @@
+{%- doc -%}
+  Removes CSV/import line-break artifacts (/n, \n) from displayed text.
+
+  @param {string} text - Raw text to clean
+  @param {string} [mode] - html (default), plain, or title
+{%- enddoc -%}
+
+{%- liquid
+  assign mode = mode | default: 'html'
+  assign cleaned = text | default: ''
+  assign nl_literal = '\' | append: 'n'
+
+  if cleaned != blank
+    assign cleaned = cleaned | replace: nl_literal, ' ' | replace: '/n', ' ' | replace: '  ', ' ' | strip
+
+    case mode
+      when 'plain'
+        assign cleaned = cleaned | newline_to_br | replace: '<br />', ' ' | replace: '<br>', ' ' | replace: '  ', ' ' | strip
+        capture artifact_clean
+          render 'sg-sanitize-display-artifacts', text: cleaned
+        endcapture
+        assign cleaned = artifact_clean | strip
+      when 'title'
+        assign cleaned = cleaned | strip
+      else
+        assign cleaned = cleaned | newline_to_br | strip
+    endcase
+  endif
+-%}
+{{- cleaned -}}

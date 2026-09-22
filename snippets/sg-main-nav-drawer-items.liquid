@@ -1,0 +1,116 @@
+{%- doc -%}
+
+  Spiritual Green — mobile drawer navigation.
+
+{%- enddoc -%}
+
+
+
+{% liquid
+
+  capture sg_nav_keys_raw
+
+    render 'sg-main-nav-config', output: 'keys'
+
+  endcapture
+
+  capture sg_nav_translation_keys_raw
+
+    render 'sg-main-nav-config', output: 'translation_keys'
+
+  endcapture
+
+  capture sg_nav_dropdown_keys_raw
+
+    render 'sg-main-nav-config', output: 'dropdown_keys'
+
+  endcapture
+
+  assign sg_nav_keys = sg_nav_keys_raw | strip | split: '|'
+
+  assign sg_nav_translation_keys = sg_nav_translation_keys_raw | strip | split: '|'
+
+  assign sg_nav_dropdown_keys = sg_nav_dropdown_keys_raw | strip | split: '|'
+
+  assign animation_index = 0
+
+%}
+
+
+
+{% for nav_key in sg_nav_keys %}
+
+  {% assign label = sg_nav_translation_keys[forloop.index0] | t %}
+
+  {% assign animation_index = animation_index | plus: 1 %}
+
+  {% capture nav_url %}{% render 'sg-main-nav-url', key: nav_key %}{% endcapture %}
+
+  {% assign nav_url = nav_url | strip %}
+
+  {% assign is_categorie = false %}
+
+  {% if sg_nav_dropdown_keys contains nav_key %}
+
+    {% assign is_categorie = true %}
+
+  {% endif %}
+
+
+
+  <li
+
+    style="--menu-drawer-animation-index: {{ animation_index }};"
+
+    class="menu-drawer__list-item--flat{% if block.settings.drawer_dividers %} menu-drawer__list-item--divider{% endif %}"
+
+  >
+
+    {% if is_categorie %}
+
+      <details id="Details-menu-drawer-sg-categorie" class="sg-categorie-drawer__root">
+
+        <summary
+
+          id="HeaderDrawer-categorie"
+
+          class="menu-drawer__menu-item menu-drawer__menu-item--mainlist menu-drawer__animated-element focus-inset"
+
+        >
+
+          <span class="menu-drawer__menu-item-text wrap-text">{{ label | escape }}</span>
+
+          <span class="svg-wrapper icon-plus">
+
+            {{- 'icon-plus.svg' | inline_asset_content -}}
+
+          </span>
+
+        </summary>
+
+        {% render 'sg-categorie-drawer-accordion' %}
+
+      </details>
+
+    {% else %}
+
+      <a
+
+        id="HeaderDrawer-{{ nav_key }}"
+
+        href="{{ nav_url }}"
+
+        class="menu-drawer__menu-item menu-drawer__menu-item--mainlist menu-drawer__animated-element focus-inset"
+
+      >
+
+        <span class="menu-drawer__menu-item-text wrap-text">{{ label | escape }}</span>
+
+      </a>
+
+    {% endif %}
+
+  </li>
+
+{% endfor %}
+

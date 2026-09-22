@@ -1,0 +1,124 @@
+{%- doc -%}
+  Spiritual Green — shop category metadata (single source of truth).
+
+  @param {string} [handle] - Category collection handle
+  @param {string} [search_terms] - Raw search query to resolve a category
+  @param {string} output - handle | title | subtitle | description | overline | search_query | background_asset | circle_image_url
+
+  Titles may include `~` to force a heading line break in the shop hero.
+{%- enddoc -%}
+
+{% liquid
+  comment
+    UI language follows the real Shopify locale:
+    it → Italian, en → English.
+  endcomment
+  assign sg_raw_locale = request.locale.iso_code | default: localization.language.iso_code | default: 'it'
+  assign sg_ui_lang = sg_raw_locale
+  if sg_ui_lang != 'en' and sg_ui_lang != 'it'
+    assign sg_ui_lang = 'it'
+  endif
+
+  assign category_handles = 'sonno-mente-energia,difese-protezione-respiratorie,intestino-digestione-metabolismo,movimento-dolori-recupero,benessere-ormonale-intimo,bellezza-cura-persona,mondo-zen' | split: ','
+
+  if sg_ui_lang == 'en'
+    assign category_overlines = 'NATURAL REST|NATURAL DEFENSES|GUT WELLNESS|MOVE & RECOVER|HORMONAL BALANCE|NATURAL BEAUTY|ZEN HARMONY' | split: '|'
+    assign category_titles = 'Sleep, Mind~& Energy|Defenses, Protection &~Respiratory|Gut, Digestion &~Metabolism|Movement, Pain &~Recovery|Hormonal & Intimate~Wellness|Beauty & personal~care|Zen World' | split: '|'
+    assign category_subtitles = 'Sleep better, stress, anxiety and relax, energy, focus and concentration|Immune defenses, nose and throat, allergies, antioxidants|Digestion, bloating, metabolism, detox and purification|Pain, joints, muscles, circulation, sport|Women’s wellness, hormonal balance, urinary tract|Skin, hair and nails, natural perfume and make-up|Home, pets, essential oils, aromatherapy, phytotherapy' | split: '|'
+    assign category_descriptions = '<p>Natural supplements and remedies to sleep better, manage stress and anxiety, and restore everyday energy and focus.</p>|<p>Products to support immune defenses, nose and throat wellness, allergies, and antioxidant protection.</p>|<p>Support for digestion, bloating, metabolism, detox and purification with natural gut-wellness solutions.</p>|<p>Formulas for pain, joints, muscles, circulation and sports recovery, so you can move more freely.</p>|<p>Women’s wellness, hormonal balance and urinary tract support with carefully selected natural products.</p>|<p>Natural cosmetics for skin, hair and nails, plus perfume and make-up for personal care.</p>|<p>Harmony for home and pets, essential oils, aromatherapy and phytotherapy for everyday zen wellness.</p>' | split: '|'
+  else
+    assign category_overlines = 'SONNO NATURALE|DIFESE NATURALI|BENESSERE INTESTINALE|MOVIMENTO E RECUPERO|EQUILIBRIO ORMONALE|BELLEZZA NATURALE|ARMONIA ZEN' | split: '|'
+    assign category_titles = 'Sonno, Mente~ed Energia|Difese, Protezione e~Vie Respiratorie|Intestino, Digestione e~Metabolismo|Movimento, Dolori e~Recupero|Benessere Ormonale~e Intimo|Bellezza e cura~della persona|Mondo Zen' | split: '|'
+    assign category_subtitles = 'Dormire meglio, stress, ansia e relax, energia e concentrazione|Difese immunitarie, naso e gola, allergie, antiossidanti|Digestione, gonfiore, metabolismo e depurazione|Dolori, articolazioni, muscoli, circolazione, sport|Benessere femminile, equilibrio ormonale, vie urinarie|Pelle, capelli e unghie, profumi e trucco naturale|Casa, animali, oli essenziali, aromaterapia, fitoterapia' | split: '|'
+    assign category_descriptions = '<p>Integratori e rimedi naturali per dormire meglio, gestire stress e ansia, ritrovare energia e concentrazione nel quotidiano.</p>|<p>Prodotti per sostenere le difese immunitarie, il benessere di naso e gola, le allergie e la protezione antiossidante.</p>|<p>Supporto per digestione, gonfiore, metabolismo e depurazione con soluzioni naturali per il benessere intestinale.</p>|<p>Formule per dolori, articolazioni, muscoli, circolazione e recupero sportivo, per muoverti con più leggerezza.</p>|<p>Benessere femminile, equilibrio ormonale e supporto per le vie urinarie con prodotti naturali selezionati.</p>|<p>Cosmetici naturali per pelle, capelli e unghie, profumi e trucco per la cura della persona.</p>|<p>Armonia per la casa, gli animali, oli essenziali, aromaterapia e rimedi fitoterapici per un benessere zen quotidiano.</p>' | split: '|'
+  endif
+
+  assign category_search_queries = 'sonno stress ansia magnesio|difese immunitarie allergia naso gola|intestino digestione aloe detox|dolori articolazioni muscoli sport|ormonale femminile salvia|bellezza pelle capelli crema|oli essenziali aromaterapia zen' | split: '|'
+  assign category_backgrounds = 'sg-erboristeria-hero-bg.png,sg-erboristeria-hero-bg.png,sg-erboristeria-hero-bg.png,sg-erboristeria-hero-bg.png,sg-erboristeria-hero-bg.png,sg-erboristeria-hero-bg.png,sg-erboristeria-hero-bg.png' | split: ','
+  comment
+    Circle photos: absolute CDN URLs (store files), shared across homepage + collection pages.
+  endcomment
+  assign category_circle_images = 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/Sonno_mente_ed_energia_1.jpg?v=1787298586|https://cdn.shopify.com/s/files/1/0998/9482/1248/files/DifeseProtezioneeVieRespiratorie.jpg?v=1784698670|https://cdn.shopify.com/s/files/1/0998/9482/1248/files/IntestinoDigestioneMetabolismo.jpg?v=1784698640|https://cdn.shopify.com/s/files/1/0998/9482/1248/files/MovimentoDoloriERecupero.jpg?v=1784698601|https://cdn.shopify.com/s/files/1/0998/9482/1248/files/benessere_ormonale_e_intimo_1.jpg?v=1787298594|https://cdn.shopify.com/s/files/1/0998/9482/1248/files/BellezzaECuraDellaPersona.jpg?v=1784698701|https://cdn.shopify.com/s/files/1/0998/9482/1248/files/MondoZen.jpg?v=1784698612' | split: '|'
+
+  assign resolved_handle = handle | default: ''
+  assign resolved_index = -1
+
+  if resolved_handle != blank
+    capture normalized_handle_raw
+      render 'sg-normalize-macro-handle', handle: resolved_handle
+    endcapture
+    assign resolved_handle = normalized_handle_raw | strip
+
+    for category_handle in category_handles
+      if category_handle == resolved_handle
+        assign resolved_index = forloop.index0
+        break
+      endif
+    endfor
+  endif
+
+  if resolved_index == -1 and search_terms != blank
+    assign search_normalized = search_terms | downcase | strip | replace: '+', ' '
+
+    for category_handle in category_handles
+      assign query = category_search_queries[forloop.index0]
+      if search_normalized == query
+        assign resolved_index = forloop.index0
+        assign resolved_handle = category_handle
+        break
+      endif
+    endfor
+
+    if resolved_index == -1
+      for category_handle in category_handles
+        assign query = category_search_queries[forloop.index0]
+        assign query_first = query | split: ' ' | first
+        if search_normalized contains query_first
+          assign resolved_index = forloop.index0
+          assign resolved_handle = category_handle
+          break
+        endif
+      endfor
+    endif
+  endif
+
+  case output
+    when 'handle'
+      echo resolved_handle
+    when 'title'
+      if resolved_index >= 0
+        echo category_titles[resolved_index]
+      endif
+    when 'subtitle'
+      if resolved_index >= 0
+        echo category_subtitles[resolved_index]
+      endif
+    when 'overline'
+      if resolved_index >= 0
+        echo category_overlines[resolved_index]
+      endif
+    when 'description'
+      if resolved_index >= 0
+        echo category_descriptions[resolved_index]
+      endif
+    when 'search_query'
+      if resolved_index >= 0
+        echo category_search_queries[resolved_index]
+      endif
+    when 'background_asset'
+      if resolved_index >= 0
+        echo category_backgrounds[resolved_index]
+      else
+        echo 'sg-erboristeria-hero-bg.png'
+      endif
+    when 'circle_image_url'
+      if resolved_index >= 0
+        assign circle_src = category_circle_images[resolved_index] | strip
+        if circle_src contains '://'
+          echo circle_src
+        elsif circle_src != blank
+          echo circle_src | asset_url
+        endif
+      endif
+  endcase
+%}

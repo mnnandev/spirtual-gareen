@@ -1,0 +1,72 @@
+{%- doc -%}
+  Clean short intro text for the PDP (above the fold).
+
+  @param {object} product - Current product
+  @param {number} [character_limit] - Max characters
+{%- enddoc -%}
+
+{%- liquid
+  assign current_product = product
+  if current_product == blank and closest.product != blank
+    assign current_product = closest.product
+  endif
+
+  assign char_limit = character_limit | default: 220
+  assign html = current_product.description | default: ''
+  assign mf_descrizione = current_product.metafields.custom.descrizione
+  assign intro = ''
+
+  if mf_descrizione != blank and mf_descrizione.value != blank
+    assign raw_for_intro = mf_descrizione | metafield_tag
+  elsif html != blank
+    assign raw_for_intro = html
+  else
+    assign raw_for_intro = ''
+  endif
+
+  if raw_for_intro != blank
+    capture stripped_intro
+      render 'sg-pdp-strip-for-descrizione', html: raw_for_intro
+    endcapture
+    assign intro = stripped_intro | strip_html | strip
+    assign intro = intro | replace: '  ', ' ' | strip
+
+    capture contenuto_check
+      render 'sg-pdp-extract-contenuto', product: current_product, html: html
+    endcapture
+    assign contenuto_check = contenuto_check | strip
+    if contenuto_check != blank and intro contains contenuto_check
+      assign intro = intro | remove: contenuto_check | strip
+    endif
+
+    # Also strip the pack size that is embedded in the product title (e.g. "300 perle").
+    capture pack_from_title
+      render 'sg-extract-pack-size', title: current_product.title, output: 'pack'
+    endcapture
+    assign pack_from_title = pack_from_title | strip
+    if pack_from_title != blank and intro contains pack_from_title
+      assign intro = intro | replace: pack_from_title, '' | strip
+    endif
+
+    assign intro_prefixes = 'Descrizione|DESCRIZIONE|Description|DESCRIPTION' | split: '|'
+    for intro_prefix in intro_prefixes
+      if intro == intro_prefix
+        assign intro = ''
+      elsif intro contains intro_prefix
+        assign intro_parts = intro | split: intro_prefix
+        assign intro = intro_parts | last | strip
+      endif
+    endfor
+
+    if intro.size > char_limit
+      assign intro = intro | truncate: char_limit, '…'
+    endif
+
+    capture cleaned_intro
+      render 'sg-sanitize-line-breaks', text: intro, mode: 'plain'
+    endcapture
+    assign intro = cleaned_intro | strip
+  endif
+
+  echo intro
+-%}

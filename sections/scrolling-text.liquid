@@ -1,0 +1,51 @@
+{%- comment -%}
+  Placeholder: scrolling text bar.
+  Homepage currently uses the "sg-cert-badges-carousel" section type.
+  Replace the section type in templates/index.json when this section is ready.
+{%- endcomment -%}
+
+<section
+  id="ScrollingText-{{ section.id }}"
+  class="scrolling-text scrolling-text--placeholder"
+  data-section-id="{{ section.id }}"
+>
+  <div class="scrolling-text__container">
+    <p class="scrolling-text__note">Placeholder section — homepage uses Cert badges carousel for the scrolling text bar.</p>
+  </div>
+</section>
+
+{% stylesheet %}
+  .scrolling-text--placeholder {
+    padding: 24px;
+    text-align: center;
+    background: #EFF5ED;
+    border-bottom: 1px solid #D8E8D4;
+  }
+
+  .scrolling-text__note {
+    margin: 0;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 0.875rem;
+    color: #666666;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Scrolling text bar",
+  "tag": "section",
+  "class": "scrolling-text-section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Placeholder — switch templates/index.json to type scrolling-text when this section is ready."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Scrolling text bar",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

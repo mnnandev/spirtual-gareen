@@ -1,0 +1,27 @@
+{%- doc -%}
+  Renders a macro-category icon via the central category-icons snippet.
+
+  @param {string} [category] - Collection handle (preferred)
+  @param {string} [icon] - Legacy short key (moon, shield, …) — kept for backward compatibility
+  @param {number} [size] - 48, 24, or 20. Default: 48
+  @param {string} [class] - Extra CSS classes
+  @param {string} [label] - Accessible name override
+  @param {boolean} [decorative] - Hide from screen readers when inside a labeled control
+{%- enddoc -%}
+
+{%- liquid
+  assign icon_category = category | default: icon
+  assign icon_size = size | default: 48
+  assign icon_decorative = decorative
+  if icon_decorative == nil
+    assign icon_decorative = true
+  endif
+-%}
+
+{% render 'category-icons',
+  category: icon_category,
+  size: icon_size,
+  class: class,
+  label: label,
+  decorative: icon_decorative
+%}

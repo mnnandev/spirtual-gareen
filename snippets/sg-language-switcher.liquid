@@ -1,0 +1,242 @@
+{%- doc -%}
+  Language switcher — segmented IT | EN toggle.
+
+  @param {string} [placement] - header (desktop ≥769px) | drawer (mobile menu ≤768px)
+
+  Uses the native localization form so the selected language persists
+  across navigation (Shopify locale cookie + URL prefix).
+{%- enddoc -%}
+
+{%- liquid
+  assign sg_placement = placement | default: 'drawer'
+  assign sg_return_clean = request.path | default: '/'
+  if sg_return_clean contains '/en-it'
+    assign sg_return_clean = sg_return_clean | replace: '/en-it', ''
+  endif
+  if sg_return_clean contains '/it-it'
+    assign sg_return_clean = sg_return_clean | replace: '/it-it', ''
+  endif
+  if sg_return_clean contains '/en/'
+    assign sg_return_clean = sg_return_clean | replace: '/en/', '/'
+  endif
+  if sg_return_clean == '/en'
+    assign sg_return_clean = '/'
+  endif
+  if sg_return_clean == blank
+    assign sg_return_clean = '/'
+  endif
+
+  assign sg_current = localization.language.iso_code | default: request.locale.iso_code | default: 'it'
+  assign sg_form_id = 'SgLanguageSwitcher'
+  if sg_placement == 'drawer'
+    assign sg_form_id = 'SgLanguageSwitcherDrawer'
+  elsif sg_placement == 'header'
+    assign sg_form_id = 'SgLanguageSwitcherHeader'
+  endif
+-%}
+
+<div
+  class="sg-lang-switch sg-lang-switch--{{ sg_placement }}"
+  data-testid="sg-language-switcher"
+  aria-label="Lingua"
+>
+  {%- form 'localization', id: sg_form_id, class: 'sg-lang-switch__form', return_to: sg_return_clean -%}
+    <input type="hidden" name="country_code" value="{{ localization.country.iso_code }}">
+
+    <span class="sg-lang-switch__globe" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="M3 12h18"></path>
+        <path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18z"></path>
+      </svg>
+    </span>
+
+    <span class="sg-lang-switch__label">Lingua</span>
+
+    {%- assign sg_lang_order = 'it,en' | split: ',' -%}
+    {%- for code in sg_lang_order -%}
+      {%- liquid
+        assign language = localization.available_languages | where: 'iso_code', code | first
+        assign sg_locale_code = code
+        if language != blank
+          assign sg_locale_code = language.iso_code
+        endif
+
+        assign sg_is_active = false
+        if sg_locale_code == sg_current
+          assign sg_is_active = true
+        endif
+
+        assign sg_lang_label = sg_locale_code | upcase
+        assign sg_lang_title = sg_locale_code | upcase
+        if sg_locale_code == 'it'
+          assign sg_lang_label = 'IT'
+          assign sg_lang_title = 'Italiano'
+        elsif sg_locale_code == 'en'
+          assign sg_lang_label = 'EN'
+          assign sg_lang_title = 'English'
+        endif
+      -%}
+      <button
+        type="{% if sg_is_active %}button{% else %}submit{% endif %}"
+        name="language_code"
+        value="{{ sg_locale_code }}"
+        lang="{{ sg_locale_code }}"
+        class="sg-lang-switch__btn{% if sg_is_active %} is-active{% endif %}"
+        aria-current="{% if sg_is_active %}true{% else %}false{% endif %}"
+        aria-label="{{ sg_lang_title }}"
+        title="{{ sg_lang_title }}"
+        {% if sg_is_active %}disabled{% endif %}
+        data-sg-lang-label="{{ sg_lang_label }}"
+        data-sg-locale-code="{{ sg_locale_code }}"
+      >
+        {{- sg_lang_label -}}
+      </button>
+    {%- endfor -%}
+  {%- endform -%}
+</div>
+
+{% stylesheet %}
+  .sg-lang-switch__label {
+    display: none;
+  }
+
+  .sg-lang-switch__form {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    margin: 0;
+    padding: 2px 3px 2px 7px;
+    background: #ffffff;
+    border: 1px solid rgba(27, 48, 20, 0.14);
+    border-radius: 999px;
+  }
+
+  .sg-lang-switch__globe {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #1b3014;
+    opacity: 0.7;
+    margin-inline-end: 1px;
+    pointer-events: none;
+  }
+
+  .sg-lang-switch__btn {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: none;
+    padding: 5px 8px;
+    margin: 0;
+    font-family: Helvetica, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    color: #1b3014;
+    opacity: 0.55;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color 0.18s ease, color 0.18s ease, opacity 0.18s ease;
+  }
+
+  .sg-lang-switch__btn:hover,
+  .sg-lang-switch__btn:focus-visible {
+    opacity: 1;
+    background: rgba(127, 175, 114, 0.18);
+    outline: none;
+  }
+
+  .sg-lang-switch__btn.is-active,
+  .sg-lang-switch__btn.is-active:hover,
+  .sg-lang-switch__btn.is-active:focus-visible {
+    opacity: 1;
+    color: #ffffff;
+    background: #1b3014;
+    cursor: default;
+  }
+
+  .sg-lang-switch__btn:disabled {
+    pointer-events: none;
+  }
+
+  /* Drawer: last menu row — match drawer link rhythm */
+  .sg-lang-switch--drawer {
+    display: flex;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .menu-drawer__list-item--lang {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid rgba(27, 48, 20, 0.1);
+    list-style: none;
+  }
+
+  .sg-lang-switch--drawer .sg-lang-switch__form {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 4px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-sizing: border-box;
+  }
+
+  .sg-lang-switch--drawer .sg-lang-switch__label {
+    display: inline-block;
+    flex: 1 1 auto;
+    margin: 0;
+    font-family: var(--menu-font-family, Helvetica, sans-serif);
+    font-size: inherit;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+    color: inherit;
+    opacity: 0.85;
+  }
+
+  .sg-lang-switch--drawer .sg-lang-switch__globe {
+    color: inherit;
+    opacity: 0.65;
+  }
+
+  .sg-lang-switch--drawer .sg-lang-switch__btn {
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid rgba(27, 48, 20, 0.14);
+    background: #ffffff;
+    opacity: 0.7;
+  }
+
+  .sg-lang-switch--drawer .sg-lang-switch__btn.is-active,
+  .sg-lang-switch--drawer .sg-lang-switch__btn.is-active:hover,
+  .sg-lang-switch--drawer .sg-lang-switch__btn.is-active:focus-visible {
+    opacity: 1;
+    color: #ffffff;
+    background: #1b3014;
+    border-color: #1b3014;
+  }
+
+  .sg-lang-switch--header {
+    display: inline-flex;
+    position: relative;
+    flex-shrink: 0;
+    align-items: center;
+    z-index: 3;
+    margin: 0;
+  }
+
+  @media print {
+    .sg-lang-switch {
+      display: none !important;
+    }
+  }
+{% endstylesheet %}

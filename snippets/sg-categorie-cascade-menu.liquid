@@ -1,0 +1,72 @@
+{%- doc -%}
+  Desktop Categorie menu — minimal text panel + flyout subcategories.
+{%- enddoc -%}
+
+{% liquid
+  assign sg_category_handles = 'sonno-mente-energia,difese-protezione-respiratorie,intestino-digestione-metabolismo,movimento-dolori-recupero,benessere-ormonale-intimo,bellezza-cura-persona,mondo-zen' | split: ','
+  assign sg_category_titles = 'Sonno, Mente ed Energia|Difese, Protezione e Vie Respiratorie|Intestino, Digestione e Metabolismo|Movimento, Dolori e Recupero|Benessere Ormonale e Intimo|Bellezza e Cura della Persona|Mondo Zen' | split: '|'
+%}
+
+<nav
+  class="sg-categorie-cascade"
+  aria-label="{{ 'spiritual_green.nav.categorie' | t }}"
+>
+  <div class="sg-categorie-cascade__panel">
+    <ul class="sg-categorie-cascade__list list-unstyled" role="list">
+      {% for handle in sg_category_handles %}
+        {% assign title = sg_category_titles[forloop.index0] %}
+        {% capture parent_url %}{% render 'sg-collection-nav-url', handle: handle %}{% endcapture %}
+        {% capture sub_handles_raw %}{% render 'sg-collection-subcategory-meta', parent_handle: handle, output: 'handles' %}{% endcapture %}
+        {% capture sub_titles_raw %}{% render 'sg-collection-subcategory-meta', parent_handle: handle, output: 'titles' %}{% endcapture %}
+        {% assign sub_handles = sub_handles_raw | strip | split: ',' %}
+        {% assign sub_titles = sub_titles_raw | strip | split: '|' %}
+        {% assign has_flyout = false %}
+        {% if sub_handles_raw != blank and sub_handles.size > 0 %}
+          {% assign has_flyout = true %}
+        {% endif %}
+
+        <li
+          class="sg-categorie-cascade__item"
+          {% if has_flyout %}
+            data-has-flyout="true"
+          {% endif %}
+        >
+          <a
+            href="{{ parent_url | strip }}"
+            class="sg-categorie-cascade__link"
+          >
+            <span class="sg-categorie-cascade__link-icon" aria-hidden="true">
+              {% render 'category-icons', category: handle, size: 24, label: title, decorative: true %}
+            </span>
+            <span class="sg-categorie-cascade__link-label">{{ title }}</span>
+          </a>
+
+          {% if has_flyout %}
+            <div class="sg-categorie-cascade__flyout" aria-hidden="true">
+              <div class="sg-categorie-cascade__flyout-panel">
+                <ul class="sg-categorie-cascade__sublist list-unstyled" role="list">
+                  <li>
+                    <a href="{{ parent_url | strip }}" class="sg-categorie-cascade__sublink">
+                      {{ 'spiritual_green.nav.all_products_in_category' | t }}
+                    </a>
+                  </li>
+                  {% for sub_handle in sub_handles %}
+                    {% unless sub_handle == blank %}
+                    {% assign sub_title = sub_titles[forloop.index0] %}
+                    {% capture sub_url %}{% render 'sg-subcategory-nav-url', parent_handle: handle, sub_handle: sub_handle %}{% endcapture %}
+                    <li>
+                      <a href="{{ sub_url | strip }}" class="sg-categorie-cascade__sublink">
+                        {{ sub_title }}
+                      </a>
+                    </li>
+                    {% endunless %}
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</nav>

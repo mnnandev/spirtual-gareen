@@ -1,0 +1,70 @@
+{%- comment -%}
+  Placeholder: homepage product collection grid.
+  Homepage currently uses the "sg-home-products-tabs" section type.
+  Replace the section type in templates/index.json when this section is ready.
+{%- endcomment -%}
+
+<section
+  id="ProductGrid-{{ section.id }}"
+  class="product-grid product-grid--placeholder"
+  data-section-id="{{ section.id }}"
+>
+  <div class="product-grid__container">
+    {% if section.settings.heading != blank %}
+      <h2 class="product-grid__heading">{{ section.settings.heading }}</h2>
+    {% endif %}
+    <p class="product-grid__note">Placeholder section — homepage uses Home products tabs until the product grid is built.</p>
+  </div>
+</section>
+
+{% stylesheet %}
+  .product-grid--placeholder {
+    padding: 48px 24px;
+    text-align: center;
+    background: #ffffff;
+  }
+
+  .product-grid__container {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .product-grid__heading {
+    margin: 0 0 12px;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 1.5rem;
+    color: #1a1a1a;
+  }
+
+  .product-grid__note {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: #666666;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product grid",
+  "tag": "section",
+  "class": "product-grid-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section heading",
+      "default": "Prodotti in evidenza"
+    },
+    {
+      "type": "paragraph",
+      "content": "Placeholder — switch templates/index.json to type product-grid when this section is ready."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product grid",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

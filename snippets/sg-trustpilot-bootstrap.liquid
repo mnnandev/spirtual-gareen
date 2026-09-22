@@ -1,0 +1,43 @@
+{% comment %}
+  Trustpilot TrustBox bootstrap (load once per page).
+  Docs: https://help.trustpilot.com/s/article/Add-a-service-review-TrustBox-widget
+{% endcomment %}
+<script
+  type="text/javascript"
+  src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
+  async
+></script>
+<script>
+  (function () {
+    function loadTrustpilotWidgets() {
+      if (window.Trustpilot && typeof window.Trustpilot.loadFromElements === 'function') {
+        window.Trustpilot.loadFromElements(document.getElementsByClassName('trustpilot-widget'), true);
+      }
+    }
+
+    function scheduleLoad() {
+      if (window.Trustpilot && typeof window.Trustpilot.loadFromElements === 'function') {
+        loadTrustpilotWidgets();
+        return;
+      }
+      var attempts = 0;
+      var timer = window.setInterval(function () {
+        attempts += 1;
+        if (window.Trustpilot && typeof window.Trustpilot.loadFromElements === 'function') {
+          window.clearInterval(timer);
+          loadTrustpilotWidgets();
+        } else if (attempts > 40) {
+          window.clearInterval(timer);
+        }
+      }, 250);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', scheduleLoad);
+    } else {
+      scheduleLoad();
+    }
+
+    document.addEventListener('shopify:section:load', scheduleLoad);
+  })();
+</script>

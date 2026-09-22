@@ -1,0 +1,258 @@
+{% comment %}
+  Three hand-picked positive reviews for the homepage (hardcoded / editable).
+
+  How to update:
+  1. Theme Editor → Homepage → "SG Featured reviews" → edit the 3 review blocks
+  2. Or edit templates/index.json → section "sg_featured_reviews_home" → blocks
+  3. Or edit the defaults in snippets/sg-featured-reviews-data.liquid (used when no blocks exist)
+{% endcomment %}
+
+{%- liquid
+  assign reviews = section.blocks
+-%}
+
+<section
+  id="SgFeaturedReviews-{{ section.id }}"
+  class="sg-featured-reviews"
+  style="
+    --sg-fr-pad-top: {{ section.settings.padding_top }}px;
+    --sg-fr-pad-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="sg-featured-reviews__inner">
+    {% if section.settings.heading != blank or section.settings.subheading != blank %}
+      <header class="sg-featured-reviews__header">
+        {% if section.settings.heading != blank %}
+          <h2 class="sg-featured-reviews__heading">{{ section.settings.heading }}</h2>
+        {% endif %}
+        {% if section.settings.subheading != blank %}
+          <p class="sg-featured-reviews__subheading">{{ section.settings.subheading }}</p>
+        {% endif %}
+      </header>
+    {% endif %}
+
+    {% render 'sg-featured-reviews-cards', blocks: section.blocks %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .sg-featured-reviews {
+    background: linear-gradient(180deg, #f7faf5 0%, #ffffff 100%);
+    padding: var(--sg-fr-pad-top, 48px) 0 var(--sg-fr-pad-bottom, 56px);
+  }
+
+  .sg-featured-reviews__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .sg-featured-reviews__header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .sg-featured-reviews__heading {
+    margin: 0 0 8px;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+    font-weight: 500;
+    color: #1a1a1a;
+  }
+
+  .sg-featured-reviews__subheading {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #5a5a5a;
+  }
+
+  .sg-featured-reviews__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  @media (min-width: 768px) {
+    .sg-featured-reviews__grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+  }
+
+  .sg-featured-reviews__card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .sg-featured-reviews__stars {
+    display: flex;
+    gap: 2px;
+    color: #c4a35a;
+  }
+
+  .sg-featured-reviews__quote {
+    margin: 0;
+    flex: 1;
+  }
+
+  .sg-featured-reviews__quote p {
+    margin: 0;
+    font-size: 0.98rem;
+    line-height: 1.55;
+    color: #2a2a2a;
+  }
+
+  .sg-featured-reviews__footer {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .sg-featured-reviews__author {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #1a1a1a;
+  }
+
+  .sg-featured-reviews__source {
+    font-size: 0.8rem;
+    color: #6b6b6b;
+  }
+
+  @media screen and (max-width: 768px) {
+    .sg-featured-reviews__inner {
+      padding: 0 16px;
+    }
+
+    .sg-featured-reviews__header {
+      margin-bottom: 24px;
+    }
+
+    .sg-featured-reviews__quote p {
+      font-size: 0.94rem;
+      line-height: 1.5;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "SG Featured reviews",
+  "tag": "section",
+  "class": "sg-featured-reviews-section",
+  "max_blocks": 3,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Exactly 3 hand-picked reviews. Edit blocks here, in templates/index.json, or defaults in snippets/sg-featured-reviews-data.liquid."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Le voci dei nostri clienti"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Tre esperienze scelte tra le recensioni più apprezzate"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 56
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Stars",
+          "default": 5
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Review text",
+          "default": "Prodotti naturali di qualità e spedizione puntuale. Tornerò sicuramente."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "Cliente"
+        },
+        {
+          "type": "text",
+          "id": "source",
+          "label": "Source label",
+          "default": "Ordine verificato"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "SG Featured reviews",
+      "blocks": [
+        {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "author": "Giulia P.",
+            "source": "Ordine verificato",
+            "text": "Ottima per la routine quotidiana. Profumo delicato e ingredienti naturali, proprio quello che cercavo."
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "author": "Maria R.",
+            "source": "Ordine verificato",
+            "text": "Crema gel leggerissima, si assorbe subito e non unge. Dopo una settimana la pelle è più morbida e uniforme."
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "author": "Elena S.",
+            "source": "Ordine verificato",
+            "text": "Confezione curata e consegna veloce. Effetto luminoso naturale, consigliatissimo per chi ama i cosmetici botanici."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,225 @@
+{%- doc -%}
+  Single split-hero slide (product image or Instagram).
+
+  @param {object} block - Section block
+  @param {boolean} [is_active] - Carousel active slide
+  @param {boolean} [eager_media] - Eager-load image (LCP)
+  @param {boolean} [pinned] - Pinned below carousel (gift card panel)
+{%- enddoc -%}
+
+{%- liquid
+  assign is_active = is_active | default: false
+  assign eager_media = eager_media | default: false
+  assign pinned = pinned | default: false
+
+  assign slide_product = block.settings.product
+  assign sg_slide_product_handle = block.settings.product_handle | strip
+  if slide_product == blank and sg_slide_product_handle != blank
+    assign slide_product = all_products[sg_slide_product_handle]
+  endif
+  if slide_product == blank and block.settings.link != blank
+    assign sg_link_raw = block.settings.link | strip
+    if sg_link_raw contains '/products/'
+      assign sg_handle_from_link = sg_link_raw | split: '/products/' | last | split: '?' | first | split: '/' | first
+      if sg_handle_from_link != blank
+        assign slide_product = all_products[sg_handle_from_link]
+      endif
+    endif
+  endif
+
+  assign slide_link = block.settings.link
+  if slide_link == blank and slide_product != blank
+    assign slide_link = slide_product.url
+  endif
+  if slide_link == blank and block.settings.collection != blank
+    assign slide_link = block.settings.collection.url
+  endif
+  if slide_link == blank and block.settings.page != blank
+    assign slide_link = block.settings.page.url
+  endif
+
+  assign slide_image = block.settings.image
+  assign slide_image_url = blank
+
+  if block.settings.use_gift_card_product and block.settings.image_url_fallback != blank
+    assign slide_image_url = block.settings.image_url_fallback | strip
+    assign slide_image = blank
+  else
+    if slide_image == blank and slide_product != blank and slide_product.featured_image != blank
+      assign slide_image = slide_product.featured_image
+    endif
+
+    if slide_image == blank and block.settings.use_gift_card_product
+      capture sg_gift_handle
+        render 'sg-gift-card-find-product', configured_product: block.settings.product
+      endcapture
+      assign sg_gift_handle = sg_gift_handle | strip
+      if sg_gift_handle != blank
+        assign sg_gift_product = all_products[sg_gift_handle]
+        if sg_gift_product != blank
+          if slide_link == blank
+            assign slide_link = sg_gift_product.url
+          endif
+          if slide_image == blank and sg_gift_product.featured_image != blank
+            assign slide_image = sg_gift_product.featured_image
+          endif
+        endif
+      endif
+    endif
+
+    if slide_image == blank and block.settings.image_url_fallback != blank
+      assign slide_image_url = block.settings.image_url_fallback | strip
+    endif
+  endif
+
+  if slide_link == blank and block.settings.link != blank
+    assign slide_link = block.settings.link
+  endif
+
+  assign show_hero_best_sellers_badge = false
+  if block.type == 'slide' and block.settings.show_best_sellers_badge
+    assign show_hero_best_sellers_badge = true
+  endif
+
+  assign slide_extra_class = ''
+  if block.type == 'slide' and block.settings.use_gift_card_product
+    assign slide_extra_class = ' sg-split-hero__slide--gift-card'
+  endif
+-%}
+
+{%- if pinned -%}
+  {%- if slide_link != blank -%}
+    <a class="sg-split-hero__gift-link" href="{{ slide_link }}">
+  {%- else -%}
+    <div class="sg-split-hero__gift-link">
+  {%- endif -%}
+    {%- if slide_image != blank -%}
+      {{
+        slide_image
+        | image_url: width: 1200
+        | image_tag:
+          class: 'sg-split-hero__gift-media',
+          loading: 'lazy',
+          widths: '400, 600, 800, 1000, 1200',
+          sizes: '(min-width: 1180px) 28vw, 100vw',
+          alt: block.settings.label | default: 'Carta regalo' | escape
+      }}
+    {%- elsif slide_image_url != blank -%}
+      <img
+        class="sg-split-hero__gift-media"
+        src="{{ slide_image_url | escape }}"
+        alt="{{ block.settings.label | default: 'Carta regalo' | escape }}"
+        loading="lazy"
+        width="1200"
+        height="675"
+        decoding="async"
+      >
+    {%- else -%}
+      <div class="sg-split-hero__slide-fallback">
+        <span>{{ block.settings.label | default: 'Carta regalo' }}</span>
+      </div>
+    {%- endif -%}
+  {%- if slide_link != blank -%}
+    </a>
+  {%- else -%}
+    </div>
+  {%- endif -%}
+{%- else -%}
+  <div
+    class="sg-split-hero__slide{{ slide_extra_class }}{% if is_active %} is-active{% endif %}"
+    data-sg-split-slide
+    {{ block.shopify_attributes }}
+    {% if is_active %}aria-hidden="false"{% else %}aria-hidden="true"{% endif %}
+  >
+    {%- if block.type == 'instagram' -%}
+      <div
+        class="sg-split-hero__ig"
+        data-sg-ig-slide
+        data-instagram-url="{{ block.settings.instagram_url | escape }}"
+      >
+        {%- if block.settings.poster != blank -%}
+          {{
+            block.settings.poster
+            | image_url: width: 1000
+            | image_tag:
+              class: 'sg-split-hero__ig-poster',
+              loading: 'lazy',
+              widths: '400, 600, 800, 1000',
+              sizes: '(min-width: 1180px) 28vw, 100vw',
+              alt: block.settings.label | default: 'Instagram' | escape
+          }}
+        {%- else -%}
+          <div class="sg-split-hero__slide-fallback" aria-hidden="true">
+            <span>{{ block.settings.label | default: 'Instagram' }}</span>
+          </div>
+        {%- endif -%}
+        <button type="button" class="sg-split-hero__ig-play" data-sg-ig-play aria-label="Riproduci video Instagram">
+          <span class="sg-split-hero__ig-play-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 5v14l11-7L8 5z"/>
+            </svg>
+          </span>
+        </button>
+        <div class="sg-split-hero__ig-frame" data-sg-ig-frame></div>
+      </div>
+    {%- else -%}
+      {%- if show_hero_best_sellers_badge -%}
+        <span
+          class="sg-image-bestseller-badge sg-image-bestseller-badge--sm sg-split-hero__best-sellers-badge"
+          aria-label="Best Sellers"
+        >Best Sellers</span>
+      {%- endif -%}
+      {%- if slide_link != blank -%}
+        <a class="sg-split-hero__slide-link" href="{{ slide_link }}">
+      {%- else -%}
+        <div class="sg-split-hero__slide-link">
+      {%- endif -%}
+        {%- if slide_image != blank -%}
+          {%- if eager_media -%}
+            {{
+              slide_image
+              | image_url: width: 1000
+              | image_tag:
+                class: 'sg-split-hero__slide-media',
+                loading: 'eager',
+                widths: '400, 600, 800, 1000',
+                sizes: '(min-width: 1180px) 28vw, 100vw',
+                alt: block.settings.label | default: slide_image.alt | escape
+            }}
+          {%- else -%}
+            {{
+              slide_image
+              | image_url: width: 1000
+              | image_tag:
+                class: 'sg-split-hero__slide-media',
+                loading: 'lazy',
+                widths: '400, 600, 800, 1000',
+                sizes: '(min-width: 1180px) 28vw, 100vw',
+                alt: block.settings.label | default: slide_image.alt | escape
+            }}
+          {%- endif -%}
+        {%- elsif slide_image_url != blank -%}
+          <img
+            class="sg-split-hero__slide-media"
+            src="{{ slide_image_url | escape }}"
+            alt="{{ block.settings.label | default: 'Spiritual Green' | escape }}"
+            loading="{% if eager_media %}eager{% else %}lazy{% endif %}"
+            width="1000"
+            height="1000"
+            decoding="async"
+          >
+        {%- else -%}
+          {%- unless block.settings.use_gift_card_product or block.settings.image_url_fallback != blank -%}
+            <div class="sg-split-hero__slide-fallback">
+              <span>{{ block.settings.label | default: 'Spiritual Green' }}</span>
+            </div>
+          {%- endunless -%}
+        {%- endif -%}
+      {%- if slide_link != blank -%}
+        </a>
+      {%- else -%}
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+{%- endif -%}

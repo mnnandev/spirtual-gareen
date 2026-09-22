@@ -1,0 +1,55 @@
+{%- doc -%}
+  Outputs legal virtual page type from current request path (no whitespace).
+
+  @returns {string} terms | cookie | refund | privacy | faq | consulenza | empty
+{%- enddoc -%}
+
+{% liquid
+  assign detected_type = ''
+  assign path_lower = request.path | downcase
+
+  if path_lower contains 'consulenza-online'
+    assign detected_type = 'consulenza'
+  elsif path_lower contains '/pages/gift-card' or path_lower contains '/pages/buono-regalo' or path_lower contains '/pages/carta-regalo' or path_lower contains '/pages/giftcard'
+    assign detected_type = 'gift-card'
+  endif
+
+  assign path_probe = request.path | append: ' ' | append: canonical_url | append: ' ' | append: request.origin | downcase
+  if request.url != blank
+    assign path_probe = path_probe | append: ' ' | append: request.url | downcase
+  endif
+
+  if detected_type == blank
+    if path_probe contains 'refund-policy' or path_probe contains 'politica-di-reso' or path_probe contains 'politica_di_reso' or path_probe contains 'diritto-di-recesso'
+      assign detected_type = 'refund'
+    elsif path_probe contains 'privacy-policy' or path_probe contains '/pages/privacy'
+      assign detected_type = 'privacy'
+    elsif path_probe contains 'terms-of-service' or path_probe contains 'termini-e-condizioni' or path_probe contains 'termini_e_condizioni'
+      assign detected_type = 'terms'
+    elsif path_probe contains 'cookie-policy'
+      assign detected_type = 'cookie'
+    elsif path_probe contains '/pages/faq'
+      assign detected_type = 'faq'
+    elsif path_probe contains 'consulenza-online'
+      assign detected_type = 'consulenza'
+    elsif path_probe contains '/pages/gift-card' or path_probe contains '/pages/buono-regalo' or path_probe contains '/pages/carta-regalo' or path_probe contains '/pages/giftcard'
+      assign detected_type = 'gift-card'
+    endif
+  endif
+
+  if detected_type == blank and page.handle == 'termini-e-condizioni'
+    assign detected_type = 'terms'
+  elsif detected_type == blank and page.handle == 'cookie-policy'
+    assign detected_type = 'cookie'
+  elsif detected_type == blank and page.handle == 'politica-di-reso'
+    assign detected_type = 'refund'
+  elsif detected_type == blank and page.handle == 'privacy'
+    assign detected_type = 'privacy'
+  elsif detected_type == blank and page.handle == 'faq'
+    assign detected_type = 'faq'
+  elsif detected_type == blank and page.handle == 'consulenza-online'
+    assign detected_type = 'consulenza'
+  elsif detected_type == blank and page.handle == 'gift-card'
+    assign detected_type = 'gift-card'
+  endif
+-%}{{- detected_type -}}

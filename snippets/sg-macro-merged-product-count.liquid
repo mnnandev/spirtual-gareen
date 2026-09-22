@@ -1,0 +1,71 @@
+{%- doc -%}
+  Count unique products for a macro parent (parent collection + subcategory collections).
+
+  @param {string} parent_handle - Normalized macro collection handle
+  @param {collection} collection - Current parent collection
+{%- enddoc -%}
+
+{%- liquid
+  assign resolved_parent = parent_handle | default: '' | strip
+  assign sg_seen_ids = ','
+  assign sg_merged_count = 0
+
+  capture sg_price_filter_active_raw
+    render 'sg-collection-price-filter-active', collection: collection
+  endcapture
+  assign sg_price_filter_active_raw = sg_price_filter_active_raw | strip
+  assign sg_price_filter_active = false
+  if sg_price_filter_active_raw == 'true'
+    assign sg_price_filter_active = true
+  endif
+
+  capture sg_subcategory_handles_csv
+    render 'sg-collection-subcategory-meta', parent_handle: resolved_parent, output: 'handles'
+  endcapture
+  assign sg_sub_handles = sg_subcategory_handles_csv | strip | split: ','
+-%}
+
+{%- if collection != blank -%}
+  {%- for product in collection.products -%}
+    {%- if sg_price_filter_active -%}
+      {%- capture sg_in_range_raw -%}
+        {%- render 'sg-product-in-price-range', product: product, collection: collection -%}
+      {%- endcapture -%}
+      {%- assign sg_in_range = sg_in_range_raw | strip -%}
+      {%- unless sg_in_range == 'true' -%}
+        {%- continue -%}
+      {%- endunless -%}
+    {%- endif -%}
+
+    {%- assign sg_pid_marker = product.id | prepend: ',' | append: ',' -%}
+    {%- unless sg_seen_ids contains sg_pid_marker -%}
+      {%- assign sg_seen_ids = sg_seen_ids | append: product.id | append: ',' -%}
+      {%- assign sg_merged_count = sg_merged_count | plus: 1 -%}
+    {%- endunless -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- for sg_sub_handle in sg_sub_handles -%}
+  {%- assign sg_sub_handle = sg_sub_handle | strip -%}
+  {%- if collections[sg_sub_handle] != blank -%}
+    {%- for product in collections[sg_sub_handle].products -%}
+      {%- if sg_price_filter_active -%}
+        {%- capture sg_in_range_raw -%}
+          {%- render 'sg-product-in-price-range', product: product, collection: collection -%}
+        {%- endcapture -%}
+        {%- assign sg_in_range = sg_in_range_raw | strip -%}
+        {%- unless sg_in_range == 'true' -%}
+          {%- continue -%}
+        {%- endunless -%}
+      {%- endif -%}
+
+      {%- assign sg_pid_marker = product.id | prepend: ',' | append: ',' -%}
+      {%- unless sg_seen_ids contains sg_pid_marker -%}
+        {%- assign sg_seen_ids = sg_seen_ids | append: product.id | append: ',' -%}
+        {%- assign sg_merged_count = sg_merged_count | plus: 1 -%}
+      {%- endunless -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{{- sg_merged_count -}}

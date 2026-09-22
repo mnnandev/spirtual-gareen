@@ -1,0 +1,18 @@
+{%- doc -%}
+  Central Spiritual Green main navigation configuration.
+
+  @param {string} output - keys | translation_keys | dropdown_keys | split_at | center_key
+{%- enddoc -%}
+
+{%- case output -%}
+  {%- when 'keys' -%}
+    categorie|novita|best-seller|offerte|estate|consulenza|gift-card|contatti
+  {%- when 'translation_keys' -%}
+    spiritual_green.nav.categorie|spiritual_green.nav.novita|spiritual_green.nav.best_seller|spiritual_green.nav.offerte|spiritual_green.nav.estate|spiritual_green.nav.consulenza|spiritual_green.nav.gift_card|spiritual_green.nav.contatti
+  {%- when 'dropdown_keys' -%}
+    categorie
+  {%- when 'split_at' -%}
+    5
+  {%- when 'center_key' -%}
+    consulenza
+{%- endcase -%}

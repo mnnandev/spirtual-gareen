@@ -1,0 +1,98 @@
+{%- doc -%}
+  Gift card page media — lifestyle hero + branded card mockup.
+
+  @param {image} [image] - Optional lifestyle/background image_picker
+  @param {string} [image_url] - Fallback CDN URL when no picker image
+  @param {image} [card_image] - Optional gift card design image (client asset)
+  @param {string} [card_label] - Overlay text under the logo (default: Gift Card)
+  @param {boolean} [show_card_overlay] - Show logo + label on the card
+  @param {string} [alt] - Image alt text
+{%- enddoc -%}
+
+{% liquid
+  assign sg_gc_default_url = 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/3c92af44-5e32-4993-ab51-3135ed365460.png?v=1789029443'
+  assign sg_gc_hero_url = image_url | default: sg_gc_default_url
+  assign sg_gc_alt = alt | default: 'Carta regalo Spiritual Green'
+  assign sg_gc_card_label = card_label | default: 'Carta regalo'
+  assign sg_gc_show_overlay = true
+  if show_card_overlay == false or show_card_overlay == 'false'
+    assign sg_gc_show_overlay = false
+  endif
+
+  assign sg_gc_card = card_image
+  if sg_gc_card == blank and images['gift-card-banner.png'] != blank
+    assign sg_gc_card = images['gift-card-banner.png']
+  endif
+  if sg_gc_card == blank and images['gift-card-banner.jpg'] != blank
+    assign sg_gc_card = images['gift-card-banner.jpg']
+  endif
+
+  assign sg_gc_show_float = false
+  if sg_gc_card != blank or sg_gc_show_overlay
+    assign sg_gc_show_float = true
+  endif
+%}
+
+<div class="sg-gift-card-page__gallery">
+  <div class="sg-gift-card-page__media-frame">
+    {% if image != blank %}
+      {{
+        image
+        | image_url: width: 1200
+        | image_tag:
+          class: 'sg-gift-card-page__hero-image',
+          loading: 'eager',
+          fetchpriority: 'high',
+          widths: '400, 600, 800, 1000, 1200',
+          sizes: '(min-width: 990px) 50vw, 100vw',
+          alt: image.alt | default: sg_gc_alt
+      }}
+    {% else %}
+      <img
+        class="sg-gift-card-page__hero-image"
+        src="{{ sg_gc_hero_url }}"
+        alt="{{ sg_gc_alt | escape }}"
+        width="1200"
+        height="900"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+      >
+    {% endif %}
+
+    {% if sg_gc_show_float %}
+      <div class="sg-gift-card-page__card-float" aria-hidden="true">
+        <div class="sg-gift-card-page__card-face{% if sg_gc_card != blank %} sg-gift-card-page__card-face--photo{% endif %}">
+          {% if sg_gc_card != blank %}
+            {{
+              sg_gc_card
+              | image_url: width: 800
+              | image_tag:
+                class: 'sg-gift-card-page__card-photo',
+                loading: 'lazy',
+                widths: '320, 480, 640, 800',
+                sizes: '(min-width: 990px) 22vw, 70vw',
+                alt: ''
+            }}
+          {% endif %}
+
+          {% if sg_gc_show_overlay %}
+            <div class="sg-gift-card-page__card-brand">
+              {% render 'sg-brand-logo',
+                variant: 'header',
+                tone: 'light',
+                class: 'sg-gift-card-page__card-logo',
+                height_desktop: 48,
+                height_mobile: 36,
+                max_width_desktop: 200,
+                max_width_mobile: 150,
+                loading: 'lazy'
+              %}
+              <p class="sg-gift-card-page__card-label">{{ sg_gc_card_label | escape }}</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>

@@ -1,0 +1,33 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "sg_contact": {
+      "type": "sg-contact",
+      "settings": {
+        "breadcrumb_label": "Contatti",
+        "heading": "RIMANIAMO IN CONTATTO",
+        "intro": "Hai bisogno di info? Compila il form sottostante, ti risponderemo il prima possibile!",
+        "label_email": "E-mail",
+        "label_name": "Nome e Cognome",
+        "label_phone": "Numero",
+        "label_city": "Città",
+        "label_message": "Il tuo messaggio..",
+        "label_terms": "Termini e condizioni",
+        "consent_text": "Ho letto l'informativa privacy e acconsento al trattamento dei miei dati personali secondo quanto stabilito dal regolamento europeo per la protezione dei dati personali n. 679/2016, GDPR. (Potrai cancellarli o chiederne una copia facendo esplicita richiesta a info@spiritualgreen.it). Questo sito è protetto da reCAPTCHA e l'Informativa sulla privacy e i Termini di servizio di Google.",
+        "submit_label": "INVIA",
+        "success_message": "Grazie! Il tuo messaggio è stato inviato. Ti risponderemo al più presto."
+      }
+    }
+  },
+  "order": [
+    "sg_contact"
+  ]
+}

@@ -1,0 +1,512 @@
+{% liquid
+  assign subheading = section.settings.subheading
+%}
+
+<section
+  class="sg-testimonials"
+  id="sg-testimonials-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="sg-testimonials__floral sg-testimonials__floral--left" aria-hidden="true"></div>
+  <div class="sg-testimonials__floral sg-testimonials__floral--right" aria-hidden="true"></div>
+  <div class="sg-testimonials__floral sg-testimonials__floral--bottom" aria-hidden="true"></div>
+
+  <div class="sg-testimonials__inner">
+    <header class="sg-testimonials__header">
+      {% if section.settings.heading != blank %}
+        <h2 class="sg-testimonials__heading">{{ section.settings.heading }}</h2>
+      {% endif %}
+      <span class="sg-testimonials__rule" aria-hidden="true"></span>
+      {% if section.settings.show_stars %}
+        <div class="sg-testimonials__stars" aria-hidden="true">
+          {% for i in (1..5) %}
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path d="M10 1.5l2.47 5.01 5.53.8-4 3.9.94 5.5L10 14.26 5.06 16.7l.94-5.5-4-3.9 5.53-.8L10 1.5z"/>
+            </svg>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if subheading != blank %}
+        <p class="sg-testimonials__subheading">{{ subheading }}</p>
+      {% endif %}
+    </header>
+
+    <div class="sg-testimonials__grid" role="list">
+      {% for block in section.blocks %}
+            {% liquid
+              assign card_image_url = blank
+              assign card_image_alt = block.settings.author
+              assign card_product = block.settings.product
+
+              if block.settings.image != blank
+                assign card_image_url = block.settings.image | image_url: width: 600
+                assign card_image_alt = block.settings.image.alt | default: card_image_alt
+              elsif card_product != blank and card_product.featured_image != blank
+                assign card_image_url = card_product.featured_image | image_url: width: 600
+                assign card_image_alt = card_product.featured_image.alt | default: card_product.title
+              endif
+
+              assign author_name = block.settings.author
+              assign author_initial = author_name | slice: 0
+            %}
+
+            <article
+              class="sg-testimonials__card"
+              role="listitem"
+              {{ block.shopify_attributes }}
+            >
+              <div class="sg-testimonials__card-stars" aria-hidden="true">
+                {% for i in (1..5) %}
+                  <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path d="M10 1.5l2.47 5.01 5.53.8-4 3.9.94 5.5L10 14.26 5.06 16.7l.94-5.5-4-3.9 5.53-.8L10 1.5z"/>
+                  </svg>
+                {% endfor %}
+              </div>
+
+              {% if block.settings.text != blank %}
+                <blockquote class="sg-testimonials__card-quote">
+                  <p>{{ block.settings.text }}</p>
+                </blockquote>
+              {% endif %}
+
+              <footer class="sg-testimonials__card-footer">
+                {% if author_name != blank %}
+                  {% if card_image_url != blank %}
+                    <img
+                      class="sg-testimonials__card-avatar-img"
+                      src="{{ card_image_url }}"
+                      alt="{{ card_image_alt | escape }}"
+                      width="48"
+                      height="48"
+                      loading="lazy"
+                      decoding="async"
+                    >
+                  {% else %}
+                    <span class="sg-testimonials__card-avatar" aria-hidden="true">{{ author_initial }}</span>
+                  {% endif %}
+                  <div class="sg-testimonials__card-author">
+                    <cite class="sg-testimonials__card-name">{{ author_name }}</cite>
+                    {% if block.settings.source != blank %}
+                      <span class="sg-testimonials__card-source">{{ block.settings.source }}</span>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </footer>
+            </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+  .sg-testimonials {
+    --sg-t-green: #1a1a1a;
+    --sg-t-green-soft: #4a5568;
+    --sg-t-cream: #faf8f4;
+    --sg-t-star: #f5a623;
+  }
+
+  .sg-testimonials {
+    position: relative;
+    background: var(--sg-t-cream);
+    color: #1a1a1a;
+    overflow: hidden;
+  }
+
+  .sg-testimonials__floral {
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(1px);
+  }
+
+  .sg-testimonials__floral--left {
+    left: -5%;
+    top: 12%;
+    width: min(36vw, 300px);
+    height: min(48vh, 380px);
+    background:
+      radial-gradient(ellipse 70% 55% at 28% 42%, rgba(232, 180, 188, 0.38), transparent 72%),
+      radial-gradient(ellipse 42% 38% at 62% 68%, rgba(245, 210, 216, 0.28), transparent 70%);
+  }
+
+  .sg-testimonials__floral--right {
+    right: -6%;
+    top: 6%;
+    width: min(38vw, 320px);
+    height: min(52vh, 400px);
+    background:
+      radial-gradient(ellipse 65% 50% at 72% 34%, rgba(232, 180, 188, 0.34), transparent 72%),
+      radial-gradient(ellipse 48% 40% at 38% 76%, rgba(240, 198, 204, 0.3), transparent 68%);
+  }
+
+  .sg-testimonials__floral--bottom {
+    left: 50%;
+    bottom: -6%;
+    width: min(92vw, 880px);
+    height: min(38vh, 280px);
+    transform: translateX(-50%);
+    background:
+      radial-gradient(ellipse 52% 44% at 24% 58%, rgba(232, 180, 188, 0.36), transparent 72%),
+      radial-gradient(ellipse 46% 38% at 76% 52%, rgba(245, 215, 220, 0.3), transparent 70%);
+  }
+
+  .sg-testimonials__inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    padding: clamp(2.5rem, 5vw, 3.5rem) 0 clamp(1.5rem, 3vw, 2rem);
+    box-sizing: border-box;
+  }
+
+  .sg-testimonials__header {
+    width: min(100%, 720px);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    text-align: center;
+  }
+
+  .sg-testimonials__heading {
+    margin: 0;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(1.75rem, 3.5vw, 2.35rem);
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    line-height: 1.15;
+    color: #111111;
+  }
+
+  .sg-testimonials__rule {
+    display: block;
+    width: 48px;
+    height: 1px;
+    margin: 16px auto 14px;
+    background: #111111;
+  }
+
+  .sg-testimonials__stars {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    color: #111111;
+  }
+
+  .sg-testimonials__subheading {
+    margin: 14px 0 0;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #666666;
+  }
+
+  .sg-testimonials__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    width: min(100%, 1280px);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    box-sizing: border-box;
+    list-style: none;
+  }
+
+  .sg-testimonials__card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: #ffffff;
+    border: none;
+    border-radius: 20px;
+    padding: 26px 28px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+    box-sizing: border-box;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+  }
+
+  .sg-testimonials__card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.1);
+  }
+
+  .sg-testimonials__card-stars {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 18px;
+    color: var(--sg-t-star);
+  }
+
+  .sg-testimonials__card-quote {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    flex: 1 1 auto;
+  }
+
+  .sg-testimonials__card-quote p {
+    margin: 0;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1.65;
+    color: #4a4a4a;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    overflow: hidden;
+  }
+
+  .sg-testimonials__card-footer {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0;
+    margin-top: 22px;
+  }
+
+  .sg-testimonials__card-avatar,
+  .sg-testimonials__card-avatar-img {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .sg-testimonials__card-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #EFF5ED 0%, #D8E8D4 100%);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--sg-t-green-soft);
+    text-transform: uppercase;
+  }
+
+  .sg-testimonials__card-author {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .sg-testimonials__card-name {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    font-style: normal;
+    color: #1a1a1a;
+    letter-spacing: 0;
+    line-height: 1.2;
+  }
+
+  .sg-testimonials__card-source {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    color: #888888;
+    line-height: 1.3;
+  }
+
+  @media screen and (max-width: 1024px) {
+    .sg-testimonials__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .sg-testimonials__inner {
+      padding: 2rem 0 1.25rem;
+      gap: 1.35rem;
+    }
+
+    .sg-testimonials__header {
+      padding: 0 1.25rem;
+    }
+
+    .sg-testimonials__heading {
+      font-size: clamp(1.5rem, 5vw, 1.75rem);
+      letter-spacing: 0.14em;
+    }
+
+    .sg-testimonials__subheading {
+      font-size: 14px;
+    }
+
+    .sg-testimonials__grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 0 1.25rem;
+    }
+
+    .sg-testimonials__floral--left,
+    .sg-testimonials__floral--right {
+      opacity: 0.65;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .sg-testimonials__grid {
+      padding: 0 1rem;
+    }
+
+    .sg-testimonials__card {
+      padding: 20px 18px;
+      border-radius: 16px;
+    }
+
+    .sg-testimonials__card-quote p {
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .sg-testimonials__heading {
+      font-size: 1.5rem;
+      letter-spacing: 0.1em;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sg-testimonials__card {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Testimonial carousel",
+  "tag": "section",
+  "class": "sg-testimonials-section",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "DICONO DI NOI"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Le recensioni verificate dei nostri clienti"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stars",
+      "label": "Show 5 stars",
+      "default": true
+    },
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Review card",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product image (from catalog)"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom card image"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Review text",
+          "default": "Ottima per la routine quotidiana. Profumo delicato e ingredienti naturali, proprio quello che cercavo in erboristeria."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author name",
+          "default": "Giulia P."
+        },
+        {
+          "type": "text",
+          "id": "source",
+          "label": "Source label",
+          "default": "Cliente verificato"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonial carousel",
+      "settings": {
+        "subheading": "Le recensioni verificate dei nostri clienti"
+      },
+      "blocks": [
+        {
+          "type": "testimonial",
+          "settings": {
+            "author": "Giulia P.",
+            "source": "Cliente verificato",
+            "text": "Ottima per la routine quotidiana. Profumo delicato e ingredienti naturali, proprio quello che cercavo in erboristeria."
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "author": "Maria R.",
+            "source": "Cliente verificato",
+            "text": "Crema gel leggerissima, si assorbe subito e non unge. Dopo una settimana la pelle del viso è più morbida e uniforme."
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "author": "Elena S.",
+            "source": "Google",
+            "text": "Confezione curata e consegna veloce. Effetto luminoso naturale sulla pelle, consigliatissimo per chi ama i cosmetici botanici."
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "author": "Francesco M.",
+            "source": "Cliente verificato",
+            "text": "Prodotto di qualità, texture piacevole e risultati visibili. La consiglio per chi vuole una routine di cura della pelle semplice ed efficace."
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "author": "Angelica",
+            "source": "Google",
+            "text": "Sono molto soddisfatta dell'acquisto. Prodotti naturali di qualità e consulenza competente: finalmente un'erboristeria di fiducia online."
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "author": "Laura B.",
+            "source": "Cliente verificato",
+            "text": "L'Aloe Vera Fresh Juice è diventato parte della mia routine. Digestione più regolare e un prodotto davvero puro, come promesso."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

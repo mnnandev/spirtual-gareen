@@ -1,0 +1,547 @@
+{% liquid
+  assign left_image = section.settings.left_image
+  assign headline = section.settings.headline
+  assign subheading = section.settings.subheading
+  assign cta_text = section.settings.cta_text
+  assign cta_link = section.settings.cta_link
+  assign right_media_type = section.settings.right_media_type | default: 'images'
+  assign right_video = section.settings.right_video
+  assign right_video_url = section.settings.right_video_url | strip
+  assign hide_right_mobile = section.settings.hide_right_on_mobile
+  assign slideshow_interval = section.settings.slideshow_interval | default: 4
+
+  assign slideshow_blocks = section.blocks | where: 'type', 'slideshow_image'
+  assign slideshow_count = 0
+  for block in slideshow_blocks
+    if block.settings.image != blank
+      assign slideshow_count = slideshow_count | plus: 1
+    endif
+  endfor
+
+  assign show_slideshow = false
+  if right_media_type == 'images' and slideshow_count > 0
+    assign show_slideshow = true
+  endif
+
+  assign show_video = false
+  if right_media_type == 'video'
+    if right_video != blank or right_video_url != blank
+      assign show_video = true
+    endif
+  endif
+
+  assign show_aside = false
+  if show_slideshow or show_video
+    assign show_aside = true
+  endif
+
+  assign left_image_fallback = 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/ALOE-HEADER.webp?v=1780750156'
+  assign left_image_alt = left_image.alt | default: headline | default: shop.name
+%}
+
+<section
+  id="HeroBanner-{{ section.id }}"
+  class="hero-banner{% if hide_right_mobile %} hero-banner--hide-aside-mobile{% endif %}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="hero-banner__grid">
+    <div class="hero-banner__main">
+      {% if left_image != blank %}
+        {{
+          left_image
+          | image_url: width: 2400
+          | image_tag:
+            class: 'hero-banner__main-image',
+            loading: 'eager',
+            fetchpriority: 'high',
+            widths: '800, 1200, 1600, 2000, 2400',
+            sizes: '(min-width: 769px) 80vw, 100vw',
+            alt: left_image_alt
+        }}
+      {% else %}
+        <img
+          class="hero-banner__main-image"
+          src="{{ left_image_fallback }}"
+          alt="{{ left_image_alt | escape }}"
+          width="2400"
+          height="1600"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        >
+      {% endif %}
+
+      <div class="hero-banner__overlay">
+        <div class="hero-banner__scrim">
+          {% if headline != blank %}
+            <h1 class="hero-banner__headline">{{ headline }}</h1>
+          {% endif %}
+
+          {% if subheading != blank %}
+            <p class="hero-banner__subheading">{{ subheading }}</p>
+          {% endif %}
+
+          {% if cta_text != blank %}
+            <div class="hero-banner__actions">
+              <a
+                class="hero-banner__cta"
+                {% if cta_link != blank %}
+                  href="{{ cta_link }}"
+                {% else %}
+                  href="{{ routes.all_products_collection_url }}"
+                {% endif %}
+              >
+                {{ cta_text }}
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {% if show_aside %}
+      <aside class="hero-banner__aside" aria-label="{{ section.settings.right_column_label | default: 'Contenuti in evidenza' | escape }}">
+        {% if show_video %}
+          <div class="hero-banner__video-wrap">
+            {% if right_video != blank %}
+              {{
+                right_video
+                | video_tag:
+                  class: 'hero-banner__video',
+                  autoplay: true,
+                  loop: true,
+                  muted: true,
+                  controls: false,
+                  playsinline: true,
+                  preload: 'auto',
+                  image_size: '800x'
+              }}
+            {% elsif right_video_url != blank %}
+              <video
+                class="hero-banner__video"
+                autoplay
+                muted
+                loop
+                playsinline
+                disablepictureinpicture
+                preload="auto"
+                aria-label="{{ section.settings.video_aria_label | default: 'Video in evidenza' | escape }}"
+              >
+                <source src="{{ right_video_url }}" type="video/mp4">
+              </video>
+            {% endif %}
+          </div>
+        {% elsif show_slideshow %}
+          <div
+            class="hero-banner__slideshow"
+            data-hero-slideshow
+            data-interval="{{ slideshow_interval }}"
+            data-slide-count="{{ slideshow_count }}"
+          >
+            <div class="hero-banner__slideshow-track" data-hero-slideshow-track>
+              {% for block in slideshow_blocks %}
+                {% if block.settings.image != blank %}
+                  <div
+                    class="hero-banner__slide{% if forloop.first %} is-active{% endif %}"
+                    data-hero-slide
+                    {{ block.shopify_attributes }}
+                  >
+                    {{
+                      block.settings.image
+                      | image_url: width: 900
+                      | image_tag:
+                        class: 'hero-banner__slide-image',
+                        loading: 'lazy',
+                        widths: '400, 600, 800, 900',
+                        sizes: '20vw',
+                        alt: block.settings.image.alt | default: headline
+                    }}
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      </aside>
+    {% endif %}
+  </div>
+</section>
+
+{% javascript %}
+  (function () {
+    const initSlideshow = (root) => {
+      if (!root || root.dataset.heroSlideshowInit === 'true') return;
+      const slides = Array.from(root.querySelectorAll('[data-hero-slide]'));
+      if (slides.length < 2) return;
+
+      root.dataset.heroSlideshowInit = 'true';
+      const intervalMs = Math.max(2, parseInt(root.dataset.interval, 10) || 4) * 1000;
+      let activeIndex = slides.findIndex((slide) => slide.classList.contains('is-active'));
+      if (activeIndex < 0) activeIndex = 0;
+
+      const showSlide = (index) => {
+        slides.forEach((slide, i) => {
+          slide.classList.toggle('is-active', i === index);
+        });
+      };
+
+      window.setInterval(() => {
+        activeIndex = (activeIndex + 1) % slides.length;
+        showSlide(activeIndex);
+      }, intervalMs);
+    };
+
+    const initSection = (section) => {
+      const slideshow = section.querySelector('[data-hero-slideshow]');
+      if (slideshow) initSlideshow(slideshow);
+    };
+
+    document.querySelectorAll('.hero-banner').forEach(initSection);
+
+    document.addEventListener('shopify:section:load', (event) => {
+      const section = event.target.querySelector('.hero-banner') || event.target.closest('.hero-banner');
+      if (section) initSection(section.closest('[id^="shopify-section-"]') || section);
+    });
+  })();
+{% endjavascript %}
+
+{% stylesheet %}
+  .hero-banner-section {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .shopify-section.hero-banner-section {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .hero-banner {
+    --hero-banner-font: 'DM Sans', system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --hero-banner-green: #97C48A;
+    --hero-banner-green-hover: #7FAF72;
+    --hero-banner-min-height: min(88vh, 820px);
+    width: 100%;
+    background: #f5f5f0;
+  }
+
+  .hero-banner__grid {
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    min-height: var(--hero-banner-min-height);
+  }
+
+  .hero-banner__main {
+    position: relative;
+    min-height: var(--hero-banner-min-height);
+    overflow: hidden;
+    background: #e8ebe4;
+  }
+
+  .hero-banner__main-image,
+  .hero-banner__main-placeholder {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .hero-banner__main-placeholder {
+    background: linear-gradient(145deg, #d8e8d4 0%, #b8d4b0 55%, #8fbc8f 100%);
+  }
+
+  .hero-banner__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    padding: clamp(24px, 5vw, 64px);
+    pointer-events: none;
+  }
+
+  .hero-banner__scrim {
+    position: relative;
+    max-width: min(640px, 92%);
+    padding: clamp(20px, 3vw, 32px) clamp(22px, 3.5vw, 36px);
+    border-radius: 4px;
+    background: linear-gradient(
+      135deg,
+      rgb(18 28 18 / 62%) 0%,
+      rgb(10 18 10 / 48%) 100%
+    );
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    pointer-events: auto;
+  }
+
+  .hero-banner__headline {
+    margin: 0 0 12px;
+    font-family: var(--hero-banner-font);
+    font-size: clamp(1.75rem, 4vw, 3.25rem);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+  }
+
+  .hero-banner__subheading {
+    margin: 0 0 22px;
+    font-family: var(--hero-banner-font);
+    font-size: clamp(0.95rem, 1.6vw, 1.125rem);
+    font-weight: 400;
+    line-height: 1.55;
+    color: rgb(255 255 255 / 92%);
+    max-width: 42ch;
+  }
+
+  .hero-banner__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .hero-banner__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 12px 28px;
+    border-radius: 999px;
+    border: 1px solid #ffffff;
+    background: #ffffff;
+    color: var(--hero-banner-green);
+    font-family: var(--hero-banner-font);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .hero-banner__cta:hover {
+    background: var(--hero-banner-green);
+    border-color: var(--hero-banner-green);
+    color: #ffffff;
+    transform: translateY(-1px);
+  }
+
+  .hero-banner__aside {
+    position: relative;
+    min-height: var(--hero-banner-min-height);
+    overflow: hidden;
+    background: #1a1a1a;
+  }
+
+  .hero-banner__video-wrap,
+  .hero-banner__slideshow {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-banner__video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  .hero-banner__slideshow-track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-banner__slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transform: translateY(12%);
+    transition:
+      opacity 0.9s ease,
+      transform 1s ease;
+    pointer-events: none;
+  }
+
+  .hero-banner__slide.is-active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    z-index: 1;
+  }
+
+  .hero-banner__slide-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hero-banner__grid {
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+
+    .hero-banner__main {
+      min-height: min(72vh, 560px);
+    }
+
+    .hero-banner__overlay {
+      align-items: flex-end;
+      padding: 20px 16px 24px;
+    }
+
+    .hero-banner__scrim {
+      max-width: 100%;
+      padding: 18px 20px;
+    }
+
+    .hero-banner__headline {
+      font-size: clamp(1.5rem, 7vw, 2rem);
+    }
+
+    .hero-banner--hide-aside-mobile .hero-banner__aside {
+      display: none;
+    }
+
+    .hero-banner:not(.hero-banner--hide-aside-mobile) .hero-banner__aside {
+      min-height: 220px;
+      max-height: 42vh;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Hero banner (two column)",
+  "tag": "section",
+  "class": "hero-banner-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Colonna sinistra (80%)"
+    },
+    {
+      "type": "image_picker",
+      "id": "left_image",
+      "label": "Immagine stagionale"
+    },
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "Titolo principale",
+      "default": "Estate in equilibrio"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Sottotitolo",
+      "default": "Scopri integratori, erbe e cosmetici naturali per il tuo benessere estivo."
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Testo pulsante CTA",
+      "default": "Scopri le categorie"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Link pulsante CTA"
+    },
+    {
+      "type": "header",
+      "content": "Colonna destra (20%)"
+    },
+    {
+      "type": "select",
+      "id": "right_media_type",
+      "label": "Tipo contenuto colonna destra",
+      "options": [
+        { "value": "images", "label": "Slideshow immagini" },
+        { "value": "video", "label": "Video" }
+      ],
+      "default": "images"
+    },
+    {
+      "type": "video",
+      "id": "right_video",
+      "label": "Video (caricamento Shopify)",
+      "info": "Usato quando il tipo contenuto è Video. Autoplay, muto, loop."
+    },
+    {
+      "type": "text",
+      "id": "right_video_url",
+      "label": "URL video MP4 (alternativo)",
+      "info": "Facoltativo. Usato se non è selezionato un video Shopify."
+    },
+    {
+      "type": "text",
+      "id": "video_aria_label",
+      "label": "Etichetta accessibilità video",
+      "default": "Video in evidenza"
+    },
+    {
+      "type": "range",
+      "id": "slideshow_interval",
+      "label": "Intervallo slideshow (secondi)",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "text",
+      "id": "right_column_label",
+      "label": "Etichetta accessibilità colonna destra",
+      "default": "Contenuti in evidenza"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_right_on_mobile",
+      "label": "Nascondi colonna destra su mobile",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slideshow_image",
+      "name": "Immagine slideshow",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Immagine"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero banner (two column)",
+      "category": "Banners",
+      "blocks": [
+        { "type": "slideshow_image" },
+        { "type": "slideshow_image" },
+        { "type": "slideshow_image" }
+      ]
+    }
+  ]
+}
+{% endschema %}

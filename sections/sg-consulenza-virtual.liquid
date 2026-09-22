@@ -1,0 +1,22 @@
+<div class="sg-consulenza-page template-consulenza">
+  {% capture calendly_resolved %}
+    {% render 'sg-consulenza-calendly-url' %}
+  {% endcapture %}
+  {% assign calendly_url = calendly_resolved | strip %}
+  {% render 'sg-consulenza-page-default', calendly_url: calendly_url %}
+</div>
+
+{% if calendly_url != blank %}
+  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+  <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+{% endif %}
+<script src="{{ 'sg-consulenza-booking.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "SG Consulenza (virtual)",
+  "tag": "section",
+  "class": "sg-consulenza-page-section",
+  "settings": []
+}
+{% endschema %}

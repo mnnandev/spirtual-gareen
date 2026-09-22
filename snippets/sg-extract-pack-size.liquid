@@ -1,0 +1,94 @@
+{%- doc -%}
+  Splits a product title into its name and trailing pack size.
+
+  Example: "OMEGA 3 PLUS 300 perle"
+    - name → "OMEGA 3 PLUS"
+    - pack → "300 perle"
+
+  The pack size is detected as the first number token that is either
+  immediately followed by a known unit word (e.g. "300 perle") or a
+  number+unit joined token (e.g. "50ml"), through to the end of the string.
+
+  @param {string} title - Full product title
+  @param {string} [output] - 'name' (default) | 'pack'
+{%- enddoc -%}
+
+{%- liquid
+  assign out = output | default: 'name'
+  assign src = title | default: '' | strip
+
+  assign units = 'perle,perla,capsule,capsula,caps,compresse,compressa,cpr,tavolette,tavoletta,ovaline,ml,cl,ml,g,gr,grammi,mg,kg,bustine,bustina,stick,pezzi,pz,flacone,flaconi,gocce,fiale,fiala,caramelle,softgel,opercoli,opercolo,confetti,palline,granuli,l' | split: ','
+
+  assign words = src | split: ' '
+  assign split_index = -1
+  assign digit_chars = '0123456789' | split: ''
+
+  for word in words
+    assign w = word | strip
+    if w == blank
+      continue
+    endif
+
+    assign wl = w | downcase | replace: '.', '' | replace: ',', '' | replace: '(', '' | replace: ')', ''
+
+    assign has_digit = false
+    for d in digit_chars
+      if wl contains d
+        assign has_digit = true
+        break
+      endif
+    endfor
+    if has_digit == false
+      continue
+    endif
+
+    assign is_pack_start = false
+
+    # Case A: token is purely a number and the NEXT token is a unit word.
+    assign token_no_digits = wl
+    for c in digit_chars
+      assign token_no_digits = token_no_digits | replace: c, ''
+    endfor
+    if token_no_digits == blank
+      assign next_i = forloop.index0 | plus: 1
+      if next_i < words.size
+        assign next_wl = words[next_i] | downcase | strip | replace: '.', '' | replace: ',', '' | replace: '(', '' | replace: ')', ''
+        if units contains next_wl
+          assign is_pack_start = true
+        endif
+      endif
+    endif
+
+    # Case B: number and unit joined in one token, e.g. "50ml" / "300perle".
+    if is_pack_start == false
+      for unit in units
+        if wl contains unit
+          assign rest = wl | replace: unit, ''
+          assign rest_no_digits = rest
+          for c in digit_chars
+            assign rest_no_digits = rest_no_digits | replace: c, ''
+          endfor
+          if rest != blank and rest_no_digits == blank
+            assign is_pack_start = true
+            break
+          endif
+        endif
+      endfor
+    endif
+
+    if is_pack_start
+      assign split_index = forloop.index0
+      break
+    endif
+  endfor
+
+  if split_index > 0
+    assign name_part = words | slice: 0, split_index | join: ' ' | strip
+    assign pack_len = words.size | minus: split_index
+    assign pack_part = words | slice: split_index, pack_len | join: ' ' | strip
+  else
+    assign name_part = src
+    assign pack_part = ''
+  endif
+-%}
+{%- if out == 'pack' -%}{{- pack_part -}}{%- else -%}{{- name_part -}}{%- endif -%}

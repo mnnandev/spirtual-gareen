@@ -1,0 +1,49 @@
+{%- doc -%}
+  Extract one PDP subsection from legacy product description HTML.
+
+  @param {string} html - Source HTML
+  @param {string} section_key - ingredienti | modo_duso | avvertenze | titolazione | benefici
+{%- enddoc -%}
+
+{%- liquid
+  assign source = html | default: ''
+  assign result = ''
+
+  assign other_markers = "Ingredienti|INGREDIENTI|Ingredienti:|INGREDIENTI:|Ingredients|INGREDIENTS|Ingredients:|INGREDIENTS:|Nutritional Information|NUTRITIONAL INFORMATION|Informazioni nutrizionali|Modo d'uso|Modo d uso|MODI D'USO|MODI D USO|Directions for use|DIRECTIONS FOR USE|How to use|HOW TO USE|Come si usa|COME SI USA|Avvertenze|AVVERTENZE|Avvertenze:|AVVERTENZE:|Warnings|WARNINGS|Warnings:|WARNINGS:|Titolazione|TITOLAZIONE|Titolazione:|TITOLAZIONE:|Titration|TITRATION|Titration:|TITRATION:|Benefici|BENEFICI|Benefici:|BENEFICI:|Benefits|BENEFITS|Benefits:|BENEFITS:|Descrizione|DESCRIZIONE|Descrizione:|DESCRIZIONE:|Description|DESCRIPTION|Description:|DESCRIPTION:" | split: '|'
+
+  case section_key
+    when 'ingredienti'
+      assign start_markers = '<h4>Ingredienti</h4>|<h3>Ingredienti</h3>|<h4>INGREDIENTI</h4>|<strong>Ingredienti</strong>|Ingredienti:|INGREDIENTI:|Ingredients:|INGREDIENTS:|Nutritional Information|NUTRITIONAL INFORMATION|Informazioni nutrizionali|contenuto-prodotto' | split: '|'
+    when 'modo_duso'
+      assign start_markers = "<h4>Modo d'uso</h4>|<h3>Modo d'uso</h3>|<strong>Modo d'uso</strong>|modo-duso-prodotto|Modo d'uso|Modo d uso|MODI D'USO|MODI D USO|Directions for use|DIRECTIONS FOR USE|How to use|HOW TO USE|Come si usa|COME SI USA" | split: '|'
+    when 'avvertenze'
+      assign start_markers = 'Avvertenze|AVVERTENZE|Avvertenze:|AVVERTENZE:|Warnings|WARNINGS|Warnings:|WARNINGS:' | split: '|'
+    when 'titolazione'
+      assign start_markers = 'Titolazione|TITOLAZIONE|Titolazione:|TITOLAZIONE:|Titration|TITRATION|Titration:|TITRATION:' | split: '|'
+    when 'benefici'
+      assign start_markers = 'Benefici|BENEFICI|Benefici:|BENEFICI:|Benefits|BENEFITS|Benefits:|BENEFITS:' | split: '|'
+    else
+      assign start_markers = '' | split: '|'
+  endcase
+
+  for start_marker in start_markers
+    if result == blank and source != blank and source contains start_marker
+      assign after_start = source | split: start_marker | last
+      assign section_body = after_start
+      assign found_end = false
+
+      for end_marker in other_markers
+        if found_end == false and end_marker != start_marker and after_start contains end_marker
+          assign end_parts = after_start | split: end_marker
+          assign section_body = end_parts | first
+          assign found_end = true
+        endif
+      endfor
+
+      assign result = section_body | strip
+      break
+    endif
+  endfor
+-%}
+
+{{- result -}}

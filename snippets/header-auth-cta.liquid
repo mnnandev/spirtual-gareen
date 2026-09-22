@@ -1,0 +1,173 @@
+{% doc %}
+  Header Sign in + Get Started CTAs (Spiritual Green).
+
+  @param {string} [shop_url] - URL for Get Started button
+{% enddoc %}
+
+{% liquid
+  assign header_shop_url = shop_url | default: collections.all.url
+  assign sign_in_login_url = routes.account_login_url
+  if routes.storefront_login_url != blank
+    assign sign_in_login_url = routes.storefront_login_url
+  endif
+  assign sign_in_popover_id = 'sign-in-popover'
+  assign sign_in_anchor_name = '--sign-in-anchor'
+%}
+
+<div class="header-auth-cta">
+  {% if customer %}
+    <a href="{{ routes.account_url }}" class="header-auth-cta__sign-in button-unstyled">
+      {{ 'content.account_title' | t }}
+    </a>
+    <a href="{{ header_shop_url }}" class="header-auth-cta__get-started button">
+      {{ 'spiritual_green.get_started' | t }}
+    </a>
+  {% else %}
+    <anchored-popover-component
+      class="sign-in-popover-wrapper"
+      data-close-on-resize
+    >
+      <div
+        class="header-auth-cta__cluster"
+        ref="trigger"
+        style="anchor-name: {{ sign_in_anchor_name }};"
+      >
+        <button
+          type="button"
+          class="header-auth-cta__sign-in button-unstyled"
+          popovertarget="{{ sign_in_popover_id }}"
+          aria-haspopup="dialog"
+          aria-controls="{{ sign_in_popover_id }}"
+        >
+          {{ 'actions.log_in' | t }}
+        </button>
+
+        <a href="{{ header_shop_url }}" class="header-auth-cta__get-started button">
+          {{ 'spiritual_green.get_started' | t }}
+        </a>
+      </div>
+
+      {% render 'sign-in-popover',
+        login_url: sign_in_login_url,
+        popover_id: sign_in_popover_id,
+        anchor_name: sign_in_anchor_name
+      %}
+    </anchored-popover-component>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .header-auth-cta {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    position: relative;
+    z-index: calc(var(--layer-header-menu, 12) + 2);
+  }
+
+  .sign-in-popover-wrapper {
+    display: inline-flex;
+  }
+
+  .header-auth-cta__cluster {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .header-auth-cta__get-started {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 10px 14px;
+      font-size: 0.8125rem;
+    }
+
+    .header-auth-cta__sign-in {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      font-size: 0.8125rem;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .header-auth-cta__sign-in {
+      display: none;
+    }
+
+    .header-auth-cta__get-started {
+      padding: 10px 12px;
+      font-size: 0.75rem;
+    }
+  }
+
+  .header-auth-cta__sign-in {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 4px;
+    font-family: Helvetica, sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.25;
+    color: #ffffff;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .header-auth-cta__sign-in:hover,
+  .header-auth-cta__sign-in:focus-visible {
+    color: #ffffff;
+    opacity: 0.85;
+  }
+
+  #header-component[data-sticky-state='active'] .header-auth-cta__sign-in {
+    color: #ffffff;
+  }
+
+  #header-component[data-sticky-state='active'] .header-auth-cta__sign-in:hover,
+  #header-component[data-sticky-state='active'] .header-auth-cta__sign-in:focus-visible {
+    color: #ffffff;
+    opacity: 0.85;
+  }
+
+  .header-auth-cta__get-started {
+    --button-background-color: #ffffff;
+    --button-color: #97C48A;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 22px;
+    border-radius: 999px;
+    border: none;
+    background: #ffffff;
+    color: #97C48A;
+    font-family: Helvetica, sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .header-auth-cta__get-started:hover {
+    background: #f5f5f0;
+    color: #7FAF72;
+  }
+
+  .header__column--right header-actions:has(.header-auth-cta) {
+    gap: var(--gap-md);
+  }
+
+  #header-component:has(.header-auth-cta) .header__column--right,
+  #header-component:has(.header-auth-cta) header-actions,
+  #header-component:has(.header-auth-cta) .header__row--top {
+    overflow: visible;
+  }
+{% endstylesheet %}

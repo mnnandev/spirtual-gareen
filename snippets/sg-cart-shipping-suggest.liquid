@@ -1,0 +1,197 @@
+{%- doc -%}
+  Suggests up to 2 in-stock products that best close the next cart reward gap.
+  Shown in cart drawer + cart page order summary (under incentives, above totals).
+
+  Milestones (same as sg-cart-incentives):
+  - €49 free shipping
+  - €69 first gift
+  - €89 second gift
+
+  Re-renders with cart morph on add/remove; hides when all rewards are unlocked.
+{%- enddoc -%}
+
+{%- liquid
+  assign milestone_1_cents = 4900
+  assign milestone_2_cents = 6900
+  assign milestone_3_cents = 8900
+
+  assign cart_total_cents = cart.items_subtotal_price | default: cart.total_price
+  assign remaining_cents = 0
+  assign suggest_goal = blank
+
+  if cart_total_cents < milestone_1_cents
+    assign remaining_cents = milestone_1_cents | minus: cart_total_cents
+    assign suggest_goal = 'shipping'
+  elsif cart_total_cents < milestone_2_cents
+    assign remaining_cents = milestone_2_cents | minus: cart_total_cents
+    assign suggest_goal = 'gift1'
+  elsif cart_total_cents < milestone_3_cents
+    assign remaining_cents = milestone_3_cents | minus: cart_total_cents
+    assign suggest_goal = 'gift2'
+  endif
+
+  if remaining_cents < 0
+    assign remaining_cents = 0
+  endif
+
+  assign suggest_count = 0
+  assign best_handle = ''
+  assign best_diff = 999999999
+  assign second_handle = ''
+  assign second_diff = 999999999
+
+  if remaining_cents > 0 and cart.empty? == false
+    assign source_collection = collections['piu-venduti']
+    if source_collection == blank or source_collection.products_count == 0
+      assign source_collection = collections['offerte']
+    endif
+    if source_collection == blank or source_collection.products_count == 0
+      assign source_collection = collections.all
+    endif
+
+    if source_collection != blank and source_collection.products_count > 0
+      for product in source_collection.products limit: 48
+        if product.available == false
+          continue
+        endif
+
+        assign variant = product.selected_or_first_available_variant
+        if variant == blank or variant.available == false
+          continue
+        endif
+
+        assign in_cart = false
+        for item in cart.items
+          if item.product_id == product.id
+            assign in_cart = true
+            break
+          endif
+        endfor
+        if in_cart
+          continue
+        endif
+
+        assign price_cents = variant.price
+        assign diff = price_cents | minus: remaining_cents
+        if diff < 0
+          assign abs_diff = remaining_cents | minus: price_cents
+        else
+          assign abs_diff = diff
+        endif
+
+        comment
+          Prefer products that cover (or nearly cover) the gap without huge overshoot.
+          Soft-penalize prices more than 2.5x the remaining amount.
+        endcomment
+        assign max_price = remaining_cents | times: 25 | divided_by: 10
+        if price_cents > max_price and remaining_cents > 0
+          assign abs_diff = abs_diff | plus: price_cents
+        endif
+
+        if abs_diff < best_diff
+          assign second_handle = best_handle
+          assign second_diff = best_diff
+          assign best_handle = product.handle
+          assign best_diff = abs_diff
+        elsif abs_diff < second_diff and product.handle != best_handle
+          assign second_handle = product.handle
+          assign second_diff = abs_diff
+        endif
+      endfor
+    endif
+  endif
+
+  assign heading_label = 'spiritual_green.cart_might_also_like' | t
+  if suggest_goal == 'shipping'
+    assign heading_label = 'spiritual_green.cart_shipping_suggest_heading' | t
+  elsif suggest_goal == 'gift1' or suggest_goal == 'gift2'
+    assign heading_label = 'spiritual_green.cart_gift_suggest_heading' | t
+  endif
+
+  assign add_label = 'spiritual_green.cart_shipping_suggest_add' | t
+  assign loading_label = 'products.product.adding_to_cart' | t
+  assign success_label = 'spiritual_green.added_success' | t
+-%}
+
+{%- if remaining_cents > 0 and best_handle != blank -%}
+  <div
+    class="sg-cart-shipping-suggest"
+    data-sg-shipping-suggest
+    data-remaining="{{ remaining_cents }}"
+    data-goal="{{ suggest_goal }}"
+    aria-live="polite"
+  >
+    <p class="sg-cart-shipping-suggest__heading">
+      {{ heading_label }}
+    </p>
+
+    <ul class="sg-cart-shipping-suggest__list" role="list">
+      {%- for pass in (1..2) -%}
+        {%- liquid
+          if pass == 1
+            assign handle = best_handle
+          else
+            assign handle = second_handle
+          endif
+        -%}
+        {%- if handle != blank -%}
+          {%- assign product = all_products[handle] -%}
+          {%- if product != blank and product.available -%}
+            {%- assign variant = product.selected_or_first_available_variant -%}
+            {%- if variant != blank and variant.available -%}
+              {%- assign suggest_count = suggest_count | plus: 1 -%}
+              <li class="sg-cart-shipping-suggest__item">
+                <a href="{{ product.url }}" class="sg-cart-shipping-suggest__media" tabindex="-1" aria-hidden="true">
+                  {%- if product.featured_image -%}
+                    {{
+                      product.featured_image
+                      | image_url: width: 120
+                      | image_tag:
+                        class: 'sg-cart-shipping-suggest__image',
+                        loading: 'lazy',
+                        widths: '60, 120',
+                        sizes: '48px',
+                        alt: product.featured_image.alt | default: product.title
+                    }}
+                  {%- else -%}
+                    <span class="sg-cart-shipping-suggest__placeholder"></span>
+                  {%- endif -%}
+                </a>
+
+                <div class="sg-cart-shipping-suggest__info">
+                  <a href="{{ product.url }}" class="sg-cart-shipping-suggest__title">
+                    {%- capture clean_title -%}
+                      {%- render 'sg-sanitize-line-breaks', text: product.title, mode: 'title' -%}
+                    {%- endcapture -%}
+                    {{- clean_title | strip | escape -}}
+                  </a>
+                  <p class="sg-cart-shipping-suggest__price">{{ variant.price | money }}</p>
+                </div>
+
+                <form
+                  method="post"
+                  action="{{ routes.cart_add_url }}"
+                  class="sg-cart-shipping-suggest__form"
+                  data-sg-card-add-form
+                  data-product-id="{{ product.id }}"
+                >
+                  <input type="hidden" name="id" value="{{ variant.id }}">
+                  <input type="hidden" name="quantity" value="1">
+                  <button
+                    type="submit"
+                    class="sg-cart-shipping-suggest__btn sg-product-card-actions__btn--add"
+                    data-label-add="{{ add_label | escape }}"
+                    data-label-loading="{{ loading_label | escape }}"
+                    data-label-success="{{ success_label | escape }}"
+                  >
+                    {{ add_label }}
+                  </button>
+                </form>
+              </li>
+            {%- endif -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}

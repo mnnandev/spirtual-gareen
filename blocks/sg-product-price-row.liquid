@@ -1,0 +1,81 @@
+
+{% liquid
+  assign product = closest.product
+  assign block_settings = block.settings
+%}
+
+{%- capture sg_bestseller_flag -%}
+  {%- render 'sg-bestseller-flag', product: product -%}
+{%- endcapture -%}
+{%- assign sg_bestseller_flag = sg_bestseller_flag | strip -%}
+
+<div
+  class="sg-price-row spacing-style"
+  style="{% render 'spacing-style', settings: block_settings %}"
+  {{ block.shopify_attributes }}
+>
+  <product-price class="sg-price-row__price text-block text-left paragraph">
+    {% render 'price',
+      product_resource: product,
+      show_sale_price_first: block_settings.show_sale_price_first
+    %}
+  </product-price>
+
+  {% if block_settings.show_bestseller and sg_bestseller_flag == 'true' %}
+    <span class="sg-bestseller-badge">{{ block_settings.bestseller_label }}</span>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "SG Price row",
+  "tag": null,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_bestseller",
+      "label": "Show bestseller badge",
+      "default": true,
+      "info": "Shows only on products tagged bestseller / piu-venduto (or PEA Complex 1200)."
+    },
+    {
+      "type": "text",
+      "id": "bestseller_label",
+      "label": "Bestseller badge text",
+      "default": "Più venduto"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sale_price_first",
+      "label": "Show sale price first",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 32,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 32,
+      "step": 4,
+      "unit": "px",
+      "default": 4
+    }
+  ],
+  "presets": [
+    {
+      "name": "SG Price row",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

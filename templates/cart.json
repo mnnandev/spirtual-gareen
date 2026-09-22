@@ -1,0 +1,74 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */{
+  "sections": {
+    "cart-section": {
+      "type": "main-cart",
+      "blocks": {
+        "cart-page-title": {
+          "type": "_cart-title",
+          "static": true,
+          "settings": {
+            "title": "Il tuo carrello",
+            "show_count": false,
+            "type_preset": "h1",
+            "alignment": "left",
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "cart-page-items": {
+          "type": "_cart-products",
+          "static": true,
+          "settings": {
+            "gap": 24,
+            "image_ratio": "square",
+            "dividers": true,
+            "vendor": false,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "cart-page-summary": {
+          "type": "_cart-summary",
+          "static": true,
+          "settings": {
+            "extend_summary": false,
+            "inherit_color_scheme": true,
+            "color_scheme": "scheme-6",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0
+          },
+          "blocks": {}
+        }
+      },
+      "settings": {
+        "section_width": "full-width",
+        "color_scheme": "scheme-6",
+        "show_upsell": true,
+        "upsell_collection": "all",
+        "upsell_heading": "Potrebbe piacerti anche:",
+        "upsell_max_products": 3,
+        "padding-block-start": 32,
+        "padding-block-end": 48
+      }
+    }
+  },
+  "order": [
+    "cart-section"
+  ]
+}

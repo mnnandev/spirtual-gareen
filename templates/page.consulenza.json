@@ -1,0 +1,128 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "consulenza-hero",
+      "settings": {
+        "eyebrow": "Consulenza Online con Alice",
+        "title": "Il tuo percorso verso il benessere naturale inizia da qui.",
+        "subtitle": "",
+        "cta_label": "Prenota la tua consulenza",
+        "cta_action": "scroll",
+        "image_url": "https://cdn.shopify.com/s/files/1/0998/9482/1248/files/6867548.jpg?v=1781691490",
+        "image_alt": "Consulenza online con Alice illustrazione"
+      }
+    },
+    "intro": {
+      "type": "consulenza-intro",
+      "settings": {
+        "intro": "<p>Ogni persona è unica e merita un approccio realmente personalizzato. per questo ho scelto di mettere a disposizione la mia esperienza attraverso un servizio di consulenza online personalizzata, dedicato all'ascolto e pensato per comprendere le tue esigenze accompagnandoti nell'individuare il percorso naturale più adatto a te. Durante la consulenza analizzeremo insieme le tue esigenze e riceverai consigli pratici e personalizzati su fitoterapia, integrazione, alimentazione, cosmetica naturale e strategie di benessere, con l'obiettivo di sostenere il tuo equilibrio in modo naturale.</p>",
+        "cta_text": "Prenota la tua consulenza personalizzata e inizia a prenderti cura di te con un approccio costruito sulle tue reali esigenze.",
+        "cta_label": "Prenota la tua consulenza"
+      }
+    },
+    "benefits": {
+      "type": "consulenza-benefits",
+      "blocks": {
+        "benefit_1": {
+          "type": "benefit",
+          "settings": {
+            "title": "Personalizzazione",
+            "description": "ogni indicazione viene costruita sulle tue reali esigenze."
+          }
+        },
+        "benefit_2": {
+          "type": "benefit",
+          "settings": {
+            "title": "Comodità da casa",
+            "description": "puoi svolgere la consulenza ovunque ti trovi, in modo semplice e pratico."
+          }
+        },
+        "benefit_3": {
+          "type": "benefit",
+          "settings": {
+            "title": "Approccio naturale",
+            "description": "ricevi consigli orientati al benessere naturale e alla fitoterapia."
+          }
+        },
+        "benefit_4": {
+          "type": "benefit",
+          "settings": {
+            "title": "Supporto professionale",
+            "description": "hai al tuo fianco una figura esperta che ti guida con competenza e ascolto."
+          }
+        },
+        "benefit_5": {
+          "type": "benefit",
+          "settings": {
+            "title": "Indicazioni chiare e concrete",
+            "description": "al termine della consulenza avrai suggerimenti utili e facilmente applicabili nella tua quotidianità."
+          }
+        }
+      },
+      "block_order": ["benefit_1", "benefit_2", "benefit_3", "benefit_4", "benefit_5"],
+      "settings": {
+        "heading": "I vantaggi della consulenza online"
+      }
+    },
+    "about_alice": {
+      "type": "consulenza-about",
+      "settings": {
+        "heading": "Chi è Alice?",
+        "bio": "<p>Alice è Erborista ed esperta di fitoterapia e benessere naturale. Da anni affianca ogni giorno centinaia di persone, aiutandole ad orientarsi nel mondo dei rimedi naturali con competenza, ascolto e un approccio sempre personalizzato.</p><p>La sua filosofia è semplice: non esistono soluzioni valide per tutti. Ogni persona ha caratteristiche, esigenze e obiettivi diversi, ed è proprio da qui che nasce un percorso di benessere efficace.</p><p>La consulenza online è stata pensata per offrirti un confronto diretto e professionale, durante il quale potrai ricevere indicazioni chiare e personalizzate per scegliere i rimedi naturali più adatti alla tua situazione, comodamente da casa.</p><p>Perché il vero benessere non significa semplicemente acquistare un prodotto, ma comprendere di cosa il tuo corpo ha davvero bisogno e costruire, passo dopo passo, un percorso su misura per ritrovare e mantenere il proprio equilibrio.</p>",
+        "image_url": "https://cdn.shopify.com/s/files/1/0998/9482/1248/files/5044731.jpg?v=1781692917",
+        "image_alt": "Alice, erborista Spiritual Green",
+        "cta_label": "Prenota con Alice"
+      }
+    },
+    "steps": {
+      "type": "consulenza-steps",
+      "blocks": {
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "title": "Prenota online",
+            "description": "Scegli data e orario dal calendario di Alice."
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "title": "Ricevi conferma",
+            "description": "Ti invieremo un'email con tutti i dettagli della consulenza."
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "title": "Inizia il percorso",
+            "description": "Parla con Alice e ricevi consigli personalizzati per il tuo benessere."
+          }
+        }
+      },
+      "block_order": ["step_1", "step_2", "step_3"],
+      "settings": {
+        "heading": "Come funziona?"
+      }
+    },
+    "booking": {
+      "type": "consulenza-booking",
+      "settings": {
+        "heading": "Prenota la tua consulenza",
+        "intro": "Scegli il giorno e l'orario più comodo per te. Il calendario mostra la disponibilità aggiornata di Alice.",
+        "calendly_url": "",
+        "display_mode": "both",
+        "popup_button_label": "Scegli data e ora"
+      }
+    }
+  },
+  "order": ["hero", "intro", "benefits", "about_alice", "steps", "booking"]
+}

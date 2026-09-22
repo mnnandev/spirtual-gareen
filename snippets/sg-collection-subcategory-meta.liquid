@@ -1,0 +1,54 @@
+{%- doc -%}
+  Subcategory filter metadata for the 7 parent macro-collections.
+
+  @param {string} parent_handle - Parent collection handle
+  @param {string} output - handles | titles | count
+{%- enddoc -%}
+
+{%- liquid
+  capture sg_normalized_parent_raw
+    render 'sg-normalize-macro-handle', handle: parent_handle
+  endcapture
+  assign resolved_parent = sg_normalized_parent_raw | strip
+
+  assign subcategory_handles = ''
+  assign subcategory_titles = ''
+
+  case resolved_parent
+    when 'sonno-mente-energia'
+      assign subcategory_handles = 'dormire-meglio,stress,ansia-e-relax,energia-e-stanchezza,focus-e-concentrazione'
+      assign subcategory_titles = "Dormire meglio|Stress|Ansia e Relax|Energia e Stanchezza|Concentrazione"
+    when 'difese-protezione-respiratorie'
+      assign subcategory_handles = 'difese-immunitarie,benessere-occhi-naso-e-gola,allergie-e-respirazione,antiossidanti-e-protezione-cellulare'
+      assign subcategory_titles = 'Difese immunitarie|Benessere occhi naso e gola|Allergie e respirazione|Antiossidanti e protezione cellulare'
+    when 'intestino-digestione-metabolismo'
+      assign subcategory_handles = 'intestino-e-digestione,gonfiore-e-metabolismo,peso-e-fame-nervosa,colesterolo-pressione-e-glicemia,detox-e-depurazione'
+      assign subcategory_titles = 'Intestino e Digestione|Gonfiore e Metabolismo|Peso e fame nervosa|Colesterolo Pressione e Glicemia|Depurazione'
+    when 'movimento-dolori-recupero'
+      assign subcategory_handles = 'dolori,infiammazione-e-articolazioni,muscoli-e-recupero,circolazione-e-gambe-leggere,sport-e-performance'
+      assign subcategory_titles = 'Dolori|Infiammazione e Articolazioni|Muscoli e Recupero|Circolazione e gambe leggere|Sport e prestazione'
+    when 'benessere-ormonale-intimo'
+      assign subcategory_handles = 'benessere-femminile,equilibrio-ormonale,funzionalita-vie-urinarie'
+      assign subcategory_titles = 'Benessere femminile|Equilibrio ormonale|Funzionalità delle vie urinarie'
+    when 'bellezza-cura-persona'
+      assign subcategory_handles = 'pelle-e-igiene-personale,capelli-e-unghie'
+      assign subcategory_titles = 'Pelle e igiene personale|Capelli e Unghie'
+    when 'mondo-zen'
+      assign subcategory_handles = 'armonia-della-casa,pet,oli-essenziali-e-aromaterapia,rimedi-fitoterapici'
+      assign subcategory_titles = 'Armonia della casa|Animali|Oli essenziali e aromaterapia|Rimedi Fitoterapici'
+  endcase
+
+  assign handles_list = subcategory_handles | split: ','
+  assign titles_list = subcategory_titles | split: '|'
+-%}
+
+{%- case output -%}
+  {%- when 'handles' -%}
+    {{- subcategory_handles -}}
+  {%- when 'titles' -%}
+    {{- subcategory_titles -}}
+  {%- when 'count' -%}
+    {{- handles_list.size -}}
+  {%- when 'parent' -%}
+    {{- resolved_parent -}}
+{%- endcase -%}

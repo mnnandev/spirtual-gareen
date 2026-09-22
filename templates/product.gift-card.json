@@ -1,0 +1,30 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "sg_gift_card": {
+      "type": "sg-gift-card",
+      "settings": {
+        "breadcrumb_label": "Carta regalo",
+        "heading": "Carta regalo Spiritual Green",
+        "description": "<p>Regala benessere con una carta regalo Spiritual Green. Scegli l'importo, aggiungi al carrello e ricevi il buono regalo via e-mail. Il destinatario potrà utilizzarlo su tutto il nostro negozio online.</p>",
+        "card_label": "Carta regalo",
+        "show_card_overlay": false,
+        "default_image_url": "https://cdn.shopify.com/s/files/1/0998/9482/1248/files/3c92af44-5e32-4993-ab51-3135ed365460.png?v=1789029443",
+        "amount_label": "Scegli l'importo",
+        "button_label": "Aggiungi al carrello",
+        "product_missing_text": "Collega un prodotto carta regalo nelle impostazioni della sezione per abilitare l'acquisto."
+      }
+    }
+  },
+  "order": [
+    "sg_gift_card"
+  ]
+}

@@ -1,0 +1,67 @@
+{%- doc -%}
+  Resolve a macro category handle to the Shopify collection handle that exists in the store.
+
+  @param {string} handle - Theme or Shopify collection handle
+{%- enddoc -%}
+
+{%- liquid
+  assign input_handle = handle | default: '' | strip
+
+  capture canonical_raw
+    render 'sg-normalize-macro-handle', handle: input_handle
+  endcapture
+  assign canonical = canonical_raw | strip
+
+  assign resolved = ''
+
+  if collections[input_handle] != blank
+    assign resolved = input_handle
+  endif
+
+  if resolved == blank and collections[canonical] != blank
+    assign resolved = canonical
+  endif
+
+  if resolved == blank
+    case canonical
+      when 'sonno-mente-energia'
+        if collections['sonno-mente-ed-energia'] != blank
+          assign resolved = 'sonno-mente-ed-energia'
+        endif
+      when 'difese-protezione-respiratorie'
+        if collections['difese-protezione-e-vie-respiratorie'] != blank
+          assign resolved = 'difese-protezione-e-vie-respiratorie'
+        elsif collections['difese-protezione-vie-respiratorie'] != blank
+          assign resolved = 'difese-protezione-vie-respiratorie'
+        endif
+      when 'intestino-digestione-metabolismo'
+        if collections['intestino-digestione-e-metabolismo'] != blank
+          assign resolved = 'intestino-digestione-e-metabolismo'
+        endif
+      when 'movimento-dolori-recupero'
+        if collections['movimento-dolori-e-recupero'] != blank
+          assign resolved = 'movimento-dolori-e-recupero'
+        endif
+      when 'benessere-ormonale-intimo'
+        if collections['benessere-ormonale-e-intimo'] != blank
+          assign resolved = 'benessere-ormonale-e-intimo'
+        endif
+      when 'bellezza-cura-persona'
+        if collections['bellezza-e-cura-della-persona'] != blank
+          assign resolved = 'bellezza-e-cura-della-persona'
+        elsif collections['bellezza-cura-della-persona'] != blank
+          assign resolved = 'bellezza-cura-della-persona'
+        endif
+      when 'mondo-zen'
+        if collections['mondo-zen'] != blank
+          assign resolved = 'mondo-zen'
+        endif
+    endcase
+  endif
+
+  if resolved == blank
+    assign resolved = canonical
+  endif
+-%}
+
+{{- resolved -}}

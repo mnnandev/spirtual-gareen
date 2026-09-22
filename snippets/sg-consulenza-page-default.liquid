@@ -1,0 +1,179 @@
+{%- doc -%}
+  Default Consulenza Online page markup for virtual/fallback routes.
+{%- enddoc -%}
+
+{% liquid
+  capture calendly_resolved
+    render 'sg-consulenza-calendly-url', calendly_url: calendly_url
+  endcapture
+  assign calendly_url = calendly_resolved | strip
+%}
+
+<section class="consulenza-hero" id="consulenza-hero-virtual">
+  <div class="consulenza-hero__inner">
+    <div class="consulenza-hero__content">
+      <p class="consulenza-hero__eyebrow">Consulenza Online con Alice</p>
+      <h1 class="consulenza-hero__title">Il tuo percorso verso il benessere naturale inizia da qui.</h1>
+      <button type="button" class="consulenza-hero__cta btn-prenota-ora" data-sg-consulenza-booking="scroll">
+        Prenota la tua consulenza
+      </button>
+    </div>
+    <div class="consulenza-hero__media">
+      <img
+        class="consulenza-hero__image"
+        src="https://cdn.shopify.com/s/files/1/0998/9482/1248/files/6867548.jpg?v=1781691490"
+        alt="Consulenza online con Alice illustrazione"
+        width="500"
+        height="500"
+        loading="eager"
+      >
+    </div>
+  </div>
+</section>
+
+<section class="consulenza-intro" id="consulenza-intro-virtual">
+  <div class="consulenza-intro__inner">
+    <div class="consulenza-intro__body rte">
+      <p>
+        Ogni persona è unica e merita un approccio realmente personalizzato. per questo ho scelto di mettere a disposizione la mia esperienza attraverso un servizio di consulenza online personalizzata, dedicato all'ascolto e pensato per comprendere le tue esigenze accompagnandoti nell'individuare il percorso naturale più adatto a te. Durante la consulenza analizzeremo insieme le tue esigenze e riceverai consigli pratici e personalizzati su fitoterapia, integrazione, alimentazione, cosmetica naturale e strategie di benessere, con l'obiettivo di sostenere il tuo equilibrio in modo naturale.
+      </p>
+    </div>
+    <p class="consulenza-intro__cta-line">
+      Prenota la tua consulenza personalizzata e inizia a prenderti cura di te con un approccio costruito sulle tue reali esigenze.
+    </p>
+    <button type="button" class="consulenza-intro__cta btn-prenota-ora" data-sg-consulenza-booking="scroll">
+      Prenota la tua consulenza
+    </button>
+  </div>
+</section>
+
+<section class="consulenza-benefits" id="consulenza-benefits-virtual">
+  <div class="consulenza-benefits__inner">
+    <h2 class="consulenza-benefits__title">I vantaggi della consulenza online</h2>
+    <ul class="consulenza-benefits__list" role="list">
+      <li class="consulenza-benefits__item">
+        <span class="consulenza-benefits__marker" aria-hidden="true"></span>
+        <div class="consulenza-benefits__content">
+          <h3 class="consulenza-benefits__item-title">Personalizzazione</h3>
+          <p class="consulenza-benefits__item-desc">ogni indicazione viene costruita sulle tue reali esigenze.</p>
+        </div>
+      </li>
+      <li class="consulenza-benefits__item">
+        <span class="consulenza-benefits__marker" aria-hidden="true"></span>
+        <div class="consulenza-benefits__content">
+          <h3 class="consulenza-benefits__item-title">Comodità da casa</h3>
+          <p class="consulenza-benefits__item-desc">puoi svolgere la consulenza ovunque ti trovi, in modo semplice e pratico.</p>
+        </div>
+      </li>
+      <li class="consulenza-benefits__item">
+        <span class="consulenza-benefits__marker" aria-hidden="true"></span>
+        <div class="consulenza-benefits__content">
+          <h3 class="consulenza-benefits__item-title">Approccio naturale</h3>
+          <p class="consulenza-benefits__item-desc">ricevi consigli orientati al benessere naturale e alla fitoterapia.</p>
+        </div>
+      </li>
+      <li class="consulenza-benefits__item">
+        <span class="consulenza-benefits__marker" aria-hidden="true"></span>
+        <div class="consulenza-benefits__content">
+          <h3 class="consulenza-benefits__item-title">Supporto professionale</h3>
+          <p class="consulenza-benefits__item-desc">hai al tuo fianco una figura esperta che ti guida con competenza e ascolto.</p>
+        </div>
+      </li>
+      <li class="consulenza-benefits__item">
+        <span class="consulenza-benefits__marker" aria-hidden="true"></span>
+        <div class="consulenza-benefits__content">
+          <h3 class="consulenza-benefits__item-title">Indicazioni chiare e concrete</h3>
+          <p class="consulenza-benefits__item-desc">al termine della consulenza avrai suggerimenti utili e facilmente applicabili nella tua quotidianità.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="consulenza-about" id="consulenza-about-virtual">
+  <div class="consulenza-about__inner">
+    <div class="consulenza-about__media">
+      <img
+        class="consulenza-about__photo"
+        src="https://cdn.shopify.com/s/files/1/0998/9482/1248/files/5044731.jpg?v=1781692917"
+        alt="Alice, erborista Spiritual Green"
+        width="800"
+        height="1000"
+        loading="lazy"
+      >
+    </div>
+    <div class="consulenza-about__content">
+      <h2 class="consulenza-about__heading">Chi è Alice?</h2>
+      <div class="consulenza-about__bio rte">
+        <p>
+          Alice è Erborista ed esperta di fitoterapia e benessere naturale. Da anni affianca ogni giorno centinaia di persone, aiutandole ad orientarsi nel mondo dei rimedi naturali con competenza, ascolto e un approccio sempre personalizzato.
+        </p>
+        <p>
+          La sua filosofia è semplice: non esistono soluzioni valide per tutti. Ogni persona ha caratteristiche, esigenze e obiettivi diversi, ed è proprio da qui che nasce un percorso di benessere efficace.
+        </p>
+        <p>
+          La consulenza online è stata pensata per offrirti un confronto diretto e professionale, durante il quale potrai ricevere indicazioni chiare e personalizzate per scegliere i rimedi naturali più adatti alla tua situazione, comodamente da casa.
+        </p>
+        <p>
+          Perché il vero benessere non significa semplicemente acquistare un prodotto, ma comprendere di cosa il tuo corpo ha davvero bisogno e costruire, passo dopo passo, un percorso su misura per ritrovare e mantenere il proprio equilibrio.
+        </p>
+      </div>
+      <button type="button" class="consulenza-about__cta btn-prenota-ora btn-prenota-ora--outline" data-sg-consulenza-booking="scroll">
+        Prenota con Alice
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="consulenza-steps" id="consulenza-steps-virtual">
+  <div class="consulenza-steps__inner">
+    <h2 class="consulenza-steps__title">Come funziona?</h2>
+    <div class="consulenza-steps__grid steps-grid">
+      <div class="consulenza-steps__item step-item">
+        <div class="consulenza-steps__number step-number">1</div>
+        <h3 class="consulenza-steps__step-title step-title">Prenota online</h3>
+        <p class="consulenza-steps__step-desc step-desc">Scegli data e orario dal calendario di Alice.</p>
+      </div>
+      <div class="consulenza-steps__item step-item">
+        <div class="consulenza-steps__number step-number">2</div>
+        <h3 class="consulenza-steps__step-title step-title">Ricevi conferma</h3>
+        <p class="consulenza-steps__step-desc step-desc">Ti invieremo un'email con tutti i dettagli della consulenza.</p>
+      </div>
+      <div class="consulenza-steps__item step-item">
+        <div class="consulenza-steps__number step-number">3</div>
+        <h3 class="consulenza-steps__step-title step-title">Inizia il percorso</h3>
+        <p class="consulenza-steps__step-desc step-desc">Parla con Alice e ricevi consigli personalizzati per il tuo benessere.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section
+  class="consulenza-booking"
+  id="consulenza-booking"
+  data-section-id="consulenza-booking-virtual"
+  data-calendly-url="{{ calendly_url | escape }}"
+>
+  <div class="consulenza-booking__inner">
+    <h2 class="consulenza-booking__title">Prenota la tua consulenza</h2>
+    <p class="consulenza-booking__intro">
+      Scegli il giorno e l'orario più comodo per te. Il calendario mostra la disponibilità aggiornata di Alice.
+    </p>
+    {% if calendly_url != blank %}
+      <div class="consulenza-booking__calendar-wrap">
+        <iframe
+          class="consulenza-booking__iframe"
+          src="{{ calendly_url }}"
+          title="Calendario consulenza Alice"
+          loading="lazy"
+        ></iframe>
+      </div>
+    {% else %}
+      <p class="consulenza-booking__missing">
+        Il calendario di prenotazione sarà disponibile a breve. Contattaci per fissare un appuntamento.
+      </p>
+    {% endif %}
+  </div>
+</section>
+
+<script src="{{ 'sg-consulenza-booking.js' | asset_url }}" defer></script>

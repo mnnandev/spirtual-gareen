@@ -1,0 +1,34 @@
+
+{% render 'sg-product-ingredienti',
+  empty_message: block.settings.empty_message,
+  updating_message: block.settings.updating_message
+%}
+
+{% schema %}
+{
+  "name": "SG Product Ingredienti",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "empty_message",
+      "label": "Empty state message",
+      "default": "Ingredienti non disponibili.",
+      "info": "Shown when no ingredients are found (custom.ingredienti metafield or description)."
+    },
+    {
+      "type": "text",
+      "id": "updating_message",
+      "label": "Updating message",
+      "default": "Ingredienti in aggiornamento...",
+      "info": "Shown when ingredients appear to still be inside the product description."
+    }
+  ],
+  "presets": [
+    {
+      "name": "SG Product Ingredienti",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

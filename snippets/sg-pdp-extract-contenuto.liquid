@@ -1,0 +1,121 @@
+{%- doc -%}
+  Extract package size / quantity for the Descrizione accordion (Contenuto line).
+
+  @param {object} product - Current product
+  @param {string} html - Source HTML (usually product.description)
+{%- enddoc -%}
+
+{%- liquid
+  assign current_product = product
+  if current_product == blank and closest.product != blank
+    assign current_product = closest.product
+  endif
+
+  assign source = html | default: ''
+  assign contenuto = ''
+
+  assign contenuto_headers = '<h4>Contenuto</h4>|<h4>CONTENUTO</h4>|<h3>Contenuto</h3>' | split: '|'
+  for contenuto_header in contenuto_headers
+    if source contains contenuto_header
+      assign after_header = source | split: contenuto_header | last
+      if after_header contains 'contenuto-prodotto'
+        assign cp_piece = after_header | split: 'contenuto-prodotto' | last
+        assign cp_after_open = cp_piece | split: '>' | slice: 1 | join: '>'
+        assign cp_text = cp_after_open | split: '</div>' | first | strip_html | strip
+        if cp_text contains ' in '
+          assign contenuto_qty_parts = cp_text | split: ' in '
+          assign qty_candidate = contenuto_qty_parts[1] | split: ':' | first | strip
+          if qty_candidate.size > 0 and qty_candidate.size < 40
+            assign contenuto = qty_candidate
+          endif
+        endif
+        if contenuto == blank and cp_text.size > 0 and cp_text.size <= 40
+          assign cp_down = cp_text | downcase
+          unless cp_down contains 'ingredienti' or cp_down contains ' mg' or cp_down contains 'inulina'
+            assign contenuto = cp_text
+          endunless
+        endif
+      endif
+      break
+    endif
+  endfor
+
+  if source contains 'contenuto-field'
+    assign field_chunks = source | split: 'contenuto-field'
+    if field_chunks.size > 1
+      assign field_piece = field_chunks[1]
+      assign field_after_open = field_piece | split: '>' | slice: 1 | join: '>'
+      assign field_value = field_after_open | split: '</' | first | strip_html | strip
+      if field_value != blank and field_value.size > 1
+        if contenuto == blank
+          assign contenuto = field_value
+        endif
+      endif
+    endif
+  endif
+
+  if contenuto == blank
+    assign mf_contenuto = current_product.metafields.custom.contenuto
+    if mf_contenuto != blank and mf_contenuto.value != blank
+      assign mf_value = mf_contenuto.value | strip
+      if mf_value.size > 1 and mf_value.size <= 80
+        assign contenuto = mf_value
+      endif
+    endif
+  endif
+
+  if contenuto == blank and source != blank
+    assign plain = source | strip_html | strip
+    assign nl_literal = '\' | append: 'n'
+    assign plain = plain | replace: nl_literal, '|||' | replace: '/n', '|||' | replace: '\n', '|||'
+    assign line_candidates = plain | split: '|||'
+    assign qty_hints = 'capsule|compresse|cpr| ml|ml |grammi|litri|pezzi|pz.|flacone|stick|bustine|bustina|barattolo|formato:' | split: '|'
+
+    for line_candidate in line_candidates
+      assign line_trim = line_candidate | strip
+      if contenuto == blank and line_trim != blank
+        assign line_down = line_trim | downcase
+        assign line_len = line_trim.size
+        assign skip_line = false
+
+        if line_len > 80 or line_len < 2
+          assign skip_line = true
+        endif
+
+        if skip_line == false
+          if line_down contains 'si consiglia' or line_down contains 'assunzione' or line_down contains 'descrizione' or line_down contains 'integratore alimentare' or line_down contains 'ingredienti funzionali' or line_down contains 'poiché' or line_down contains 'poiche'
+            assign skip_line = true
+          endif
+        endif
+
+        if skip_line == false
+          for hint in qty_hints
+            if line_down contains hint
+              assign contenuto = line_trim
+              break
+            endif
+          endfor
+        endif
+      endif
+    endfor
+  endif
+
+  if contenuto != blank
+    if contenuto contains '<' or contenuto contains '>'
+      assign contenuto = ''
+    endif
+  endif
+
+  if contenuto != blank
+    capture cleaned_contenuto
+      render 'sg-sanitize-line-breaks', text: contenuto, mode: 'plain'
+    endcapture
+    assign contenuto = cleaned_contenuto | strip
+    capture artifact_clean
+      render 'sg-sanitize-display-artifacts', text: contenuto
+    endcapture
+    assign contenuto = artifact_clean | strip
+  endif
+
+  echo contenuto
+-%}

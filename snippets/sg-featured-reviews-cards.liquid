@@ -1,0 +1,37 @@
+{%- doc -%}
+  Renders up to 3 featured review cards (section blocks or snippet defaults).
+
+  @param {object} [blocks] - Section blocks of type "review"
+{%- enddoc -%}
+
+<div class="sg-featured-reviews__grid" role="list">
+  {%- if blocks != blank and blocks.size > 0 -%}
+    {%- for block in blocks limit: 3 -%}
+      <article class="sg-featured-reviews__card" role="listitem"{% if block.shopify_attributes %} {{ block.shopify_attributes }}{% endif %}>
+        <div class="sg-featured-reviews__stars" aria-hidden="true">
+          {%- assign star_count = block.settings.rating | default: 5 | at_most: 5 | at_least: 1 -%}
+          {%- for i in (1..star_count) -%}
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path d="M10 1.5l2.47 5.01 5.53.8-4 3.9.94 5.5L10 14.26 5.06 16.7l.94-5.5-4-3.9 5.53-.8L10 1.5z"/>
+            </svg>
+          {%- endfor -%}
+        </div>
+        {%- if block.settings.text != blank -%}
+          <blockquote class="sg-featured-reviews__quote">
+            <p>{{ block.settings.text | escape | newline_to_br }}</p>
+          </blockquote>
+        {%- endif -%}
+        <footer class="sg-featured-reviews__footer">
+          {%- if block.settings.author != blank -%}
+            <cite class="sg-featured-reviews__author">{{ block.settings.author | escape }}</cite>
+          {%- endif -%}
+          {%- if block.settings.source != blank -%}
+            <span class="sg-featured-reviews__source">{{ block.settings.source | escape }}</span>
+          {%- endif -%}
+        </footer>
+      </article>
+    {%- endfor -%}
+  {%- else -%}
+    {% render 'sg-featured-reviews-data', mode: 'cards' %}
+  {%- endif -%}
+</div>

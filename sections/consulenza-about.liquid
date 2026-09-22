@@ -1,0 +1,107 @@
+{% liquid
+  assign about_heading = section.settings.heading | default: 'Chi è Alice?'
+  assign about_text = section.settings.bio
+  assign about_image = section.settings.image
+  assign about_image_url = section.settings.image_url
+  assign about_image_alt = section.settings.image_alt | default: 'Alice, erborista Spiritual Green'
+%}
+
+<section
+  class="consulenza-about"
+  id="consulenza-about-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="consulenza-about__inner">
+    <div class="consulenza-about__media">
+      {% if about_image != blank %}
+        {{
+          about_image
+          | image_url: width: 900
+          | image_tag:
+            class: 'consulenza-about__photo',
+            loading: 'lazy',
+            widths: '400, 600, 800, 900',
+            sizes: '(min-width: 990px) 360px, 100vw',
+            alt: about_image_alt
+        }}
+      {% elsif about_image_url != blank %}
+        <img
+          class="consulenza-about__photo"
+          src="{{ about_image_url }}"
+          alt="{{ about_image_alt | escape }}"
+          width="800"
+          height="1000"
+          loading="lazy"
+        >
+      {% else %}
+        <div
+          class="consulenza-about__photo consulenza-about__photo--placeholder"
+          role="img"
+          aria-label="{{ about_image_alt | escape }}"
+        >
+          {{ 'sg-alice-placeholder.svg' | inline_asset_content }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="consulenza-about__content">
+      <h2 class="consulenza-about__heading">{{ about_heading }}</h2>
+      {% if about_text != blank %}
+        <div class="consulenza-about__bio rte">{{ about_text }}</div>
+      {% endif %}
+      <button
+        type="button"
+        class="consulenza-about__cta btn-prenota-ora btn-prenota-ora--outline"
+        data-sg-consulenza-booking="scroll"
+      >
+        {{ section.settings.cta_label | default: 'Prenota con Alice' }}
+      </button>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Consulenza About",
+  "tag": "section",
+  "class": "consulenza-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Chi è Alice?"
+    },
+    {
+      "type": "richtext",
+      "id": "bio",
+      "label": "Bio",
+      "default": "<p>Alice è l'erborista di Spiritual Green, con anni di esperienza nella fitoterapia e nel benessere naturale. Ti accompagna nella scelta di prodotti, integratori e percorsi personalizzati, ascoltando le tue esigenze con professionalità e calore umano.</p><p>La consulenza online è pensata per chi desidera un consiglio chiaro, pratico e su misura — comodamente da casa.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Alice photo",
+      "info": "Upload the client's photo of Alice. A placeholder illustration is shown until then."
+    },
+    {
+      "type": "text",
+      "id": "image_url",
+      "label": "Photo URL override",
+      "default": "https://cdn.shopify.com/s/files/1/0998/9482/1248/files/5044731.jpg?v=1781692917"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Photo alt text",
+      "default": "Alice, erborista Spiritual Green"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "Prenota con Alice"
+    }
+  ]
+}
+{% endschema %}

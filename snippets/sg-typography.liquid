@@ -1,0 +1,347 @@
+{% comment %}
+  Global typography — store-wide (Zanetti / Spiritual Green audit)
+  Headings: Wulkan Display stand-in (Zodiak) — 600 / 28px / 36px / #404040
+  Body & descriptions: Config — 400 / 16px / 22px / #404040
+{% endcomment %}
+<style id="sg-typography-tokens">
+  :root {
+    --sg-font-body: 'Config', system-ui, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    /* Legal free stand-in for commercial "Wulkan Display" */
+    --sg-font-heading: 'Zodiak', 'Wulkan Display', Georgia, 'Times New Roman', serif;
+
+    --font-body--family: var(--sg-font-body);
+    --font-body--style: normal;
+    --font-body--weight: 400;
+    --font-subheading--family: var(--sg-font-body);
+    --font-subheading--style: normal;
+    --font-subheading--weight: 400;
+    --font-heading--family: var(--sg-font-heading);
+    --font-heading--style: normal;
+    --font-heading--weight: 600;
+    --font-accent--family: var(--sg-font-heading);
+    --font-accent--style: normal;
+    --font-accent--weight: 600;
+
+    /* Body / descriptions — Config 16 / 22 / #404040 */
+    --font-size--paragraph: 1rem; /* 16px */
+    --line-height--body-normal: 1.375; /* 22px @ 16px */
+    --sg-body-size: 1rem;
+    --sg-body-lh: 1.375;
+    --sg-text-color: #404040;
+
+    /* Headings — Wulkan/Zodiak 28 / 36 / 600 / #404040 */
+    --sg-heading-size: 1.75rem; /* 28px */
+    --sg-heading-lh: 1.2857142857; /* 36px @ 28px */
+    --sg-heading-weight: 600;
+    --font-size--h1: var(--sg-heading-size);
+    --font-size--h2: var(--sg-heading-size);
+    --font-size--h3: var(--sg-heading-size);
+    --font-size--h4: 1.375rem; /* 22px — nested titles slightly smaller */
+    --font-size--h5: 1.125rem; /* 18px */
+    --font-size--h6: 0.875rem; /* 14px */
+
+    --font-paragraph--size: var(--font-size--paragraph);
+    --font-paragraph--weight: 400;
+    --font-paragraph--letter-spacing: 0;
+
+    --font-h1--size: var(--font-size--h1);
+    --font-h1--weight: 600;
+    --font-h2--size: var(--font-size--h2);
+    --font-h2--weight: 600;
+    --font-h3--size: var(--font-size--h3);
+    --font-h3--weight: 600;
+    --font-h4--size: var(--font-size--h4);
+    --font-h4--weight: 600;
+    --font-h5--size: var(--font-size--h5);
+    --font-h5--weight: 600;
+    --font-h6--size: var(--font-size--h6);
+    --font-h6--weight: 400;
+
+    /* PDP accordion panels follow body description rhythm */
+    --sg-pdp-panel-font: var(--sg-font-body);
+    --sg-pdp-panel-size: var(--sg-body-size);
+    --sg-pdp-panel-lh: var(--sg-body-lh);
+    --sg-pdp-panel-weight: 400;
+    --sg-pdp-panel-color: var(--sg-text-color);
+    --sg-pdp-panel-pad-block: 0.5rem;
+    --sg-pdp-panel-item-gap: 0.625rem;
+    --sg-pdp-panel-strong: #404040;
+    --sg-pdp-panel-muted: #8a8a8a;
+    --sg-pdp-panel-icon: var(--color-button, #7faf72);
+
+    --sg-nav-size: 0.9375rem; /* 15px */
+    --sg-nav-size-mobile: 0.875rem; /* 14px */
+    --sg-button-size: 1rem; /* 16px */
+    --sg-button-weight: 500;
+    --sg-product-title-size: 1rem; /* 16px — Config body */
+    --sg-product-title-size-desktop: 1rem;
+    --sg-product-price-size: 1rem;
+    --sg-product-price-size-desktop: 1.125rem;
+
+    --sg-h1-size: var(--sg-heading-size);
+    --sg-h2-size: var(--sg-heading-size);
+    --sg-h3-size: var(--sg-heading-size);
+  }
+
+  @media screen and (max-width: 749px) {
+    :root {
+      /* Keep same heading/body metrics on mobile for consistency */
+      --sg-heading-size: 1.75rem; /* 28px */
+      --font-size--h1: var(--sg-heading-size);
+      --font-size--h2: var(--sg-heading-size);
+      --font-size--h3: var(--sg-heading-size);
+      --sg-nav-size: var(--sg-nav-size-mobile);
+    }
+  }
+
+  html {
+    font-size: 100%;
+  }
+
+  body {
+    font-family: var(--sg-font-body);
+    font-size: var(--sg-body-size);
+    font-weight: 400;
+    font-style: normal;
+    line-height: var(--sg-body-lh);
+    color: var(--sg-text-color);
+  }
+
+  /* Body copy / descriptions store-wide */
+  p,
+  .rte,
+  .rte p,
+  .text-block,
+  .text-block p,
+  .section-description,
+  .sg-product-pdp-content,
+  .product-description,
+  .product-details .rte,
+  .accordion .details-content,
+  .accordion .details-content p {
+    font-family: var(--sg-font-body) !important;
+    font-size: var(--sg-body-size) !important;
+    font-weight: 400 !important;
+    font-style: normal !important;
+    line-height: var(--sg-body-lh) !important;
+    color: var(--sg-text-color) !important;
+  }
+
+  /* Brand story / glass hero — keep light text on dark photo */
+  .sg-brand-story p,
+  .sg-brand-story h1,
+  .sg-brand-story h2,
+  .sg-brand-story h3,
+  .sg-brand-story .sg-brand-story__heading,
+  .sg-brand-story .sg-brand-story__eyebrow,
+  .sg-brand-story .sg-brand-story__stat-text,
+  .sg-brand-story .sg-brand-story__stat-number,
+  .sg-brand-story .sg-brand-story__footnote,
+  .sg-brand-story .sg-brand-story__callout-title,
+  .sg-brand-story .sg-brand-story__callout-text {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+
+  .sg-brand-story .sg-brand-story__footnote {
+    color: rgba(255, 255, 255, 0.75) !important;
+    -webkit-text-fill-color: rgba(255, 255, 255, 0.75) !important;
+  }
+
+  .sg-brand-story .sg-brand-story__cta {
+    color: #1a1a1a !important;
+    -webkit-text-fill-color: #1a1a1a !important;
+  }
+
+  /* Headings store-wide — Wulkan Display (Zodiak) 28/36/600
+     Exclude brand-story glass hero (needs white on photo). */
+  h1, h2, h3, h4, h5,
+  .h1, .h2, .h3, .h4, .h5,
+  .section-heading,
+  .section-header__title,
+  .sg-scroll-row__heading,
+  .category-circles__heading,
+  .custom-best-sellers__heading,
+  .sg-home-products-tabs__heading,
+  .sg-featured-reviews__heading,
+  .macro-categories__heading,
+  [class*='__heading']:not(.menu-drawer__heading):not(.accordion__heading):not(.details__heading):not(.sg-brand-story__heading) {
+    font-family: var(--sg-font-heading) !important;
+    font-weight: var(--sg-heading-weight) !important;
+    font-style: normal !important;
+    color: var(--sg-text-color) !important;
+  }
+
+  /* Brand-story heading keeps display font, but color is set in the white block below */
+  .sg-brand-story .sg-brand-story__heading {
+    font-family: var(--sg-font-heading) !important;
+    font-weight: var(--sg-heading-weight) !important;
+    font-style: normal !important;
+  }
+
+  h1:not(.sg-brand-story__heading),
+  .h1:not(.sg-brand-story__heading),
+  h2:not(.sg-brand-story__heading),
+  .h2:not(.sg-brand-story__heading),
+  h3:not(.sg-brand-story__heading):not(.sg-collection-card__title):not(.sg-home-product-card__title):not(.custom-best-sellers__title):not(.sg-product-card-heading__title):not(.resource-card__title),
+  .h3:not(.sg-brand-story__heading):not(.sg-collection-card__title):not(.sg-home-product-card__title):not(.custom-best-sellers__title):not(.sg-product-card-heading__title):not(.resource-card__title) {
+    font-size: var(--sg-heading-size) !important;
+    line-height: var(--sg-heading-lh) !important;
+    font-weight: var(--sg-heading-weight) !important;
+  }
+
+  h4, .h4 {
+    font-size: var(--font-size--h4) !important;
+    line-height: 1.3 !important;
+    font-weight: 600 !important;
+  }
+
+  h5, .h5 {
+    font-size: var(--font-size--h5) !important;
+    line-height: 1.3 !important;
+    font-weight: 600 !important;
+  }
+
+  h6, .h6 {
+    font-family: var(--sg-font-body) !important;
+    font-size: var(--font-size--h6) !important;
+    font-weight: 400 !important;
+    line-height: 1.3 !important;
+    letter-spacing: 0.125em;
+    text-transform: uppercase;
+    color: var(--sg-text-color) !important;
+  }
+
+  /* Theme type presets that map to headings */
+  .text-block.h1,
+  .text-block.h2,
+  .text-block.h3,
+  .text-block.h4,
+  .text-block.h5,
+  [class*='type-heading'],
+  .h0 {
+    font-family: var(--sg-font-heading) !important;
+    font-weight: var(--sg-heading-weight) !important;
+    color: var(--sg-text-color) !important;
+  }
+
+  .text-block.h1,
+  .text-block.h2,
+  .text-block.h3,
+  .h0 {
+    font-size: var(--sg-heading-size) !important;
+    line-height: var(--sg-heading-lh) !important;
+  }
+
+  /* Buttons — Config 16px / 500 */
+  .button,
+  .btn,
+  button.shopify-payment-button__button,
+  .product-form__submit,
+  .sg-product-card-actions__btn,
+  .custom-best-sellers__btn,
+  a.button {
+    font-family: var(--sg-font-body) !important;
+    font-size: var(--sg-button-size) !important;
+    font-weight: var(--sg-button-weight) !important;
+    line-height: 1 !important;
+  }
+
+  /* Header nav — Config */
+  #header-component .header-menu :is(.menu-list__link, .menu-list__link-title),
+  #header-component .header-menu__center-link,
+  #header-component .header-menu__center-link .menu-list__link-title,
+  .menu-drawer__menu-item--mainlist,
+  .menu-drawer__menu-item--mainlist .menu-drawer__menu-item-text {
+    font-family: var(--sg-font-body) !important;
+    font-size: var(--sg-nav-size) !important;
+    font-weight: 400 !important;
+    line-height: 1.25 !important;
+    text-transform: capitalize;
+  }
+
+  /* Product cards — Config (descriptions/titles, not display headings).
+     Use h3.selector so these beat the store-wide h3 display size (28px). */
+  h3.sg-collection-card__title,
+  h3.sg-home-product-card__title,
+  h3.custom-best-sellers__title,
+  h3.sg-product-card-heading__title,
+  h3.resource-card__title,
+  .sg-collection-card__title,
+  .sg-home-product-card__title,
+  .sg-product-card-heading .sg-home-product-card__title,
+  .sg-product-card-heading .sg-collection-card__title,
+  .product-card .product-card__title,
+  .product-card .card__heading,
+  .custom-best-sellers__title,
+  .resource-card__title {
+    font-family: var(--sg-font-body) !important;
+    font-size: var(--sg-product-title-size) !important;
+    font-weight: 400 !important;
+    line-height: 1.35 !important;
+    letter-spacing: 0 !important;
+    color: var(--sg-text-color) !important;
+  }
+
+  /* Card descriptions — beat global `p` body rules so line-clamp can work */
+  p.sg-collection-card__description,
+  p.sg-home-product-card__description,
+  p.custom-best-sellers__card-description,
+  .sg-collection-card__description,
+  .sg-home-product-card__description,
+  .custom-best-sellers__card-description {
+    font-family: var(--sg-font-body) !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: 1.45 !important;
+    color: #6b7280 !important;
+  }
+
+  .sg-collection-card__price,
+  .sg-home-product-card__price,
+  .sg-product-card-copy .sg-home-product-card__price-row,
+  .custom-best-sellers__price,
+  .product-card .price,
+  .product-card .price-item {
+    font-family: var(--sg-font-body) !important;
+    font-size: var(--sg-product-price-size) !important;
+    font-weight: 500 !important;
+    color: var(--sg-text-color) !important;
+  }
+
+  /* Accordion row titles stay UI (Config), not display */
+  .accordion .details__header,
+  .accordion summary,
+  .accordion .details-heading,
+  .product-details .accordion .summary__title {
+    font-family: var(--sg-font-body) !important;
+    font-weight: 500 !important;
+  }
+
+  /* FINAL: brand-story glass text must stay white (beats earlier store-wide #404040 rules) */
+  .sg-brand-story h1,
+  .sg-brand-story h2,
+  .sg-brand-story h3,
+  .sg-brand-story .sg-brand-story__heading,
+  .sg-brand-story .sg-brand-story__eyebrow,
+  .sg-brand-story .sg-brand-story__stat-text,
+  .sg-brand-story .sg-brand-story__stat-number,
+  .sg-brand-story .sg-brand-story__stat-value,
+  .sg-brand-story .sg-brand-story__callout-title,
+  .sg-brand-story .sg-brand-story__callout-text,
+  .sg-brand-story .sg-brand-story__footnote,
+  .sg-brand-story p:not(.sg-brand-story__cta) {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+
+  .sg-brand-story .sg-brand-story__footnote {
+    color: rgba(255, 255, 255, 0.75) !important;
+    -webkit-text-fill-color: rgba(255, 255, 255, 0.75) !important;
+  }
+
+  .sg-brand-story .sg-brand-story__cta {
+    color: #1a1a1a !important;
+    -webkit-text-fill-color: #1a1a1a !important;
+  }
+</style>

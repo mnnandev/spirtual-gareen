@@ -1,0 +1,144 @@
+{%- doc -%}
+  Subcategory tag filter bar for parent collection pages.
+  Uses Shopify native /collections/handle/tag URLs (no JavaScript).
+
+  @param {collection} collection - Current collection object
+{%- enddoc -%}
+
+{%- capture subcategory_handles_csv -%}
+  {%- render 'sg-collection-subcategory-meta', parent_handle: collection.handle, output: 'handles' -%}
+{%- endcapture -%}
+{%- capture subcategory_titles_csv -%}
+  {%- render 'sg-collection-subcategory-meta', parent_handle: collection.handle, output: 'titles' -%}
+{%- endcapture -%}
+
+{%- assign subcategory_handles_csv = subcategory_handles_csv | strip -%}
+{%- assign subcategory_titles_csv = subcategory_titles_csv | strip -%}
+
+{%- if subcategory_handles_csv != blank -%}
+  {%- assign filter_handles = subcategory_handles_csv | split: ',' -%}
+  {%- assign filter_titles = subcategory_titles_csv | split: '|' -%}
+
+  {%- liquid
+    assign tutti_active = true
+    if current_tags != blank and current_tags.size > 0
+      assign tutti_active = false
+    endif
+  -%}
+
+  <nav
+    class="sg-collection-subcategory-filters"
+    aria-label="Filtra per sottocategoria"
+  >
+    <div class="sg-collection-subcategory-filters__scroll">
+      <a
+        href="{{ collection.url }}"
+        class="sg-collection-subcategory-filters__btn{% if tutti_active %} is-active{% endif %}"
+        {% if tutti_active %}
+          aria-current="true"
+        {% endif %}
+      >
+        Tutti
+      </a>
+
+      {%- for sub_handle in filter_handles -%}
+        {%- assign sub_index = forloop.index0 -%}
+        {%- assign sub_title = filter_titles[sub_index] -%}
+        {%- assign sub_handle = sub_handle | strip -%}
+        {%- assign tag_active = false -%}
+        {%- if current_tags contains sub_handle -%}
+          {%- assign tag_active = true -%}
+        {%- endif -%}
+        <a
+          href="{{ collection.url }}/{{ sub_handle }}"
+          class="sg-collection-subcategory-filters__btn{% if tag_active %} is-active{% endif %}"
+          {% if tag_active %}
+            aria-current="true"
+          {% endif %}
+        >
+          {{ sub_title }}
+        </a>
+      {%- endfor -%}
+    </div>
+  </nav>
+{%- endif -%}
+
+{% stylesheet %}
+  .sg-collection-subcategory-filters {
+    width: 100%;
+    margin: 0 0 20px;
+    padding: 0;
+    grid-column: var(--full-width);
+  }
+
+  .sg-collection-subcategory-filters__scroll {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+
+  .sg-collection-subcategory-filters__scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sg-collection-subcategory-filters__btn {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 8px 18px;
+    border: 1.5px solid var(--color-button, #7FAF72);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-button, #7FAF72);
+    font-family: var(--font-body--family, 'DM Sans', system-ui, sans-serif);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .sg-collection-subcategory-filters__btn:hover {
+    background: color-mix(in srgb, var(--color-button, #7FAF72) 10%, transparent);
+  }
+
+  .sg-collection-subcategory-filters__btn.is-active {
+    background: var(--color-button, #7FAF72);
+    border-color: var(--color-button, #7FAF72);
+    color: #ffffff;
+  }
+
+  .sg-collection-subcategory-filters__btn.is-active:hover {
+    background: var(--color-button, #7FAF72);
+    color: #ffffff;
+  }
+
+  @media screen and (max-width: 749px) {
+    .sg-collection-subcategory-filters {
+      margin-bottom: 16px;
+    }
+
+    .sg-collection-subcategory-filters__scroll {
+      gap: 8px;
+      margin-inline: calc(-1 * var(--page-margin, 16px));
+      padding-inline: var(--page-margin, 16px);
+    }
+
+    .sg-collection-subcategory-filters__btn {
+      min-height: 36px;
+      padding: 7px 14px;
+      font-size: 13px;
+    }
+  }
+{% endstylesheet %}

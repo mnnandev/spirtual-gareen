@@ -1,0 +1,249 @@
+<section
+  id="SgQualityFirst-{{ section.id }}"
+  class="sg-quality-first"
+  data-section-id="{{ section.id }}"
+>
+  <div class="sg-quality-first__container">
+    <div class="sg-quality-first__layout">
+      {% if section.settings.heading != blank %}
+        <h2 class="sg-quality-first__heading sg-animate">{{ section.settings.heading }}</h2>
+      {% endif %}
+
+      {% if section.blocks.size > 0 %}
+        <ul class="sg-quality-first__list" role="list">
+          {% for block in section.blocks %}
+            <li
+              class="sg-quality-first__item sg-animate"
+              data-delay="{{ forloop.index }}"
+              {{ block.shopify_attributes }}
+            >
+              <span class="sg-quality-first__check" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 6 9 17l-5-5"/>
+                </svg>
+              </span>
+              <span class="sg-quality-first__text">{{ block.settings.text }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .sg-quality-first {
+    background: #ffffff;
+    padding: clamp(64px, 7vw, 96px) 0;
+    box-sizing: border-box;
+  }
+
+  .sg-quality-first__container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 3vw, 2.5rem);
+    box-sizing: border-box;
+  }
+
+  .sg-quality-first__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    align-items: center;
+    gap: clamp(40px, 6vw, 80px);
+  }
+
+  .sg-quality-first__heading {
+    margin: 0;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(2rem, 4.2vw, 3.25rem);
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: 0.02em;
+    color: #1a1a1a;
+    text-transform: uppercase;
+  }
+
+  .sg-quality-first__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid #e8e8e4;
+  }
+
+  .sg-quality-first__item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: clamp(18px, 2.2vw, 22px) 0;
+    border-bottom: 1px solid #e8e8e4;
+  }
+
+  .sg-quality-first__check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #D8E8D4;
+    color: #1a1a1a;
+  }
+
+  .sg-quality-first__text {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: clamp(15px, 1.25vw, 17px);
+    font-weight: 400;
+    line-height: 1.45;
+    color: #4a5568;
+  }
+
+  .sg-quality-first .sg-animate {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+
+  .sg-quality-first .sg-animate.sg-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .sg-quality-first .sg-animate[data-delay='1'] { transition-delay: 0.05s; }
+  .sg-quality-first .sg-animate[data-delay='2'] { transition-delay: 0.1s; }
+  .sg-quality-first .sg-animate[data-delay='3'] { transition-delay: 0.15s; }
+  .sg-quality-first .sg-animate[data-delay='4'] { transition-delay: 0.2s; }
+  .sg-quality-first .sg-animate[data-delay='5'] { transition-delay: 0.25s; }
+  .sg-quality-first .sg-animate[data-delay='6'] { transition-delay: 0.3s; }
+
+  @media screen and (max-width: 900px) {
+    .sg-quality-first__layout {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .sg-quality-first__heading {
+      text-align: left;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .sg-quality-first {
+      padding: 48px 0;
+    }
+
+    .sg-quality-first__item {
+      gap: 12px;
+      padding: 16px 0;
+    }
+
+    .sg-quality-first__text {
+      font-size: 15px;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  function initSgQualityFirstAnimate(root = document) {
+    const items = root.querySelectorAll('.sg-quality-first .sg-animate');
+    if (!items.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      items.forEach((item) => item.classList.add('sg-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('sg-visible');
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -30px 0px' }
+    );
+
+    items.forEach((item) => {
+      if (!item.classList.contains('sg-visible')) {
+        observer.observe(item);
+      }
+    });
+  }
+
+  initSgQualityFirstAnimate();
+
+  document.addEventListener('shopify:section:load', (event) => {
+    if (event.target instanceof HTMLElement) {
+      initSgQualityFirstAnimate(event.target);
+    }
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Quality First",
+  "tag": "section",
+  "class": "sg-quality-first-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "La Qualità al Primo Posto"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "point",
+      "name": "Quality point",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Prodotto in Italia"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Quality First",
+      "category": "Custom",
+      "blocks": [
+        {
+          "type": "point",
+          "settings": {
+            "text": "Prodotto in Italia"
+          }
+        },
+        {
+          "type": "point",
+          "settings": {
+            "text": "Prodotti cosmetici naturali"
+          }
+        },
+        {
+          "type": "point",
+          "settings": {
+            "text": "Prodotti che rispettano l'ambiente e gli animali"
+          }
+        },
+        {
+          "type": "point",
+          "settings": {
+            "text": "Alimenti senza glutine, vegani e senza zucchero"
+          }
+        },
+        {
+          "type": "point",
+          "settings": {
+            "text": "Alimenti biologici, bio organici secchi e freschi certificati"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

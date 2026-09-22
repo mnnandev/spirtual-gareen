@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Consulenza online con Alice">
+  <defs>
+    <linearGradient id="hero-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#dff3df"/>
+      <stop offset="55%" stop-color="#c8e6c9"/>
+      <stop offset="100%" stop-color="#a5d6a7"/>
+    </linearGradient>
+    <linearGradient id="hero-leaf" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7bc67b"/>
+      <stop offset="100%" stop-color="#7FAF72"/>
+    </linearGradient>
+    <linearGradient id="hero-card" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f3faf3"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="900" rx="28" fill="url(#hero-bg)"/>
+
+  <circle cx="180" cy="160" r="110" fill="url(#hero-leaf)" opacity="0.18"/>
+  <circle cx="1020" cy="720" r="140" fill="url(#hero-leaf)" opacity="0.16"/>
+  <path d="M90 640c70-40 150-20 190 40-80 10-150 0-190-40z" fill="url(#hero-leaf)" opacity="0.22"/>
+  <path d="M980 120c60-50 150-40 190 20-70 20-140 10-190-20z" fill="url(#hero-leaf)" opacity="0.2"/>
+
+  <rect x="720" y="150" width="300" height="220" rx="22" fill="url(#hero-card)" stroke="#ffffff" stroke-width="8"/>
+  <rect x="750" y="185" width="240" height="150" rx="14" fill="#e8f5e9"/>
+  <circle cx="870" cy="255" r="42" fill="#f4e8dc"/>
+  <path d="M828 255c0-38 19-68 42-68s42 30 42 68" fill="#5c4033"/>
+  <ellipse cx="858" cy="252" rx="5" ry="7" fill="#3d2b1f"/>
+  <ellipse cx="882" cy="252" rx="5" ry="7" fill="#3d2b1f"/>
+  <path d="M862 270q8 6 16 0" fill="none" stroke="#8d6e63" stroke-width="3" stroke-linecap="round"/>
+  <rect x="808" y="312" width="124" height="12" rx="6" fill="#7FAF72" opacity="0.35"/>
+
+  <circle cx="280" cy="470" r="170" fill="#ffffff" opacity="0.72"/>
+  <ellipse cx="280" cy="410" rx="88" ry="96" fill="#f4e8dc"/>
+  <path d="M192 410c0-88 40-156 88-156s88 68 88 156" fill="#5c4033"/>
+  <ellipse cx="252" cy="395" rx="10" ry="13" fill="#3d2b1f"/>
+  <ellipse cx="308" cy="395" rx="10" ry="13" fill="#3d2b1f"/>
+  <path d="M262 438q18 14 36 0" fill="none" stroke="#8d6e63" stroke-width="4" stroke-linecap="round"/>
+  <path d="M205 560c35 72 115 72 150 0l-18-24H223z" fill="#ffffff"/>
+  <path d="M223 520h114l12 36H211z" fill="#7FAF72"/>
+
+  <g transform="translate(470 500)">
+    <rect x="0" y="0" width="250" height="110" rx="24" fill="#ffffff" opacity="0.95"/>
+    <path d="M28 34h194" stroke="#d7ead7" stroke-width="4" stroke-linecap="round"/>
+    <text x="28" y="68" font-family="Georgia, serif" font-size="24" fill="#7FAF72">Consulenza</text>
+    <text x="28" y="96" font-family="system-ui, sans-serif" font-size="18" fill="#4a5568">Online con Alice</text>
+  </g>
+
+  <g transform="translate(500 250)">
+    <circle cx="0" cy="0" r="34" fill="#ffffff" opacity="0.95"/>
+    <path d="M-10 -4h20M-10 8h12" stroke="#7FAF72" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="70" cy="40" r="26" fill="#ffffff" opacity="0.9"/>
+    <path d="M58 40c0-8 6-14 12-14s12 6 12 14" fill="none" stroke="#97C48A" stroke-width="4"/>
+  </g>
+
+  <text x="600" y="820" text-anchor="middle" font-family="system-ui, sans-serif" font-size="22" fill="#7FAF72" letter-spacing="2">Benessere naturale � Consulenza personalizzata</text>
+</svg>

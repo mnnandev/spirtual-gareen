@@ -1,0 +1,51 @@
+{% doc %}
+  @param {object} block - Section block
+  @param {boolean} [hidden_clone] - Duplicate slide for infinite marquee
+{% enddoc %}
+
+{% liquid
+  assign badge_icon = block.settings.icon | default: 'natural'
+  assign badge_image_url = blank
+  if block.settings.image_url != blank
+    assign badge_image_url = block.settings.image_url
+  elsif block.settings.image != blank
+    assign badge_image_url = block.settings.image | image_url: width: 240
+  endif
+%}
+
+<article
+  class="sg-cert-badges__item"
+  {% unless hidden_clone %}
+    {{ block.shopify_attributes }}
+  {% else %}
+    aria-hidden="true"
+    data-cert-clone
+  {% endunless %}
+  data-cert-item
+>
+  <div
+    class="sg-cert-badge"
+    {% if block.settings.ring_color != blank or block.settings.icon_color != blank %}
+      style="{% if block.settings.ring_color != blank %}--sg-cert-ring: {{ block.settings.ring_color }};{% endif %}{% if block.settings.icon_color != blank %} --sg-cert-icon: {{ block.settings.icon_color }};{% endif %}"
+    {% endif %}
+  >
+    <div class="sg-cert-badge__ring" aria-hidden="true">
+      {% if badge_image_url != blank %}
+        <img
+          class="sg-cert-badge__image"
+          src="{{ badge_image_url }}"
+          alt=""
+          width="56"
+          height="56"
+          loading="lazy"
+          decoding="async"
+        >
+      {% else %}
+        {% render 'sg-cert-badge-icon', icon: badge_icon %}
+      {% endif %}
+    </div>
+    {% if block.settings.label != blank %}
+      <p class="sg-cert-badge__label">{{ block.settings.label }}</p>
+    {% endif %}
+  </div>
+</article>

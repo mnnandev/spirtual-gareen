@@ -1,0 +1,1065 @@
+{% liquid
+  assign featured_product = section.settings.product
+  assign story_image_url = blank
+  assign story_image_alt = section.settings.image_alt | default: 'Prodotti naturali Spiritual Green'
+  assign story_image_link = blank
+
+  if featured_product != blank
+    if featured_product.featured_image != blank
+      assign story_image_url = featured_product.featured_image | image_url: width: 1200
+      assign story_image_alt = featured_product.featured_image.alt | default: featured_product.title
+    endif
+    assign story_image_link = featured_product.url
+  endif
+
+  if story_image_url == blank and section.settings.image != blank
+    assign story_image_url = section.settings.image | image_url: width: 1200
+    assign story_image_alt = section.settings.image.alt | default: story_image_alt
+  endif
+
+  if section.settings.button_link != blank
+    assign cta_link = section.settings.button_link
+  elsif story_image_link != blank
+    assign cta_link = story_image_link
+  else
+    assign cta_link = routes.all_products_collection_url
+  endif
+
+  if section.settings.background_image != blank
+    assign story_bg_url = section.settings.background_image | image_url: width: 2400
+  elsif section.settings.background_asset != blank
+    assign story_bg_url = section.settings.background_asset | asset_url
+  else
+    assign story_bg_url = 'sg-brand-story-bg.png' | asset_url
+  endif
+
+  assign viacap_video_path = 'v1755019042/library/viacap/Seed-2025_3D-360-Product-Catalog_Capsule_DS01-Transparency_web-web_hd_720p.mov'
+  assign viacap_cloud_base = 'https://res.cloudinary.com/dljz0lko8/video/upload'
+  assign theme_video_webm = 'sg-brand-story-product-360.webm' | asset_url
+  assign theme_video_mov = viacap_cloud_base | append: '/' | append: viacap_video_path
+  assign story_video_webm = blank
+  assign story_video_mp4 = blank
+  assign story_video_mov = blank
+  assign shopify_video = blank
+  assign video_aria_label = section.settings.video_aria_label | default: 'Capsula VIACAP 360°'
+  assign use_360_video = section.settings.use_360_video
+
+  if use_360_video
+    if section.settings.product_video != blank
+      assign shopify_video = section.settings.product_video
+    elsif section.settings.video_url != blank
+      assign story_video_url = section.settings.video_url
+      if story_video_url contains 'res.cloudinary.com' and story_video_url contains '/video/upload/'
+        assign cloudinary_upload_parts = story_video_url | split: '/video/upload/'
+        assign story_video_webm = cloudinary_upload_parts[0] | append: '/video/upload/f_webm/' | append: cloudinary_upload_parts[1]
+        assign story_video_mov = story_video_url
+      else
+        assign story_video_mp4 = story_video_url
+      endif
+    else
+      assign story_video_webm = theme_video_webm
+      assign story_video_mov = theme_video_mov
+    endif
+  endif
+
+  assign has_visual = false
+  assign visual_mode = 'image'
+  if use_360_video
+    if shopify_video != blank or story_video_mp4 != blank or story_video_webm != blank or story_video_mov != blank
+      assign has_visual = true
+      assign visual_mode = 'video'
+    endif
+  endif
+  if has_visual == false and story_image_url != blank
+    assign has_visual = true
+    assign visual_mode = 'image'
+  endif
+
+  assign use_product_content = section.settings.use_product_content
+  assign eyebrow = section.settings.eyebrow | default: '• SPIRITUAL GREEN — VIACAP®'
+  assign heading = section.settings.heading
+  assign stat_text = section.settings.stat_text
+  assign stat_value = section.settings.stat_value
+  assign footnote = section.settings.footnote
+  assign outer_title = section.settings.outer_callout_title
+  assign outer_text = section.settings.outer_callout_text
+  assign inner_title = section.settings.inner_callout_title
+  assign inner_text = section.settings.inner_callout_text
+  assign button_label = section.settings.button_label
+  assign show_callouts = section.settings.show_callouts
+  assign show_leaf_burst = section.settings.show_leaf_burst
+  assign burst_start_pct = section.settings.burst_start_pct | default: 42
+  assign burst_end_pct = section.settings.burst_end_pct | default: 70
+
+  if use_product_content and featured_product != blank
+    assign product_title = featured_product.title
+    assign heading = 'Molti integratori non resistono alla digestione — ' | append: product_title | append: ' sì.'
+    assign stat_text = product_title | append: '° supporta digestione e regolarità'
+    assign footnote = '°Aloe barbadensis Miller — gel sine cute'
+    assign outer_text = 'Protegge il succo di Aloe Vera dall' | append: "'" | append: 'acidità gastrica, per un rilascio graduale degli attivi nel tratto digestivo.'
+    assign inner_text = 'Rilascia il gel puro di Aloe barbadensis Miller nel tratto intestinale, dove il benessere quotidiano conta di più.'
+    assign video_aria_label = 'Capsula ' | append: product_title | append: ' VIACAP 360°'
+    assign button_label = 'Scopri ' | append: product_title
+    assign cta_link = featured_product.url
+  endif
+%}
+
+<section
+  class="sg-brand-story sg-brand-story--glass"
+  id="sg-brand-story-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="sg-brand-story__scene">
+    <div class="sg-brand-story__bg" aria-hidden="true">
+      <img
+        class="sg-brand-story__bg-image"
+        src="{{ story_bg_url }}"
+        alt=""
+        width="2400"
+        height="1200"
+        loading="eager"
+        fetchpriority="low"
+      >
+      <div class="sg-brand-story__bg-overlay"></div>
+    </div>
+
+    <div class="sg-brand-story__shell">
+      <div class="sg-brand-story__inner">
+      <div class="sg-brand-story__copy sg-animate sg-visible">
+        {% if eyebrow != blank %}
+          <p class="sg-brand-story__eyebrow">{{ eyebrow }}</p>
+        {% endif %}
+
+        {% if heading != blank %}
+          <h2 class="sg-brand-story__heading" style="color:#ffffff !important;-webkit-text-fill-color:#ffffff !important;">{{ heading }}</h2>
+        {% endif %}
+
+        {% if stat_text != blank or stat_value != blank %}
+          <div class="sg-brand-story__stat-card">
+            {% if stat_text != blank %}
+              <p class="sg-brand-story__stat-text">{{ stat_text }}</p>
+            {% endif %}
+            {% if stat_value != blank %}
+              <div class="sg-brand-story__stat-value" aria-hidden="true">
+                <span class="sg-brand-story__stat-icon">
+                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <circle cx="14" cy="14" r="13" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M14 18V10M14 10L10.5 13.5M14 10L17.5 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <span class="sg-brand-story__stat-number">{{ stat_value }}</span>
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {% if footnote != blank %}
+          <p class="sg-brand-story__footnote">{{ footnote }}</p>
+        {% endif %}
+
+        {% if section.settings.show_cta and button_label != blank %}
+          <a class="sg-brand-story__cta" href="{{ cta_link }}">
+            {{ button_label }}
+          </a>
+        {% endif %}
+      </div>
+
+      {% if has_visual or show_callouts %}
+        <div class="sg-brand-story__stage sg-animate sg-visible" data-delay="2">
+          {% if has_visual %}
+            <div class="sg-brand-story__visual">
+              {% if story_image_link != blank %}
+                <a
+                  href="{{ story_image_link }}"
+                  class="sg-brand-story__visual-link"
+                  aria-label="{{ featured_product.title | default: story_image_alt | escape }}"
+                >
+              {% else %}
+                <div class="sg-brand-story__visual-link">
+              {% endif %}
+                {% if visual_mode == 'video' %}
+                  <div
+                    class="sg-brand-story__video-matte"
+                    data-burst-start-pct="{{ burst_start_pct }}"
+                    data-burst-end-pct="{{ burst_end_pct }}"
+                  >
+                  {% if shopify_video != blank %}
+                    {{
+                      shopify_video
+                      | video_tag:
+                        class: 'sg-brand-story__video',
+                        autoplay: true,
+                        loop: true,
+                        muted: true,
+                        controls: false,
+                        playsinline: true,
+                        preload: 'auto',
+                        image_size: '1200x'
+                    }}
+                  {% else %}
+                      <video
+                        class="sg-brand-story__video"
+                        width="400"
+                        height="400"
+                        autoplay
+                        muted
+                        loop
+                        playsinline
+                        disablepictureinpicture
+                        preload="auto"
+                        data-testid="viacap-video"
+                        aria-label="{{ video_aria_label | escape }}"
+                      >
+                        {% if story_video_webm != blank %}
+                          <source src="{{ story_video_webm }}" type="video/webm">
+                        {% endif %}
+                        {% if story_video_mov != blank %}
+                          <source src="{{ story_video_mov }}" type="video/quicktime">
+                        {% endif %}
+                        {% if story_video_mp4 != blank and story_video_webm == blank %}
+                          <source src="{{ story_video_mp4 }}" type="video/mp4">
+                        {% endif %}
+                      </video>
+                  {% endif %}
+                  {% if show_leaf_burst %}
+                    <div class="sg-brand-story__leaf-layer" aria-hidden="true">
+                      {% for i in (1..18) %}
+                        <span class="sg-brand-story__leaf" data-leaf-index="{{ i }}">
+                          <svg width="20" height="34" viewBox="0 0 20 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M10 1.5C6.2 12.5 4.5 22.5 10 32.5C15.5 22.5 13.8 12.5 10 1.5Z" fill="currentColor"/>
+                            <path d="M10 4V30" stroke="rgba(255,255,255,0.35)" stroke-width="0.75"/>
+                          </svg>
+                        </span>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  </div>
+                {% else %}
+                  <img
+                    class="sg-brand-story__image"
+                    src="{{ story_image_url }}"
+                    alt="{{ story_image_alt | escape }}"
+                    width="400"
+                    height="520"
+                    loading="lazy"
+                    decoding="async"
+                  >
+                {% endif %}
+              {% if story_image_link != blank %}
+                </a>
+              {% else %}
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          {% if show_callouts %}
+            {% if outer_title != blank or outer_text != blank %}
+            <div class="sg-brand-story__callout sg-brand-story__callout--outer">
+              {% if outer_title != blank %}
+                <p class="sg-brand-story__callout-title">{{ outer_title }}</p>
+              {% endif %}
+              {% if outer_text != blank %}
+                <p class="sg-brand-story__callout-text">{{ outer_text }}</p>
+              {% endif %}
+            </div>
+            {% endif %}
+            {% if inner_title != blank or inner_text != blank %}
+            <div class="sg-brand-story__callout sg-brand-story__callout--inner">
+              {% if inner_title != blank %}
+                <p class="sg-brand-story__callout-title">{{ inner_title }}</p>
+              {% endif %}
+              {% if inner_text != blank %}
+                <p class="sg-brand-story__callout-text">{{ inner_text }}</p>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endif %}
+        </div>
+      {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .sg-brand-story {
+    padding: 0;
+    background: #EFF5ED;
+    color: #ffffff;
+  }
+
+  .sg-brand-story--glass {
+    width: 100%;
+    max-width: none;
+  }
+
+  .sg-brand-story__scene {
+    position: relative;
+    width: calc(100% - clamp(1.5rem, 4vw, 3rem));
+    max-width: 1440px;
+    margin: 0 auto;
+    min-height: clamp(520px, 56vw, 640px);
+    border-radius: 24px;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .sg-brand-story__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .sg-brand-story__bg-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 40%;
+    transform: scale(1.06);
+  }
+
+  .sg-brand-story__bg-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(18, 42, 28, 0.52) 0%,
+        rgba(18, 42, 28, 0.28) 38%,
+        rgba(18, 42, 28, 0.08) 68%,
+        rgba(18, 42, 28, 0.04) 100%
+      ),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.12) 100%);
+  }
+
+  .sg-brand-story__shell {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+  }
+
+  .sg-brand-story__inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(340px, 1.15fr);
+    gap: clamp(1rem, 3vw, 2rem);
+    align-items: center;
+    min-height: inherit;
+    padding: clamp(3rem, 6vw, 5rem) clamp(2rem, 5vw, 4.5rem);
+    box-sizing: border-box;
+  }
+
+  .sg-brand-story__copy {
+    max-width: 520px;
+  }
+
+  .sg-brand-story__eyebrow {
+    margin: 0 0 20px;
+    font-family: var(--sg-font-body, 'Config', system-ui, sans-serif);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #ffffff !important;
+  }
+
+  .sg-brand-story__heading {
+    margin: 0;
+    font-family: var(--sg-font-heading, 'Zodiak', Georgia, serif);
+    font-size: clamp(2rem, 3.8vw, 3rem);
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    color: #ffffff !important;
+    max-width: 500px;
+    text-wrap: balance;
+  }
+
+  .sg-brand-story__stat-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 36px;
+    padding: 16px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    max-width: 440px;
+  }
+
+  .sg-brand-story__stat-text {
+    margin: 0;
+    font-family: var(--sg-font-body, 'Config', system-ui, sans-serif);
+    font-size: 14px;
+    line-height: 1.45;
+    color: #ffffff !important;
+    flex: 1;
+  }
+
+  .sg-brand-story__stat-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    color: #ffffff !important;
+  }
+
+  .sg-brand-story__stat-icon {
+    display: inline-flex;
+    opacity: 0.92;
+    color: #ffffff !important;
+  }
+
+  .sg-brand-story__stat-number {
+    font-family: var(--sg-font-body, 'Config', system-ui, sans-serif);
+    font-size: clamp(2.1rem, 4vw, 3rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: #ffffff !important;
+  }
+
+  .sg-brand-story__footnote {
+    margin: 16px 0 0;
+    font-family: var(--sg-font-body, 'Config', system-ui, sans-serif);
+    font-size: 11px;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.75) !important;
+  }
+
+  .sg-brand-story__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 24px;
+    min-height: 44px;
+    padding: 12px 28px;
+    border-radius: 50px;
+    background: #ffffff;
+    color: #1a1a1a !important;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none !important;
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+
+  .sg-brand-story__cta:hover {
+    background: #EFF5ED;
+    transform: translateY(-2px);
+  }
+
+  .sg-brand-story__stage {
+    display: grid;
+    grid-template-columns: minmax(200px, 1fr) minmax(150px, 230px);
+    grid-template-rows: 1fr auto 1fr;
+    align-items: center;
+    width: 100%;
+    min-height: clamp(400px, 42vw, 500px);
+  }
+
+  .sg-brand-story__visual {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    position: relative;
+    z-index: 2;
+    justify-self: center;
+    width: min(100%, 380px);
+    height: min(68vh, 480px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent !important;
+  }
+
+  .sg-brand-story__visual-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: transparent !important;
+    text-decoration: none !important;
+  }
+
+  .sg-brand-story__video-matte {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: transparent !important;
+    pointer-events: none;
+  }
+
+  .sg-brand-story__video-matte--blend {
+    mix-blend-mode: screen;
+  }
+
+  .sg-brand-story__leaf-layer {
+    position: absolute;
+    left: 50%;
+    top: 54%;
+    z-index: 4;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .sg-brand-story__leaf {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: block;
+    width: 20px;
+    height: 34px;
+    margin: -17px 0 0 -10px;
+    color: #A8CE9E;
+    opacity: 0;
+    transform: translate(0, 0) rotate(var(--leaf-rot, 0deg)) scale(0.15);
+    transform-origin: center center;
+    will-change: transform, opacity;
+  }
+
+  .sg-brand-story__leaf:nth-child(3n) {
+    color: #1a1a1a;
+  }
+
+  .sg-brand-story__leaf:nth-child(3n + 1) {
+    color: #B0D4A6;
+  }
+
+  .sg-brand-story__leaf-layer--active .sg-brand-story__leaf {
+    animation: sg-brand-story-leaf-burst 1.35s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+    animation-delay: calc(var(--leaf-delay, 0ms));
+  }
+
+  @keyframes sg-brand-story-leaf-burst {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0) rotate(var(--leaf-rot, 0deg)) scale(0.15);
+    }
+
+    12% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+      transform: translate(var(--leaf-tx, 0px), var(--leaf-ty, 0px)) rotate(var(--leaf-spin, 0deg)) scale(1);
+    }
+  }
+
+  .sg-brand-story__video,
+  .sg-brand-story__image {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: min(100%, 380px);
+    max-height: 480px;
+    object-fit: contain;
+    object-position: center;
+    background: transparent !important;
+    filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.2));
+  }
+
+  .sg-brand-story__callout {
+    position: relative;
+    z-index: 3;
+    max-width: 230px;
+    font-family: var(--sg-font-body, 'Config', system-ui, sans-serif);
+    color: #ffffff !important;
+  }
+
+  .sg-brand-story__callout-title {
+    margin: 0 0 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    line-height: 1.3;
+    color: #ffffff !important;
+  }
+
+  .sg-brand-story__callout-text {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+
+  .sg-brand-story__callout--outer {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+    padding-bottom: 1.25rem;
+  }
+
+  .sg-brand-story__callout--outer::before {
+    content: '';
+    position: absolute;
+    right: calc(100% + 10px);
+    top: 58%;
+    width: clamp(56px, 9vw, 120px);
+    border-top: 1px dotted rgba(255, 255, 255, 0.62);
+    pointer-events: none;
+  }
+
+  .sg-brand-story__callout--inner {
+    grid-column: 2;
+    grid-row: 3;
+    align-self: start;
+    padding-top: 1.25rem;
+  }
+
+  .sg-brand-story__callout--inner::before {
+    content: '';
+    position: absolute;
+    right: calc(100% + 10px);
+    top: 32%;
+    width: clamp(56px, 9vw, 120px);
+    border-top: 1px dotted rgba(255, 255, 255, 0.62);
+    pointer-events: none;
+  }
+
+  .sg-brand-story .sg-animate {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .sg-brand-story .sg-animate:not(.sg-visible) {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .sg-brand-story .sg-animate.sg-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .sg-brand-story .sg-animate[data-delay='2'] {
+    transition-delay: 0.15s;
+  }
+
+  @media screen and (max-width: 1024px) {
+    .sg-brand-story__scene {
+      width: calc(100% - 2rem);
+      min-height: auto;
+    }
+
+    .sg-brand-story__inner {
+      grid-template-columns: 1fr;
+      padding: 40px 28px 44px;
+      gap: 28px;
+      min-height: auto;
+    }
+
+    .sg-brand-story__copy {
+      max-width: none;
+    }
+
+    .sg-brand-story__heading,
+    .sg-brand-story__stat-card {
+      max-width: none;
+    }
+
+    .sg-brand-story__stage {
+      min-height: 380px;
+      grid-template-columns: 1fr minmax(130px, 200px);
+    }
+
+    .sg-brand-story__visual {
+      width: min(100%, 300px);
+      height: min(55vh, 400px);
+    }
+
+    .sg-brand-story__video,
+    .sg-brand-story__image {
+      max-width: min(100%, 300px);
+      max-height: 400px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .sg-brand-story__scene {
+      width: calc(100% - 1.5rem);
+      border-radius: 18px;
+    }
+
+    .sg-brand-story__inner {
+      padding: 32px 20px 36px;
+    }
+
+    .sg-brand-story__stage {
+      display: flex;
+      flex-direction: column;
+      min-height: auto;
+      gap: 20px;
+    }
+
+    .sg-brand-story__visual {
+      width: 220px;
+      height: 300px;
+      order: 0;
+    }
+
+    .sg-brand-story__video,
+    .sg-brand-story__image {
+      max-width: 220px;
+      max-height: 300px;
+    }
+
+    .sg-brand-story__callout {
+      max-width: 100%;
+      padding: 0 !important;
+    }
+
+    .sg-brand-story__callout--outer {
+      order: 1;
+    }
+
+    .sg-brand-story__callout--inner {
+      order: 2;
+    }
+
+    .sg-brand-story__callout--outer::before,
+    .sg-brand-story__callout--inner::before {
+      display: none;
+    }
+
+    .sg-brand-story__stat-card {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .sg-brand-story__leaf-layer {
+      top: 52%;
+    }
+
+    .sg-brand-story__visual,
+    .sg-brand-story__stage {
+      overflow: hidden;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sg-brand-story__leaf-layer {
+      display: none;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  function initBrandStoryAnimate(root = document) {
+    const items = root.querySelectorAll('.sg-brand-story .sg-animate');
+    if (!items.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      items.forEach((el) => el.classList.add('sg-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('sg-visible');
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.12 }
+    );
+
+    items.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.95 && rect.bottom > 0) {
+        el.classList.add('sg-visible');
+      }
+      observer.observe(el);
+    });
+  }
+
+  function initBrandStoryVideo(root = document) {
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    root.querySelectorAll('.sg-brand-story__video').forEach((video) => {
+      if (!(video instanceof HTMLVideoElement)) return;
+
+      const matte = video.closest('.sg-brand-story__video-matte');
+      if (!matte || matte.dataset.videoInit === 'true') return;
+      matte.dataset.videoInit = 'true';
+
+      if (!isSafari) {
+        video.querySelectorAll('source[type="video/quicktime"]').forEach((source) => source.remove());
+        matte.classList.add('sg-brand-story__video-matte--blend');
+      }
+
+      const tryPlay = () => {
+        video.muted = true;
+        video.defaultMuted = true;
+        video.setAttribute('playsinline', '');
+        const playPromise = video.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+          playPromise.catch(() => {});
+        }
+      };
+
+      video.addEventListener('canplay', tryPlay, { once: true });
+      tryPlay();
+
+      initBrandStoryLeafBurst(video, matte);
+    });
+  }
+
+  function initBrandStoryLeafBurst(video, matte) {
+    const layer = matte.querySelector('.sg-brand-story__leaf-layer');
+    if (!layer || layer.dataset.leafInit === 'true') return;
+    layer.dataset.leafInit = 'true';
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const startPct = Number(matte.dataset.burstStartPct || 42) / 100;
+    const endPct = Number(matte.dataset.burstEndPct || 70) / 100;
+    const leaves = layer.querySelectorAll('.sg-brand-story__leaf');
+
+    leaves.forEach((leaf, index) => {
+      const side = index % 2 === 0 ? 1 : -1;
+      const row = Math.floor(index / 2);
+      const tx = side * (48 + row * 16 + (index % 3) * 7);
+      const ty = (row % 4 - 1.5) * 14 + (index % 2 === 0 ? -6 : 6);
+      const rot = side > 0 ? -18 + row * 8 : 198 - row * 8;
+      const spin = rot + side * 120;
+
+      leaf.style.setProperty('--leaf-tx', `${tx.toFixed(1)}px`);
+      leaf.style.setProperty('--leaf-ty', `${ty.toFixed(1)}px`);
+      leaf.style.setProperty('--leaf-rot', `${rot.toFixed(1)}deg`);
+      leaf.style.setProperty('--leaf-spin', `${spin.toFixed(1)}deg`);
+      leaf.style.setProperty('--leaf-delay', `${(row * 45 + (index % 2) * 22)}ms`);
+    });
+
+    let wasOpen = false;
+
+    const triggerBurst = () => {
+      layer.classList.remove('sg-brand-story__leaf-layer--active');
+      void layer.offsetWidth;
+      layer.classList.add('sg-brand-story__leaf-layer--active');
+    };
+
+    const onTimeUpdate = () => {
+      const duration = video.duration;
+      if (!duration || !Number.isFinite(duration)) return;
+
+      const progress = (video.currentTime % duration) / duration;
+      const isOpen = progress >= startPct && progress < endPct;
+
+      if (isOpen && !wasOpen) {
+        triggerBurst();
+      }
+
+      wasOpen = isOpen;
+    };
+
+    video.addEventListener('timeupdate', onTimeUpdate);
+    video.addEventListener('loadedmetadata', onTimeUpdate);
+  }
+
+  initBrandStoryAnimate();
+  initBrandStoryVideo();
+
+  document.addEventListener('shopify:section:load', (event) => {
+    if (event.target instanceof HTMLElement) {
+      initBrandStoryAnimate(event.target);
+      initBrandStoryVideo(event.target);
+    }
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Brand story VIACAP",
+  "tag": "section",
+  "class": "sg-brand-story-section",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Featured product",
+      "info": "Used for image, link and optional auto content from your catalog."
+    },
+    {
+      "type": "checkbox",
+      "id": "use_product_content",
+      "label": "Use Spiritual Green product content",
+      "info": "Heading, stat card, callouts and CTA text from the featured product above.",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image",
+      "info": "Rounded banner background. Default: sg-brand-story-bg.png"
+    },
+    {
+      "type": "text",
+      "id": "background_asset",
+      "label": "Background theme asset",
+      "default": "sg-brand-story-bg.png"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow label",
+      "default": "• SPIRITUAL GREEN — VIACAP®"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Molti integratori non resistono alla digestione — Aloe Vera® Fresh Juice sì.",
+      "info": "Ignored when “Use Spiritual Green product content” is on."
+    },
+    {
+      "type": "text",
+      "id": "stat_text",
+      "label": "Stat card text",
+      "default": "Aloe Vera® Fresh Juice° supporta digestione e regolarità"
+    },
+    {
+      "type": "text",
+      "id": "stat_value",
+      "label": "Stat value",
+      "default": "100%"
+    },
+    {
+      "type": "text",
+      "id": "footnote",
+      "label": "Footnote",
+      "default": "°Aloe barbadensis Miller — gel sine cute"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_callouts",
+      "label": "Show capsule callouts",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "outer_callout_title",
+      "label": "Outer callout title",
+      "default": "CAPSULA ESTERNA"
+    },
+    {
+      "type": "textarea",
+      "id": "outer_callout_text",
+      "label": "Outer callout text",
+      "default": "Protegge il succo di Aloe Vera dall'acidità gastrica, per un rilascio graduale degli attivi nel tratto digestivo."
+    },
+    {
+      "type": "text",
+      "id": "inner_callout_title",
+      "label": "Inner callout title",
+      "default": "CAPSULA INTERNA"
+    },
+    {
+      "type": "textarea",
+      "id": "inner_callout_text",
+      "label": "Inner callout text",
+      "default": "Rilascia il gel puro di Aloe barbadensis Miller nel tratto intestinale, dove il benessere quotidiano conta di più."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_leaf_burst",
+      "label": "Leaf burst when capsule opens",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "burst_start_pct",
+      "label": "Leaf burst start (% of video loop)",
+      "min": 0,
+      "max": 90,
+      "step": 1,
+      "unit": "%",
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "burst_end_pct",
+      "label": "Leaf burst end (% of video loop)",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 70
+    },
+    {
+      "type": "checkbox",
+      "id": "use_360_video",
+      "label": "3D rotating capsule video",
+      "default": true
+    },
+    {
+      "type": "video",
+      "id": "product_video",
+      "label": "Custom 360° video (optional)"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "360° video URL (Cloudinary / CDN)"
+    },
+    {
+      "type": "text",
+      "id": "video_aria_label",
+      "label": "Video accessibility label",
+      "default": "Capsula Aloe Vera® Fresh Juice VIACAP 360°"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Custom image (fallback)"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image alt text",
+      "default": "Prodotti naturali Spiritual Green"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Scopri Aloe Vera® Fresh Juice"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brand story VIACAP",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

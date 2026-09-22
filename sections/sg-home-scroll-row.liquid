@@ -1,0 +1,792 @@
+{% liquid
+  assign heading = section.settings.heading | default: 'I più richiesti'
+  assign view_all_label = section.settings.view_all_label | strip
+  assign view_all_link = section.settings.view_all_link
+  assign filter_limit = section.settings.filter_max_products | default: 16
+
+  assign collection_novita = section.settings.collection_novita
+  if collection_novita == blank
+    assign collection_novita = collections.novita
+  endif
+
+  assign collection_piu_venduti = section.settings.collection_piu_venduti
+  if collection_piu_venduti == blank
+    assign collection_piu_venduti = collections['piu-venduti']
+  endif
+
+  assign collection_offerte = section.settings.collection_offerte
+  if collection_offerte == blank
+    assign collection_offerte = collections.offerte
+  endif
+
+  assign collection_estate = section.settings.collection_estate
+  if collection_estate == blank
+    assign collection_estate = collections.estate
+  endif
+
+  assign label_novita = section.settings.tab_novita_label | default: 'Novità'
+  assign label_piu_venduti = section.settings.tab_piu_venduti_label | default: 'Più Venduti'
+  assign label_offerte = section.settings.tab_offerte_label | default: 'Offerte'
+  assign label_estate = section.settings.tab_estate_label | default: 'Estate'
+
+  assign link_novita = section.settings.link_novita | default: collection_novita.url
+  assign link_piu_venduti = section.settings.link_piu_venduti | default: collection_piu_venduti.url
+  assign link_offerte = section.settings.link_offerte | default: collection_offerte.url
+  assign link_estate = section.settings.link_estate | default: collection_estate.url
+
+  comment
+    Fallback handles when Admin collections are empty (keeps homepage tabs populated).
+  endcomment
+  assign fallback_novita = 'nad-liposomiale|coenzima-q10-30-cps|liped-kontrol|ananas-bromelina-5000-30-cpr-divisibili|ananas-bromelina-stick|kalcio-liposomiale-30-stick-pack|vitamina-d3k2-60-stick-pack|eleuterococco-stick-pack'
+  assign fallback_piu_venduti = 'pea-1200-complex-stick|cortiribes-complex|arnica-gel-98|kit-allergia-1-naso|creatina|cholesmeno-berberina-plus-30-compresse|gastro-reflu|ansiomin-50ml-in-gocce|macerato-glic-ribes-nero-in-gemme-100-ml|magnesio-regio|dentifricio-in-polvere-naturale-con-vasetto-blancodent|kit-intestino-sensibile'
+  assign fallback_offerte = 'kit-allergia-1-naso|kit-intestino-sensibile|kit-abbronzatura-perfetta|arnica-gel-98|pea-1200-complex-stick|cortiribes-complex|creatina|magnesio-regio'
+  assign fallback_estate = 'kit-abbronzatura-perfetta|ultra-tan-capsule|bioklory-crema-solare-spf-30|bioklory-crema-solare-spf-50|bioklory-crema-solare-viso-spf-50|bioklory-crema-doposole|ananas-bromelina-5000-30-cpr-divisibili|ananas-bromelina-stick|cistileve-mannosio-forte|extra-dren|dren-gusto-ananas|varieze-60-compresse|mgk-plus-energia|mgk-plus-magnesio-e-potassio|bioklory-scrub-corpo|linfa-di-betulla-biologica'
+
+  assign show_filters = section.settings.show_collection_filters
+  if show_filters == nil
+    assign show_filters = true
+  endif
+%}
+
+<section
+  id="SgScrollRow-{{ section.id }}"
+  class="sg-scroll-row"
+  data-section-id="{{ section.id }}"
+  {% if show_filters %}data-sg-scroll-row-tabs{% endif %}
+>
+  <script src="{{ 'sg-scroll-row-tabs.js' | asset_url }}" defer></script>
+  <div class="sg-scroll-row__inner">
+    <header class="sg-scroll-row__header">
+      {% if heading != blank %}
+        <h2 class="sg-scroll-row__heading">{{ heading }}</h2>
+      {% endif %}
+      {% if view_all_label != blank and view_all_link != blank %}
+        <a class="sg-scroll-row__view-all" href="{{ view_all_link }}">{{ view_all_label }} →</a>
+      {% endif %}
+    </header>
+
+    <div class="sg-scroll-row__viewport">
+      <ul class="sg-scroll-row__track" role="list">
+        {% assign rendered_count = 0 %}
+        {% for block in section.blocks %}
+          {% if block.type == 'product' %}
+            {% assign row_product = block.settings.product %}
+            {% if row_product == blank and block.settings.product_handle != blank %}
+              {% assign row_product = all_products[block.settings.product_handle] %}
+            {% endif %}
+            {% if row_product != blank %}
+              {% assign rendered_count = rendered_count | plus: 1 %}
+              <li
+                class="sg-scroll-row__item"
+                {{ block.shopify_attributes }}
+              >
+                {% render 'sg-home-product-card', product: row_product %}
+              </li>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+        {% if rendered_count == 0 and section.settings.fallback_collection != blank %}
+          {% for product in section.settings.fallback_collection.products limit: 13 %}
+            <li class="sg-scroll-row__item">
+              {% render 'sg-home-product-card', product: product %}
+            </li>
+          {% endfor %}
+        {% endif %}
+      </ul>
+    </div>
+
+    {% if rendered_count == 0 and section.settings.fallback_collection == blank and request.design_mode %}
+      <p class="sg-scroll-row__empty">
+        Aggiungi prodotti nei blocchi della sezione “I più richiesti”.
+      </p>
+    {% endif %}
+
+    {% if show_filters %}
+      <div class="sg-scroll-row__filters">
+        <div class="sg-scroll-row__filters-header">
+          <div
+            class="sg-scroll-row__tabs"
+            role="tablist"
+            aria-label="Filtra prodotti"
+            data-sg-scroll-tabs
+          >
+            <button
+              type="button"
+              class="sg-scroll-row__tab"
+              role="tab"
+              id="sg-scroll-tab-estate-{{ section.id }}"
+              aria-selected="false"
+              aria-controls="sg-scroll-panel-estate-{{ section.id }}"
+              data-sg-scroll-tab="estate"
+              data-view-all="{{ link_estate }}"
+            >
+              {{ label_estate }}
+            </button>
+            <button
+              type="button"
+              class="sg-scroll-row__tab is-active"
+              role="tab"
+              id="sg-scroll-tab-novita-{{ section.id }}"
+              aria-selected="true"
+              aria-controls="sg-scroll-panel-novita-{{ section.id }}"
+              data-sg-scroll-tab="novita"
+              data-view-all="{{ link_novita }}"
+            >
+              {{ label_novita }}
+            </button>
+            <button
+              type="button"
+              class="sg-scroll-row__tab"
+              role="tab"
+              id="sg-scroll-tab-piu-venduti-{{ section.id }}"
+              aria-selected="false"
+              aria-controls="sg-scroll-panel-piu-venduti-{{ section.id }}"
+              data-sg-scroll-tab="piu-venduti"
+              data-view-all="{{ link_piu_venduti }}"
+            >
+              {{ label_piu_venduti }}
+            </button>
+            <button
+              type="button"
+              class="sg-scroll-row__tab"
+              role="tab"
+              id="sg-scroll-tab-offerte-{{ section.id }}"
+              aria-selected="false"
+              aria-controls="sg-scroll-panel-offerte-{{ section.id }}"
+              data-sg-scroll-tab="offerte"
+              data-view-all="{{ link_offerte }}"
+            >
+              {{ label_offerte }}
+            </button>
+            <span class="sg-scroll-row__tab-indicator" data-sg-scroll-indicator aria-hidden="true"></span>
+          </div>
+
+          <a
+            class="sg-scroll-row__view-all sg-scroll-row__view-all--filter"
+            href="{{ link_novita }}"
+            data-sg-scroll-view-all
+          >
+            {{ section.settings.filter_view_all_label | default: 'Vedi tutti' }} →
+          </a>
+        </div>
+
+        <div class="sg-scroll-row__panels">
+          <div
+            class="sg-scroll-row__panel"
+            id="sg-scroll-panel-estate-{{ section.id }}"
+            role="tabpanel"
+            aria-labelledby="sg-scroll-tab-estate-{{ section.id }}"
+            data-sg-scroll-panel="estate"
+            hidden
+          >
+            {% render 'sg-scroll-row-collection-track', collection: collection_estate, limit: filter_limit, fallback_handles: fallback_estate %}
+          </div>
+          <div
+            class="sg-scroll-row__panel is-active"
+            id="sg-scroll-panel-novita-{{ section.id }}"
+            role="tabpanel"
+            aria-labelledby="sg-scroll-tab-novita-{{ section.id }}"
+            data-sg-scroll-panel="novita"
+          >
+            {% render 'sg-scroll-row-collection-track', collection: collection_novita, limit: filter_limit, fallback_handles: fallback_novita %}
+          </div>
+
+          <div
+            class="sg-scroll-row__panel"
+            id="sg-scroll-panel-piu-venduti-{{ section.id }}"
+            role="tabpanel"
+            aria-labelledby="sg-scroll-tab-piu-venduti-{{ section.id }}"
+            data-sg-scroll-panel="piu-venduti"
+            hidden
+          >
+            {% render 'sg-scroll-row-collection-track', collection: collection_piu_venduti, limit: filter_limit, fallback_handles: fallback_piu_venduti %}
+          </div>
+
+          <div
+            class="sg-scroll-row__panel"
+            id="sg-scroll-panel-offerte-{{ section.id }}"
+            role="tabpanel"
+            aria-labelledby="sg-scroll-tab-offerte-{{ section.id }}"
+            data-sg-scroll-panel="offerte"
+            hidden
+          >
+            {% render 'sg-scroll-row-collection-track', collection: collection_offerte, limit: filter_limit, fallback_handles: fallback_offerte %}
+          </div>
+
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .sg-scroll-row {
+    --sg-sr-green: #97c48a;
+    --sg-sr-text: #404040;
+    --sg-sr-muted: #6b7280;
+    --sg-sr-font: var(--sg-font-body, 'Config', system-ui, sans-serif);
+    width: 100%;
+    max-width: 100%;
+    padding: clamp(28px, 4vw, 48px) 0;
+    background: #ffffff;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .sg-scroll-row__inner {
+    width: 100%;
+    max-width: var(--sg-layout-max-width, 1440px);
+    margin: 0 auto;
+    padding: 0 var(--sg-layout-gutter, clamp(1rem, 3vw, 2rem));
+    box-sizing: border-box;
+  }
+
+  .sg-scroll-row__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .sg-scroll-row__heading {
+    margin: 0;
+    font-family: var(--sg-font-heading, 'Zodiak', Georgia, serif);
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--sg-sr-text);
+  }
+
+  .sg-scroll-row__view-all {
+    flex-shrink: 0;
+    font-family: var(--sg-sr-font);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--sg-sr-green);
+    text-decoration: none;
+  }
+
+  .sg-scroll-row__view-all:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .sg-scroll-row__viewport {
+    width: calc(100% + var(--sg-layout-gutter, 2rem));
+    max-width: none;
+    margin-right: calc(-1 * var(--sg-layout-gutter, 2rem));
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(151, 196, 138, 0.55) transparent;
+  }
+
+  .sg-scroll-row__viewport::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .sg-scroll-row__viewport::-webkit-scrollbar-thumb {
+    background: rgba(151, 196, 138, 0.55);
+    border-radius: 999px;
+  }
+
+  .sg-scroll-row__track {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 16px;
+    margin: 0;
+    padding: 4px var(--sg-layout-gutter, 2rem) 14px 0;
+    list-style: none;
+    width: max-content;
+    box-sizing: border-box;
+  }
+
+  .sg-scroll-row__item {
+    flex: 0 0 min(260px, 72vw);
+    width: min(260px, 72vw);
+    min-width: 0;
+    scroll-snap-align: start;
+    display: flex;
+  }
+
+  .sg-scroll-row__item .sg-home-product-card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #e8eee6;
+    border-radius: 12px;
+    padding: 14px 14px 16px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  }
+
+  .sg-scroll-row__item .sg-home-product-card__link {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    color: inherit;
+    text-decoration: none !important;
+  }
+
+  .sg-scroll-row__item .sg-home-product-card__media {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    aspect-ratio: 1 / 1;
+    margin-bottom: 12px;
+    background: #f7f9f7;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .sg-scroll-row__item .sg-home-product-card__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 8px;
+    box-sizing: border-box;
+  }
+
+  .sg-scroll-row__item .sg-home-product-card__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+  }
+
+  .sg-scroll-row__item .sg-product-card-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 8px;
+    min-height: calc(1.35em * 2 + 2px + 1.3em);
+    flex-shrink: 0;
+  }
+
+  .sg-scroll-row__item .sg-home-product-card__title {
+    margin: 0;
+    font-family: var(--sg-sr-font);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--sg-sr-text);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    min-height: calc(1.35em * 2);
+    max-height: calc(1.35em * 2);
+  }
+
+  .sg-scroll-row__item .sg-home-product-card__format {
+    margin: 0;
+    font-family: var(--sg-sr-font);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--sg-sr-muted);
+    min-height: 1.3em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sg-scroll-row__item .sg-home-product-card__description {
+    margin: 0 0 10px;
+    font-family: var(--sg-sr-font);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.45;
+    color: #6b7280;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    min-height: calc(1.45em * 2);
+    max-height: calc(1.45em * 2);
+    flex: 0 0 auto;
+  }
+
+  .sg-scroll-row__item .sg-home-product-card__description--empty {
+    visibility: hidden;
+  }
+
+  .sg-scroll-row__item .sg-home-product-card__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: auto;
+    flex: 0 0 auto;
+  }
+
+  .sg-scroll-row__item .sg-home-product-card__price-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 8px;
+    margin: 0;
+    min-height: 1.4em;
+  }
+
+  .sg-scroll-row__item .sg-home-product-card__price {
+    font-family: var(--sg-sr-font);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--sg-sr-text);
+  }
+
+  .sg-scroll-row__item .sg-home-product-card__price-compare {
+    font-size: 13px;
+    color: var(--sg-sr-muted);
+    text-decoration: line-through;
+  }
+
+  .sg-scroll-row__item .sg-home-product-card__availability {
+    margin: 0;
+    font-family: var(--sg-sr-font);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #b45309;
+  }
+
+  .sg-scroll-row__item .sg-home-product-card__footer {
+    flex: 0 0 auto;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .sg-scroll-row__item .sg-product-card-actions {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+
+  .sg-scroll-row__empty {
+    margin: 12px 0 0;
+    font-family: var(--sg-sr-font);
+    font-size: 14px;
+    color: var(--sg-sr-muted);
+  }
+
+  /* Collection filter tabs — same show/hide pattern as sg-home-products */
+  .sg-scroll-row__filters {
+    margin-top: clamp(28px, 4vw, 40px);
+    padding-top: clamp(20px, 3vw, 28px);
+    border-top: 1px solid #e8eee6;
+  }
+
+  .sg-scroll-row__filters-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+
+  .sg-scroll-row__tabs {
+    position: relative;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    max-width: 100%;
+  }
+
+  .sg-scroll-row__tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sg-scroll-row__tab {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 auto;
+    appearance: none;
+    border: none;
+    background: transparent;
+    padding: 10px 14px;
+    font-family: var(--sg-sr-font);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--sg-sr-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s ease;
+  }
+
+  .sg-scroll-row__tab.is-active,
+  .sg-scroll-row__tab:hover {
+    color: var(--sg-sr-text);
+  }
+
+  .sg-scroll-row__tab-indicator {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 0;
+    background: var(--sg-sr-green);
+    border-radius: 2px;
+    transform: translateX(0);
+    transition: width 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+  }
+
+  .sg-scroll-row__view-all--filter {
+    margin-left: auto;
+  }
+
+  .sg-scroll-row__panel {
+    display: none;
+  }
+
+  .sg-scroll-row__panel.is-active {
+    display: block;
+  }
+
+  .sg-scroll-row__panel[hidden] {
+    display: none !important;
+  }
+
+  .sg-scroll-row__viewport--filter {
+    width: calc(100% + var(--sg-layout-gutter, 2rem));
+    margin-right: calc(-1 * var(--sg-layout-gutter, 2rem));
+  }
+
+  @media screen and (min-width: 990px) {
+    .sg-scroll-row__item {
+      flex-basis: 240px;
+      width: 240px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .sg-scroll-row {
+      padding: 24px 0 28px;
+    }
+
+    .sg-scroll-row__header {
+      margin-bottom: 14px;
+    }
+
+    .sg-scroll-row__heading {
+      font-size: 1.35rem;
+    }
+
+    .sg-scroll-row__track {
+      gap: 12px;
+    }
+
+    .sg-scroll-row__item {
+      flex-basis: min(70vw, 220px);
+      width: min(70vw, 220px);
+    }
+
+    .sg-scroll-row__filters {
+      margin-top: 24px;
+      padding-top: 18px;
+    }
+
+    .sg-scroll-row__filters-header {
+      margin-bottom: 12px;
+      gap: 10px;
+    }
+
+    .sg-scroll-row__tab {
+      padding: 10px 12px;
+      font-size: 13px;
+      min-height: 44px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "I più richiesti",
+  "tag": "section",
+  "class": "sg-scroll-row-section",
+  "max_blocks": 20,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "I più richiesti"
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "View all label",
+      "default": "Vedi tutti"
+    },
+    {
+      "type": "url",
+      "id": "view_all_link",
+      "label": "View all link"
+    },
+    {
+      "type": "collection",
+      "id": "fallback_collection",
+      "label": "Fallback collection",
+      "info": "Used only if no product blocks resolve."
+    },
+    {
+      "type": "header",
+      "content": "Collection filter tabs"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_filters",
+      "label": "Show Novità / Più Venduti / Offerte / Estate tabs",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "filter_max_products",
+      "label": "Max products per filter tab",
+      "min": 4,
+      "max": 24,
+      "step": 1,
+      "default": 16
+    },
+    {
+      "type": "text",
+      "id": "filter_view_all_label",
+      "label": "Filter view-all label",
+      "default": "Vedi tutti"
+    },
+    {
+      "type": "collection",
+      "id": "collection_novita",
+      "label": "Novità collection",
+      "info": "Defaults to handle novita"
+    },
+    {
+      "type": "url",
+      "id": "link_novita",
+      "label": "Novità view-all link"
+    },
+    {
+      "type": "text",
+      "id": "tab_novita_label",
+      "label": "Novità tab label",
+      "default": "Novità"
+    },
+    {
+      "type": "collection",
+      "id": "collection_piu_venduti",
+      "label": "Più Venduti collection",
+      "info": "Defaults to handle piu-venduti"
+    },
+    {
+      "type": "url",
+      "id": "link_piu_venduti",
+      "label": "Più Venduti view-all link"
+    },
+    {
+      "type": "text",
+      "id": "tab_piu_venduti_label",
+      "label": "Più Venduti tab label",
+      "default": "Più Venduti"
+    },
+    {
+      "type": "collection",
+      "id": "collection_offerte",
+      "label": "Offerte collection",
+      "info": "Defaults to handle offerte"
+    },
+    {
+      "type": "url",
+      "id": "link_offerte",
+      "label": "Offerte view-all link"
+    },
+    {
+      "type": "text",
+      "id": "tab_offerte_label",
+      "label": "Offerte tab label",
+      "default": "Offerte"
+    },
+    {
+      "type": "collection",
+      "id": "collection_estate",
+      "label": "Estate collection",
+      "info": "Defaults to handle estate"
+    },
+    {
+      "type": "url",
+      "id": "link_estate",
+      "label": "Estate view-all link"
+    },
+    {
+      "type": "text",
+      "id": "tab_estate_label",
+      "label": "Estate tab label",
+      "default": "Estate"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "text",
+          "id": "product_handle",
+          "label": "Product handle (fallback)",
+          "info": "Optional. Used if the product picker is empty."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "I più richiesti",
+      "blocks": [
+        { "type": "product", "settings": { "product_handle": "pea-1200-complex" } },
+        { "type": "product", "settings": { "product_handle": "cortiribes-complex" } },
+        { "type": "product", "settings": { "product_handle": "kit-intestino-infiammato" } },
+        { "type": "product", "settings": { "product_handle": "arnica-gel-98" } },
+        { "type": "product", "settings": { "product_handle": "kit-allergia" } },
+        { "type": "product", "settings": { "product_handle": "creatina" } },
+        { "type": "product", "settings": { "product_handle": "cholesmeno-berberina-plus" } },
+        { "type": "product", "settings": { "product_handle": "benekand" } },
+        { "type": "product", "settings": { "product_handle": "dentifricio-in-polvere-con-vasetto-blancodent" } },
+        { "type": "product", "settings": { "product_handle": "gastro-reflu" } },
+        { "type": "product", "settings": { "product_handle": "ansiomin" } },
+        { "type": "product", "settings": { "product_handle": "macerato-glic-ribes-nero" } },
+        { "type": "product", "settings": { "product_handle": "magnesio-regio" } }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}

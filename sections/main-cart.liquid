@@ -1,0 +1,346 @@
+
+
+{% capture cart_page_more_blocks_content %}
+  <div class="cart-page__more-blocks">
+    {%- content_for 'blocks' -%}
+  </div>
+{% endcapture %}
+
+{% capture cart_items_children %}
+  <template id="empty-cart-template">
+  <div
+    class="section-background color-{{ section.settings.color_scheme }}"
+    style="background-color: #ffffff;"
+  ></div>
+  <div
+    class="section color-{{ section.settings.color_scheme }} section--{{ section.settings.section_width }}"
+    style="--color-background: #ffffff; --color-background-rgb: 255, 255, 255; --color-foreground: #1a1a1a; --color-foreground-rgb: 26, 26, 26; --color-foreground-heading: #1a1a1a; --color-primary: #97C48A; --color-primary-rgb: 151, 196, 138;"
+  >
+    <div
+      class="cart-page sg-cart-page spacing-style{% if cart.empty? %} cart-page--empty{% endif %}"
+        style="{% render 'spacing-style', settings: section.settings %}"
+      >
+        <div class="cart-page__title">
+          {%- content_for 'block', id: 'cart-page-title', type: '_cart-title', force_empty: true %}
+        </div>
+        <div class="cart-page__items">
+          {%- content_for 'block', id: 'cart-page-items', type: '_cart-products', force_empty: true %}
+        </div>
+        {{ cart_page_more_blocks_content }}
+      </div>
+    </div>
+  </template>
+
+  {% # theme-check-disable UniqueStaticBlockId %}
+    <div
+      class="section-background color-{{ section.settings.color_scheme }}"
+      style="background-color: #ffffff;"
+    ></div>
+    <div
+      class="section color-{{ section.settings.color_scheme }} section--{{ section.settings.section_width }}"
+      style="--color-background: #ffffff; --color-background-rgb: 255, 255, 255; --color-foreground: #1a1a1a; --color-foreground-rgb: 26, 26, 26; --color-foreground-heading: #1a1a1a; --color-primary: #97C48A; --color-primary-rgb: 151, 196, 138;"
+    >
+      <div
+        class="cart-page sg-cart-page spacing-style{% if cart.empty? %} cart-page--empty{% endif %}"
+        style="{% render 'spacing-style', settings: section.settings %}"
+      >
+      <div class="cart-page__title">
+        {%- content_for 'block', id: 'cart-page-title', type: '_cart-title' %}
+      </div>
+
+      <div class="cart-page__items">
+        {%- content_for 'block', id: 'cart-page-items', type: '_cart-products' %}
+      </div>
+
+      {%- unless cart.empty? -%}
+        {%- liquid
+          assign upsell_collection = section.settings.upsell_collection
+          if upsell_collection == blank
+            assign upsell_collection = collections.all
+          endif
+          assign show_cart_upsell = false
+          if section.settings.show_upsell and upsell_collection != blank
+            assign show_cart_upsell = true
+          endif
+        -%}
+        <div class="cart-page__footer{% unless show_cart_upsell %} cart-page__footer--summary-only{% endunless %}">
+          {%- if show_cart_upsell -%}
+            <div class="cart-page__upsell">
+              {% render 'sg-cart-upsell',
+                collection: upsell_collection,
+                heading: section.settings.upsell_heading,
+                max_products: section.settings.upsell_max_products,
+                section_id: section.id
+              %}
+            </div>
+          {%- endif -%}
+
+          <div class="cart-page__summary">
+            {%- content_for 'block', id: 'cart-page-summary', type: '_cart-summary' -%}
+          </div>
+        </div>
+      {%- endunless -%}
+
+      {{ cart_page_more_blocks_content }}
+    </div>
+  </div>
+  {% # theme-check-enable UniqueStaticBlockId %}
+{% endcapture %}
+{% render 'cart-items-component', children: cart_items_children, section_id: section.id %}
+
+{% stylesheet %}
+  .cart-page {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0 var(--padding-5xl);
+  }
+
+  .sg-cart-page.cart-page {
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    padding-inline: clamp(20px, 5vw, 64px);
+  }
+
+  .cart-page--empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cart-page--empty .cart-page__title,
+  .cart-page--empty .cart-page__more-blocks {
+    margin-top: var(--margin-6xl);
+  }
+
+  .cart-page__more-blocks {
+    width: 100%;
+  }
+
+  .cart-page--empty .cart-title {
+    text-align: center;
+  }
+
+  .cart-page__main {
+    grid-column: 1;
+  }
+
+  .cart-page__summary {
+    padding-top: var(--padding-xl);
+  }
+
+  .cart-page__title + .cart-page__items {
+    margin-block-start: var(--margin-lg);
+  }
+
+  @media screen and (min-width: 750px) {
+    .sg-cart-page.cart-page {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+      column-gap: 0;
+      row-gap: 0;
+      align-items: start;
+      width: 100%;
+      max-width: none;
+      margin-inline: 0;
+      padding-inline: clamp(20px, 5vw, 64px);
+      box-sizing: border-box;
+    }
+
+    .sg-cart-page .cart-page__title,
+    .sg-cart-page .cart-page__items,
+    .sg-cart-page .cart-page__footer,
+    .sg-cart-page .cart-page__more-blocks {
+      grid-column: 1;
+      width: 100%;
+      max-width: none;
+    }
+
+    .sg-cart-page .cart-page__items {
+      grid-row: 2;
+    }
+
+    .sg-cart-page .cart-page__footer {
+      grid-row: 3;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-top: 48px;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    .sg-cart-page .cart-page__footer:not(.cart-page__footer--summary-only) {
+      flex-direction: row;
+      align-items: flex-end;
+      gap: clamp(32px, 5vw, 72px);
+    }
+
+    .sg-cart-page .cart-page__footer--summary-only {
+      flex-direction: row;
+      justify-content: flex-end;
+    }
+
+    .sg-cart-page .cart-page__footer--summary-only .cart-page__summary {
+      flex: 0 1 400px;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .sg-cart-page .cart-page__upsell {
+      flex: 1 1 0;
+      margin-top: 0;
+      min-width: 0;
+    }
+
+    .sg-cart-page .cart-page__footer:not(.cart-page__footer--summary-only) .cart-page__summary {
+      flex: 0 0 min(380px, 34%);
+      max-width: 400px;
+      min-width: 280px;
+    }
+
+    .sg-cart-page .cart-page__summary {
+      display: flex;
+      flex-direction: column;
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+      justify-content: flex-end;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .sg-cart-page .cart-page__footer:not(.cart-page__footer--summary-only) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .sg-cart-page .cart-page__footer:not(.cart-page__footer--summary-only) .cart-page__summary {
+      flex: 1 1 auto;
+      max-width: none;
+      min-width: 0;
+    }
+
+    .sg-cart-page .cart-page__summary {
+      padding-top: 24px;
+      border-top: 1px solid #e8e8e8;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.cart",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "icon"
+    },
+    {
+      "type": "image"
+    },
+    {
+      "type": "button"
+    },
+    {
+      "type": "video"
+    },
+    {
+      "type": "group"
+    },
+    {
+      "type": "spacer"
+    }
+  ],
+  "settings": [
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-6"
+    },
+    {
+      "type": "header",
+      "content": "Potrebbe piacerti anche"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_upsell",
+      "label": "Mostra prodotti consigliati",
+      "default": true
+    },
+    {
+      "type": "collection",
+      "id": "upsell_collection",
+      "label": "Collezione consigliata"
+    },
+    {
+      "type": "text",
+      "id": "upsell_heading",
+      "label": "Titolo sezione consigliati",
+      "default": "Potrebbe piacerti anche:"
+    },
+    {
+      "type": "range",
+      "id": "upsell_max_products",
+      "label": "Upsell products",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

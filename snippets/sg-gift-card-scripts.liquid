@@ -1,0 +1,142 @@
+{%- doc -%}
+  Gift card amount selector, recipient email toggle, live price update.
+
+  @param {string} root_id - Section root element id
+{%- enddoc -%}
+
+<script
+  src="{{ 'gift-card-recipient-form.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+
+<script>
+  (() => {
+    const section = document.getElementById({{ root_id | json }});
+    if (!section) return;
+
+    const form = section.querySelector('.sg-gift-card-page__form');
+    if (!form) return;
+
+    const variantInput = form.querySelector('[data-sg-gift-card-variant]');
+    const priceEl = section.querySelector('[data-sg-gift-price]');
+    const amountButtons = [...form.querySelectorAll('.sg-gift-card-page__amount')];
+
+    const selectAmount = (button) => {
+      amountButtons.forEach((btn) => {
+        btn.classList.toggle('is-selected', btn === button);
+        btn.setAttribute('aria-checked', btn === button ? 'true' : 'false');
+      });
+      const variantId = button.dataset.variantId;
+      if (variantInput && variantId) variantInput.value = variantId;
+      if (priceEl && button.dataset.priceFormatted) {
+        priceEl.textContent = button.dataset.priceFormatted;
+      }
+    };
+
+    amountButtons.forEach((button) => {
+      button.addEventListener('click', () => selectAmount(button));
+    });
+
+    const initial = amountButtons.find((btn) => btn.classList.contains('is-selected')) || amountButtons[0];
+    if (initial) selectAmount(initial);
+
+    const initRecipientToggle = () => {
+      const recipientForm = section.querySelector('gift-card-recipient-form');
+      if (!recipientForm) return;
+
+      const myEmailBtn = recipientForm.querySelector('[ref="myEmailButton"]');
+      const recipientEmailBtn = recipientForm.querySelector('[ref="recipientEmailButton"]');
+      const recipientFields = recipientForm.querySelector('[ref="recipientFields"]');
+      if (!myEmailBtn || !recipientEmailBtn || !recipientFields) return;
+
+      const recipientInputs = [
+        recipientForm.querySelector('[ref="recipientEmail"]'),
+        recipientForm.querySelector('[ref="recipientName"]'),
+        recipientForm.querySelector('[ref="recipientMessage"]'),
+        recipientForm.querySelector('[ref="recipientSendOn"]'),
+      ].filter(Boolean);
+
+      const timezoneOffset = recipientForm.querySelector('[ref="timezoneOffset"]');
+
+      const setControlFlag = (enabled) => {
+        const flagName = 'properties[__shopify_send_gift_card_to_recipient]';
+        let controlFlag = recipientForm.querySelector(`input[name="${flagName}"]`);
+
+        if (enabled) {
+          if (!controlFlag) {
+            controlFlag = document.createElement('input');
+            controlFlag.type = 'hidden';
+            controlFlag.name = flagName;
+            controlFlag.value = 'on';
+            recipientForm.appendChild(controlFlag);
+          }
+        } else if (controlFlag) {
+          controlFlag.remove();
+        }
+      };
+
+      const applyMode = (mode) => {
+        const isRecipient = mode === 'recipient_form';
+
+        if (typeof recipientForm.toggleRecipientForm === 'function') {
+          try {
+            recipientForm.toggleRecipientForm(mode);
+            return;
+          } catch (error) {
+            console.warn('Gift card recipient toggle fallback', error);
+          }
+        }
+
+        myEmailBtn.checked = !isRecipient;
+        recipientEmailBtn.checked = isRecipient;
+        recipientFields.hidden = !isRecipient;
+
+        recipientInputs.forEach((field) => {
+          field.disabled = !isRecipient;
+          if (!isRecipient) field.value = '';
+        });
+
+        const emailField = recipientForm.querySelector('[ref="recipientEmail"]');
+        if (emailField) {
+          if (isRecipient) emailField.setAttribute('required', 'required');
+          else emailField.removeAttribute('required');
+        }
+
+        setControlFlag(isRecipient);
+
+        if (timezoneOffset) {
+          timezoneOffset.disabled = !isRecipient;
+          timezoneOffset.value = isRecipient ? new Date().getTimezoneOffset().toString() : '';
+        }
+      };
+
+      myEmailBtn.addEventListener('change', () => {
+        if (myEmailBtn.checked) applyMode('self');
+      });
+
+      recipientEmailBtn.addEventListener('change', () => {
+        if (recipientEmailBtn.checked) applyMode('recipient_form');
+      });
+
+      recipientForm.querySelectorAll('.gift-card-form-option__button-label').forEach((label) => {
+        label.addEventListener('click', () => {
+          const input = label.querySelector('input[type="radio"]');
+          if (!input) return;
+          window.requestAnimationFrame(() => {
+            if (input === myEmailBtn && myEmailBtn.checked) applyMode('self');
+            if (input === recipientEmailBtn && recipientEmailBtn.checked) applyMode('recipient_form');
+          });
+        });
+      });
+
+      applyMode('self');
+    };
+
+    if (customElements.get('gift-card-recipient-form')) {
+      initRecipientToggle();
+    } else {
+      customElements.whenDefined('gift-card-recipient-form').then(initRecipientToggle);
+    }
+  })();
+</script>

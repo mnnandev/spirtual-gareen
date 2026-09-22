@@ -1,0 +1,639 @@
+{% liquid
+  assign popup_image_url = 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/VISITE-BACKGROUND-2_1.webp?v=1780750087'
+  assign popup_logo_url = 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/02573d7e-ea25-4da7-b54d-ac578647462b-removebg-preview.png?v=1789907913'
+  assign popup_heading = 'spiritual_green.newsletter_popup_heading' | t
+  assign popup_text = 'spiritual_green.newsletter_popup_text' | t
+  assign popup_email_placeholder = 'spiritual_green.newsletter_popup_email_placeholder' | t
+  assign popup_badge = 'spiritual_green.promo_discount_badge' | t
+%}
+
+<script
+  src="{{ 'dialog.js' | asset_url }}"
+  type="module"
+></script>
+
+<dialog-component
+  id="sg-newsletter-popup"
+  class="sg-newsletter-popup"
+>
+  <dialog
+    ref="dialog"
+    class="sg-newsletter-popup__dialog dialog-modal"
+    scroll-lock
+    aria-labelledby="sg-newsletter-popup-heading"
+  >
+    <div class="sg-newsletter-popup__card">
+      <div class="sg-newsletter-popup__media" aria-hidden="true">
+        {% if popup_badge != blank %}
+          <span class="sg-newsletter-popup__badge">{{ popup_badge }}</span>
+        {% endif %}
+        <img
+          class="sg-newsletter-popup__image"
+          src="{{ popup_image_url }}"
+          alt=""
+          width="1200"
+          height="900"
+          loading="lazy"
+          decoding="async"
+        >
+      </div>
+
+      <div class="sg-newsletter-popup__panel">
+        <button
+          type="button"
+          class="sg-newsletter-popup__close button button-unstyled"
+          on:click="/closeDialog"
+          aria-label="{{ 'accessibility.close_dialog' | t }}"
+        >
+          <span class="sg-newsletter-popup__close-label">{{ 'actions.close' | t }}</span>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <path d="M4 4L14 14M14 4L4 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <div class="sg-newsletter-popup__panel-inner">
+          <div class="sg-newsletter-popup__logo-wrap">
+            <img
+              class="sg-newsletter-popup__logo"
+              src="{{ popup_logo_url }}"
+              alt="{{ 'accessibility.home_logo_alt' | t: store_name: shop.name | default: shop.name }}"
+              width="280"
+              height="268"
+              loading="lazy"
+              decoding="async"
+            >
+          </div>
+
+          <h2 id="sg-newsletter-popup-heading" class="sg-newsletter-popup__heading">
+            {{ popup_heading }}
+          </h2>
+
+          <p class="sg-newsletter-popup__text">{{ popup_text }}</p>
+
+          {% form 'customer', id: 'SgNewsletterPopup', class: 'sg-newsletter-popup__form' %}
+            <input type="hidden" name="contact[tags]" value="newsletter,popup-10">
+
+            <label class="visually-hidden" for="SgNewsletterPopup-email">{{ 'spiritual_green.email_label' | t }}</label>
+            <input
+              id="SgNewsletterPopup-email"
+              class="sg-newsletter-popup__input"
+              type="email"
+              name="contact[email]"
+              value="{{ form.email }}"
+              placeholder="{{ popup_email_placeholder | escape }}"
+              autocorrect="off"
+              autocapitalize="off"
+              autocomplete="email"
+              required
+            >
+
+            <label class="sg-newsletter-popup__consent">
+              <input
+                class="sg-newsletter-popup__checkbox"
+                type="checkbox"
+                name="sg_newsletter_consent"
+                value="1"
+                data-popup-consent
+                required
+              >
+              <span class="sg-newsletter-popup__consent-text">
+                {{ 'spiritual_green.newsletter_popup_consent_html' | t }}
+              </span>
+            </label>
+
+            <button
+              class="sg-newsletter-popup__submit"
+              type="submit"
+              name="commit"
+              data-popup-submit
+              disabled
+            >
+              {{ 'spiritual_green.newsletter_popup_submit' | t }}
+            </button>
+
+            {% if form.posted_successfully? %}
+              <p class="sg-newsletter-popup__message sg-newsletter-popup__message--success" data-popup-success>
+                {{ 'spiritual_green.newsletter_popup_success' | t }}
+              </p>
+            {% endif %}
+
+            {% if form.errors %}
+              <p class="sg-newsletter-popup__message sg-newsletter-popup__message--error">
+                {{ form.errors.messages.email | first | default: form.errors | default_errors }}
+              </p>
+            {% endif %}
+          {% endform %}
+        </div>
+      </div>
+    </div>
+  </dialog>
+</dialog-component>
+
+{% stylesheet %}
+  .sg-newsletter-popup__dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    width: min(920px, calc(100vw - 32px));
+    max-width: none;
+    max-height: calc(100dvh - 32px);
+    height: auto;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 22px;
+    overflow: hidden;
+    overflow-y: auto;
+    background: transparent;
+    box-shadow: 0 28px 80px rgba(20, 35, 24, 0.22);
+    transform: translate(-50%, -50%);
+  }
+
+  .sg-newsletter-popup__dialog[open] {
+    animation: sg-newsletter-popup-in 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .sg-newsletter-popup__dialog[open]::backdrop {
+    animation: sg-newsletter-popup-backdrop-in 0.5s ease forwards;
+  }
+
+  .sg-newsletter-popup__dialog.dialog-closing {
+    animation: sg-newsletter-popup-out 0.34s cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+
+  .sg-newsletter-popup__dialog.dialog-closing::backdrop {
+    animation: sg-newsletter-popup-backdrop-out 0.34s ease forwards;
+  }
+
+  .sg-newsletter-popup__dialog::backdrop {
+    background: rgba(18, 24, 20, 0.58);
+    backdrop-filter: blur(3px);
+  }
+
+  @keyframes sg-newsletter-popup-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, calc(-50% - 72px));
+    }
+
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  @keyframes sg-newsletter-popup-out {
+    from {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+
+    to {
+      opacity: 0;
+      transform: translate(-50%, calc(-50% - 36px));
+    }
+  }
+
+  @keyframes sg-newsletter-popup-backdrop-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes sg-newsletter-popup-backdrop-out {
+    from {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0;
+    }
+  }
+
+  .sg-newsletter-popup__card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 520px;
+    background: #f7f4ee;
+  }
+
+  .sg-newsletter-popup__media {
+    position: relative;
+    min-height: 280px;
+    overflow: hidden;
+    background: #ffffff;
+  }
+
+  .sg-newsletter-popup__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center right;
+    display: block;
+  }
+
+  .sg-newsletter-popup__badge {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    background: #d8e8a8;
+    color: #1a1a1a;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+
+  .sg-newsletter-popup__panel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1.75rem, 4vw, 2.75rem);
+    background: #f7f4ee;
+  }
+
+  .sg-newsletter-popup__close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: auto;
+    min-width: 36px;
+    height: 32px;
+    padding: 0 10px 0 12px;
+    border-radius: 999px;
+    color: #1a1a1a;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .sg-newsletter-popup__close-label {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    color: #5f6d62;
+    white-space: nowrap;
+  }
+
+  .sg-newsletter-popup__close svg {
+    flex-shrink: 0;
+    display: block;
+  }
+
+  .sg-newsletter-popup__close:hover {
+    background: rgba(127, 175, 114, 0.08);
+    transform: scale(1.04);
+  }
+
+  .sg-newsletter-popup__close:hover .sg-newsletter-popup__close-label {
+    color: #1a1a1a;
+  }
+
+  .sg-newsletter-popup__panel-inner {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .sg-newsletter-popup__logo-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto 22px;
+    line-height: 0;
+    background: #f7f4ee;
+  }
+
+  .sg-newsletter-popup__logo {
+    display: block;
+    width: min(220px, 72vw);
+    max-height: 120px;
+    height: auto;
+    margin: 0;
+    object-fit: contain;
+    object-position: center center;
+    background: transparent;
+  }
+
+  .sg-newsletter-popup__heading {
+    margin: 0 0 14px;
+    font-family: var(--sg-font-heading, 'Playfair Display', Georgia, serif);
+    font-size: clamp(1.65rem, 2.8vw, 2rem);
+    font-weight: 500;
+    line-height: 1.12;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: center;
+    color: #1a1a1a;
+  }
+
+  .sg-newsletter-popup__text {
+    margin: 0 0 22px;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    text-align: center;
+    color: #4a5568;
+  }
+
+  .sg-newsletter-popup__form {
+    display: grid;
+    gap: 14px;
+  }
+
+  .sg-newsletter-popup__input {
+    width: 100%;
+    min-height: 50px;
+    padding: 0 18px;
+    border: 1px solid rgba(127, 175, 114, 0.14);
+    border-radius: 999px;
+    background: #efe9df;
+    color: #1a1a1a;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .sg-newsletter-popup__input::placeholder {
+    color: rgba(26, 26, 26, 0.45);
+  }
+
+  .sg-newsletter-popup__input:focus {
+    border-color: rgba(127, 175, 114, 0.35);
+    box-shadow: 0 0 0 3px rgba(151, 196, 138, 0.12);
+  }
+
+  .sg-newsletter-popup__consent {
+    display: grid;
+    grid-template-columns: 18px 1fr;
+    gap: 10px;
+    align-items: start;
+    cursor: pointer;
+  }
+
+  .sg-newsletter-popup__checkbox {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    accent-color: #97C48A;
+  }
+
+  .sg-newsletter-popup__consent-text {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 10px;
+    line-height: 1.45;
+    color: #5f6d62;
+  }
+
+  .sg-newsletter-popup__consent-text a {
+    color: #1a1a1a;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .sg-newsletter-popup__submit {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 24px;
+    border: none;
+    border-radius: 999px;
+    background: #97C48A;
+    color: #ffffff;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.25s ease, opacity 0.25s ease;
+  }
+
+  .sg-newsletter-popup__submit:hover:not(:disabled) {
+    background: #7FAF72;
+    transform: translateY(-1px);
+  }
+
+  .sg-newsletter-popup__submit:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .sg-newsletter-popup__message {
+    margin: 0;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: center;
+  }
+
+  .sg-newsletter-popup__message--success {
+    color: #1a1a1a;
+  }
+
+  .sg-newsletter-popup__message--error {
+    color: #b42318;
+  }
+
+  @media screen and (max-width: 820px) {
+    .sg-newsletter-popup__dialog {
+      width: min(420px, calc(100vw - 24px)) !important;
+      height: auto !important;
+      max-height: calc(100dvh - 24px) !important;
+      padding: 0 !important;
+      border-radius: 18px;
+    }
+
+    .sg-newsletter-popup__card {
+      grid-template-columns: 1fr;
+      min-height: 0;
+    }
+
+    .sg-newsletter-popup__media {
+      min-height: 220px;
+      max-height: 240px;
+    }
+
+    .sg-newsletter-popup__panel {
+      padding: 1.5rem 1.25rem 1.75rem;
+    }
+
+    .sg-newsletter-popup__close {
+      top: 10px;
+      right: 10px;
+      height: 30px;
+      padding: 0 8px 0 10px;
+      gap: 5px;
+    }
+
+    .sg-newsletter-popup__close-label {
+      font-size: 10px;
+    }
+
+    .sg-newsletter-popup__logo-wrap {
+      margin-bottom: 16px;
+    }
+
+    .sg-newsletter-popup__heading {
+      font-size: 1.45rem;
+    }
+  }
+{% endstylesheet %}
+
+<script>
+  (function initSgNewsletterPopup() {
+    /* Show once per browser session on first open — not again on refresh. */
+    const OPEN_DELAY_MS = 1500;
+    const SEEN_SESSION_KEY = 'sg_newsletter_popup_seen';
+    const CLOSED_LOCAL_KEY = 'sg_newsletter_popup_closed';
+
+    const storageGet = (store, key) => {
+      try {
+        return store.getItem(key);
+      } catch (error) {
+        return null;
+      }
+    };
+
+    const storageSet = (store, key, value) => {
+      try {
+        store.setItem(key, value);
+      } catch (error) {
+        /* ignore quota / private mode */
+      }
+    };
+
+    const wasClosedPermanently = () => storageGet(localStorage, CLOSED_LOCAL_KEY) === '1';
+    const wasSeenThisSession = () => storageGet(sessionStorage, SEEN_SESSION_KEY) === '1';
+
+    const markSeenThisSession = () => storageSet(sessionStorage, SEEN_SESSION_KEY, '1');
+    const markClosedPermanently = () => {
+      markSeenThisSession();
+      storageSet(localStorage, CLOSED_LOCAL_KEY, '1');
+    };
+
+    const mount = () => {
+      const component = document.getElementById('sg-newsletter-popup');
+      if (!component || component.dataset.popupReady === 'true') return;
+      component.dataset.popupReady = 'true';
+
+      const dialog = component.querySelector('dialog');
+      const consent = component.querySelector('[data-popup-consent]');
+      const submit = component.querySelector('[data-popup-submit]');
+      const successMessage = component.querySelector('[data-popup-success]');
+      const closeBtn = component.querySelector('.sg-newsletter-popup__close');
+      let openTimer = null;
+      let dismissedThisPage = false;
+
+      const openPopup = () => {
+        if (dismissedThisPage) return;
+        markSeenThisSession();
+        if (typeof component.showDialog === 'function') {
+          component.showDialog();
+          return;
+        }
+        if (dialog && !dialog.open) dialog.showModal();
+      };
+
+      const closePopup = () => {
+        if (typeof component.closeDialog === 'function') {
+          component.closeDialog();
+          return;
+        }
+        if (dialog && dialog.open) dialog.close();
+      };
+
+      const dismissAndClose = () => {
+        if (openTimer) {
+          window.clearTimeout(openTimer);
+          openTimer = null;
+        }
+        dismissedThisPage = true;
+        markClosedPermanently();
+        closePopup();
+      };
+
+      const syncSubmitState = () => {
+        if (!submit || !consent) return;
+        submit.disabled = !consent.checked;
+      };
+
+      if (consent) {
+        consent.addEventListener('change', syncSubmitState);
+        syncSubmitState();
+      }
+
+      if (closeBtn) {
+        closeBtn.addEventListener('click', dismissAndClose);
+      }
+
+      if (dialog) {
+        dialog.addEventListener('close', () => {
+          dismissedThisPage = true;
+          markClosedPermanently();
+        });
+        dialog.addEventListener('cancel', () => {
+          dismissedThisPage = true;
+          markClosedPermanently();
+        });
+      }
+
+      const form = component.querySelector('#SgNewsletterPopup');
+      if (form) {
+        form.addEventListener('submit', () => {
+          dismissedThisPage = true;
+          markClosedPermanently();
+        });
+      }
+
+      const shouldAutoOpen =
+        !wasClosedPermanently() &&
+        !wasSeenThisSession() &&
+        !successMessage &&
+        !window.Shopify?.designMode &&
+        !window.location.pathname.includes('/cart') &&
+        !window.location.pathname.includes('/checkout');
+
+      if (shouldAutoOpen) {
+        openTimer = window.setTimeout(() => {
+          openTimer = null;
+          openPopup();
+        }, OPEN_DELAY_MS);
+      }
+    };
+
+    const boot = () => {
+      if (window.customElements && typeof window.customElements.whenDefined === 'function') {
+        window.customElements.whenDefined('dialog-component').then(mount).catch(mount);
+      } else {
+        mount();
+      }
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', boot);
+    } else {
+      boot();
+    }
+  })();
+</script>

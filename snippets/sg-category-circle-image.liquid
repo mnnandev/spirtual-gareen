@@ -1,0 +1,49 @@
+{%- doc -%}
+  Lifestyle circle image for a macro-category tile.
+
+  @param {string} handle - Collection handle
+  @param {image} [image] - Optional block image override
+  @param {string} [title] - Alt text fallback
+  @param {string} [class] - Extra CSS classes
+  @param {number} [size] - Render size hint (default 110)
+{%- enddoc -%}
+
+{% liquid
+  assign img_class = 'category-circles__photo'
+  if class != blank
+    assign img_class = img_class | append: ' ' | append: class
+  endif
+  assign img_size = size | default: 110
+  assign img_alt = title | default: 'Categoria'
+
+  assign circle_url = ''
+  if image != blank
+    assign circle_url = image | image_url: width: 400
+    assign img_alt = image.alt | default: img_alt
+  else
+    capture circle_url_raw
+      render 'sg-shop-category-meta', handle: handle, output: 'circle_image_url'
+    endcapture
+    assign circle_url = circle_url_raw | strip
+  endif
+-%}
+
+{% if circle_url != blank %}
+  <img
+    class="{{ img_class }}"
+    src="{{ circle_url }}"
+    alt="{{ img_alt | escape }}"
+    width="{{ img_size }}"
+    height="{{ img_size }}"
+    loading="lazy"
+    decoding="async"
+  >
+{% else %}
+  {% render 'category-icons',
+    category: handle,
+    size: 48,
+    class: 'category-circles__icon',
+    label: img_alt,
+    decorative: true
+  %}
+{% endif %}

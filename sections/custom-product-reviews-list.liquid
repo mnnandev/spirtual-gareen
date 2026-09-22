@@ -1,0 +1,648 @@
+
+{% liquid
+  assign review_image = product.featured_image
+  if review_image == blank and product.images.size > 0
+    assign review_image = product.images.first
+  endif
+
+  assign topics = section.settings.popular_topics | split: ','
+  assign product_name = product.title | default: 'questo prodotto'
+
+  assign metafield_reviews = product.metafields.custom.sg_reviews.value
+  assign metaobject_reviews = product.metafields.custom.sg_review_entries.value
+  assign use_metafield_reviews = false
+  assign use_metaobject_reviews = false
+  assign reviews_rendered = 0
+
+  if section.settings.reviews_source != 'blocks'
+    if metaobject_reviews != blank and metaobject_reviews.size > 0
+      assign use_metaobject_reviews = true
+    elsif metafield_reviews != blank and metafield_reviews.size > 0
+      assign use_metafield_reviews = true
+    endif
+  endif
+
+  assign show_theme_blocks = false
+  if use_metaobject_reviews == false and use_metafield_reviews == false
+    if section.settings.reviews_source == 'blocks'
+      assign show_theme_blocks = true
+    elsif section.settings.reviews_source == 'auto'
+      assign show_theme_blocks = true
+    elsif request.design_mode
+      assign show_theme_blocks = true
+    endif
+  endif
+%}
+
+<section
+  id="recensioni-lista"
+  class="sg-reviews-list custom-product-reviews-list-section"
+  data-sg-reviews-list
+  data-section-id="{{ section.id }}"
+  style="--sg-reviews-list-pt: {{ section.settings.padding_top }}px; --sg-reviews-list-pb: {{ section.settings.padding_bottom }}px;"
+>
+  <div class="sg-reviews-list__container page-width">
+    <div class="sg-reviews-list__toolbar">
+      <div class="sg-reviews-list__search-wrap">
+        <label class="visually-hidden" for="SgReviewsSearch-{{ section.id }}">{{ section.settings.search_label }}</label>
+        <span class="sg-reviews-list__search-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <input
+          id="SgReviewsSearch-{{ section.id }}"
+          class="sg-reviews-list__search"
+          type="search"
+          placeholder="{{ section.settings.search_placeholder }}"
+          autocomplete="off"
+        >
+      </div>
+
+      <div class="sg-reviews-list__topics">
+        <p class="sg-reviews-list__topics-label">{{ section.settings.topics_label }}</p>
+        <div class="sg-reviews-list__topics-row" data-sg-topics-row>
+          <div class="sg-reviews-list__tags-flow" data-sg-tags-flow>
+            <div class="sg-reviews-list__tags" data-sg-review-tags>
+              {%- for topic in topics -%}
+                {%- assign topic_trim = topic | strip -%}
+                {%- if topic_trim != blank -%}
+                  <button type="button" class="sg-reviews-list__tag" data-sg-review-tag>{{ topic_trim }}</button>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+            <button
+              type="button"
+              class="sg-reviews-list__tags-toggle"
+              data-sg-tags-toggle
+              data-show-more="{{ section.settings.show_more_label | escape }}"
+              data-show-less="{{ section.settings.show_less_label | escape }}"
+              hidden
+            >
+              {{ section.settings.show_more_label }}
+            </button>
+          </div>
+
+          <div class="sg-reviews-list__sort" data-sg-sort>
+            <div class="sg-reviews-list__sort-dropdown">
+              <button
+                type="button"
+                class="sg-reviews-list__sort-trigger"
+                data-sg-sort-trigger
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                aria-controls="SgReviewsSortMenu-{{ section.id }}"
+              >
+                <span class="sg-reviews-list__sort-trigger-text">
+                  <span class="sg-reviews-list__sort-prefix">{{ section.settings.sort_label }}</span>
+                  <span class="sg-reviews-list__sort-value" data-sg-sort-value>{{ section.settings.sort_option_highest }}</span>
+                </span>
+                <span class="sg-reviews-list__sort-chevron" aria-hidden="true">
+                  <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </button>
+              <div
+                id="SgReviewsSortMenu-{{ section.id }}"
+                class="sg-reviews-list__sort-panel"
+                data-sg-sort-panel
+                hidden
+              >
+                <ul class="sg-reviews-list__sort-menu" role="listbox" aria-label="{{ section.settings.sort_label }}">
+                  <li role="presentation">
+                    <button
+                      type="button"
+                      class="sg-reviews-list__sort-option is-selected"
+                      role="option"
+                      data-sort="rating-desc"
+                      aria-selected="true"
+                    >
+                      <span>{{ section.settings.sort_option_highest }}</span>
+                      <svg class="sg-reviews-list__sort-check" width="14" height="10" viewBox="0 0 14 10" aria-hidden="true">
+                        <path d="M1 5.2L4.8 9 13 1" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </li>
+                  <li role="presentation">
+                    <button type="button" class="sg-reviews-list__sort-option" role="option" data-sort="rating-asc" aria-selected="false">
+                      <span>{{ section.settings.sort_option_lowest }}</span>
+                      <svg class="sg-reviews-list__sort-check" width="14" height="10" viewBox="0 0 14 10" aria-hidden="true">
+                        <path d="M1 5.2L4.8 9 13 1" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </li>
+                  <li role="presentation">
+                    <button type="button" class="sg-reviews-list__sort-option" role="option" data-sort="media" aria-selected="false">
+                      <span>{{ section.settings.sort_option_media }}</span>
+                      <svg class="sg-reviews-list__sort-check" width="14" height="10" viewBox="0 0 14 10" aria-hidden="true">
+                        <path d="M1 5.2L4.8 9 13 1" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </li>
+                  <li role="presentation">
+                    <button type="button" class="sg-reviews-list__sort-option" role="option" data-sort="recent" aria-selected="false">
+                      <span>{{ section.settings.sort_option_recent }}</span>
+                      <svg class="sg-reviews-list__sort-check" width="14" height="10" viewBox="0 0 14 10" aria-hidden="true">
+                        <path d="M1 5.2L4.8 9 13 1" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </li>
+                  <li role="presentation">
+                    <button type="button" class="sg-reviews-list__sort-option" role="option" data-sort="verified" aria-selected="false">
+                      <span>{{ section.settings.sort_option_verified }}</span>
+                      <svg class="sg-reviews-list__sort-check" width="14" height="10" viewBox="0 0 14 10" aria-hidden="true">
+                        <path d="M1 5.2L4.8 9 13 1" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {%- liquid
+      assign show_admin_hint = false
+      if request.design_mode and use_metafield_reviews == false and use_metaobject_reviews == false
+        assign show_admin_hint = true
+      endif
+    -%}
+    {% if show_admin_hint %}
+      <div class="sg-reviews-list__admin-hint">
+        <p><strong>{{ section.settings.admin_hint_title }}</strong></p>
+        <ol class="sg-reviews-list__admin-steps">
+          <li>{{ section.settings.admin_step_1 }}</li>
+          <li>{{ section.settings.admin_step_2 }}</li>
+          <li>{{ section.settings.admin_step_3 }}</li>
+        </ol>
+        <p class="sg-reviews-list__admin-note">{{ section.settings.admin_hint_note }}</p>
+      </div>
+    {% endif %}
+
+    <p class="sg-reviews-list__empty" data-sg-reviews-empty hidden>
+      {{ section.settings.empty_filter_label }}
+    </p>
+
+    <div class="sg-reviews-list__items" data-sg-review-items>
+      {%- if use_metaobject_reviews -%}
+        {%- for review in metaobject_reviews -%}
+          {%- liquid
+            assign r_author = review.author.value | default: review.author
+            assign r_country = review.country.value | default: review.country | default: 'it'
+            assign r_verified = review.verified.value | default: review.verified
+            assign r_date_display = review.date_display.value | default: review.date_display
+            assign r_date = review.date.value | default: review.date
+            assign r_rating = review.rating.value | default: review.rating | default: 5
+            assign r_text = review.text.value | default: review.text
+            assign r_show_image = review.show_product_image.value | default: review.show_product_image
+            assign r_helpful_yes = review.helpful_yes.value | default: review.helpful_yes | default: 0
+            assign r_helpful_no = review.helpful_no.value | default: review.helpful_no | default: 0
+            assign reviews_rendered = reviews_rendered | plus: 1
+          -%}
+          {% render 'sg-review-item', review_id: review.system.id, default: forloop.index, author: r_author, country: r_country, verified: r_verified, date_display: r_date_display, date: r_date, rating: r_rating, text: r_text, show_product_image: r_show_image, helpful_yes: r_helpful_yes, helpful_no: r_helpful_no, review_image: review_image, verified_label: section.settings.verified_label, helpful_label: section.settings.helpful_label %}
+        {%- endfor -%}
+      {%- elsif use_metafield_reviews -%}
+        {%- for review in metafield_reviews -%}
+          {%- liquid
+            assign r_author = review.author
+            assign r_country = review.country | default: 'it'
+            assign r_verified = review.verified
+            assign r_date_display = review.date_display
+            assign r_date = review.date
+            assign r_rating = review.rating | default: 5
+            assign r_text = review.text
+            assign r_show_image = review.show_product_image
+            assign r_helpful_yes = review.helpful_yes | default: 0
+            assign r_helpful_no = review.helpful_no | default: 0
+            assign reviews_rendered = reviews_rendered | plus: 1
+          -%}
+          {% render 'sg-review-item',
+            review_id: forloop.index,
+            author: r_author,
+            country: r_country,
+            verified: r_verified,
+            date_display: r_date_display,
+            date: r_date,
+            rating: r_rating,
+            text: r_text,
+            show_product_image: r_show_image,
+            helpful_yes: r_helpful_yes,
+            helpful_no: r_helpful_no,
+            review_image: review_image,
+            verified_label: section.settings.verified_label,
+            helpful_label: section.settings.helpful_label
+          %}
+        {%- endfor -%}
+      {%- elsif show_theme_blocks -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'review' -%}
+            {%- assign reviews_rendered = reviews_rendered | plus: 1 -%}
+            {% render 'sg-review-item',
+              review_id: block.id,
+              author: block.settings.author,
+              country: block.settings.country,
+              verified: block.settings.verified,
+              date_display: block.settings.date_display,
+              date: block.settings.date,
+              rating: block.settings.rating,
+              text: block.settings.text,
+              show_product_image: block.settings.show_product_image,
+              helpful_yes: block.settings.helpful_yes,
+              helpful_no: block.settings.helpful_no,
+              review_image: review_image,
+              verified_label: section.settings.verified_label,
+              helpful_label: section.settings.helpful_label,
+              shopify_attributes: block.shopify_attributes
+            %}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+    {% if reviews_rendered == 0 and request.design_mode and show_theme_blocks == false %}
+      <p class="sg-reviews-list__no-reviews" data-sg-no-reviews-admin>
+        {{ section.settings.no_reviews_label }}
+      </p>
+    {% endif %}
+
+    <nav
+      class="sg-reviews-list__pagination"
+      data-sg-pagination
+      data-page-count="{{ section.settings.page_count }}"
+      aria-label="Paginazione recensioni"
+    >
+      <button
+        type="button"
+        class="sg-reviews-list__page sg-reviews-list__page--prev"
+        data-sg-page-prev
+        aria-label="Pagina precedente"
+        disabled
+      >
+        ‹
+      </button>
+      <div class="sg-reviews-list__pagination-pages" data-sg-pagination-pages>
+        {%- for page in (1..section.settings.page_count) -%}
+          <button
+            type="button"
+            class="sg-reviews-list__page{% if page == 1 %} is-active{% endif %}"
+            data-sg-page="{{ page }}"
+            aria-label="Pagina {{ page }}"
+            {% if page == 1 %}
+              aria-current="page"
+            {% endif %}
+          >
+            {{ page }}
+          </button>
+        {%- endfor -%}
+      </div>
+      <button
+        type="button"
+        class="sg-reviews-list__page sg-reviews-list__page--next"
+        data-sg-page-next
+        aria-label="Pagina successiva"
+      >
+        ›
+      </button>
+    </nav>
+  </div>
+</section>
+
+<script src="{{ 'sg-reviews-list.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Lista recensioni",
+  "tag": "section",
+  "class": "custom-product-reviews-list-section",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "select",
+      "id": "reviews_source",
+      "label": "Fonte recensioni",
+      "options": [
+        { "value": "auto", "label": "Automatica (metafield prodotto, poi blocchi tema)" },
+        { "value": "metafield", "label": "Solo metafield / metaobject prodotto" },
+        { "value": "blocks", "label": "Solo blocchi tema (uguali su tutti i prodotti)" }
+      ],
+      "default": "auto",
+      "info": "Automatica: prima metafield prodotto (se presente), altrimenti blocchi Recensione qui sotto (come demo dinamico nel tema)."
+    },
+    {
+      "type": "paragraph",
+      "content": "Metafield prodotto: Recensioni prodotto (custom.sg_review_entries, lista metaobject Recensione prodotto). Alternativa JSON: custom.sg_reviews"
+    },
+    {
+      "type": "text",
+      "id": "admin_hint_title",
+      "label": "Titolo guida (editor tema)",
+      "default": "Aggiungi recensioni per questo prodotto"
+    },
+    {
+      "type": "text",
+      "id": "admin_step_1",
+      "label": "Passo 1 (editor tema)",
+      "default": "Shopify Admin → Prodotti → apri il prodotto che stai guardando"
+    },
+    {
+      "type": "text",
+      "id": "admin_step_2",
+      "label": "Passo 2 (editor tema)",
+      "default": "In basso: Metafields → Recensioni prodotto → Aggiungi voce"
+    },
+    {
+      "type": "text",
+      "id": "admin_step_3",
+      "label": "Passo 3 (editor tema)",
+      "default": "Compila nome, testo, stelle e data → Salva prodotto"
+    },
+    {
+      "type": "textarea",
+      "id": "admin_hint_note",
+      "label": "Nota guida (editor tema)",
+      "default": "Prima volta? Crea il tipo Recensione prodotto e il metafield Recensioni prodotto in Impostazioni → Dati personalizzati (vedi config/RECENSIONI-SETUP-ADMIN.txt nel tema)."
+    },
+    {
+      "type": "text",
+      "id": "no_reviews_label",
+      "label": "Messaggio senza recensioni (solo anteprima tema)",
+      "default": "Nessuna recensione per questo prodotto. Aggiungile dal pannello Prodotti come sopra."
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search placeholder",
+      "default": "Cerca nelle recensioni"
+    },
+    {
+      "type": "text",
+      "id": "search_label",
+      "label": "Search label",
+      "default": "Cerca recensioni"
+    },
+    {
+      "type": "text",
+      "id": "topics_label",
+      "label": "Topics label",
+      "default": "Argomenti popolari"
+    },
+    {
+      "type": "textarea",
+      "id": "popular_topics",
+      "label": "Popular topics (comma separated)",
+      "default": "risultati, ingredienti, texture, pelle, idratazione, profumo, confezione, spedizione, qualità, biologico"
+    },
+    {
+      "type": "text",
+      "id": "show_more_label",
+      "label": "Show more label",
+      "default": "Mostra di più"
+    },
+    {
+      "type": "text",
+      "id": "show_less_label",
+      "label": "Show less label",
+      "default": "Mostra meno"
+    },
+    {
+      "type": "text",
+      "id": "sort_label",
+      "label": "Sort label",
+      "default": "Ordina per:"
+    },
+    {
+      "type": "text",
+      "id": "sort_option_highest",
+      "label": "Sort â€” highest rating",
+      "default": "Valutazione piÃ¹ alta"
+    },
+    {
+      "type": "text",
+      "id": "sort_option_lowest",
+      "label": "Sort â€” lowest rating",
+      "default": "Valutazione piÃ¹ bassa"
+    },
+    {
+      "type": "text",
+      "id": "sort_option_media",
+      "label": "Sort â€” with images",
+      "default": "Con immagini"
+    },
+    {
+      "type": "text",
+      "id": "sort_option_recent",
+      "label": "Sort â€” most recent",
+      "default": "PiÃ¹ recenti"
+    },
+    {
+      "type": "text",
+      "id": "sort_option_verified",
+      "label": "Sort â€” verified purchase",
+      "default": "Acquisto verificato"
+    },
+    {
+      "type": "text",
+      "id": "verified_label",
+      "label": "Verified label",
+      "default": "Recensore verificato"
+    },
+    {
+      "type": "text",
+      "id": "helpful_label",
+      "label": "Helpful label",
+      "default": "Questa recensione ti Ã¨ stata utile?"
+    },
+    {
+      "type": "text",
+      "id": "empty_filter_label",
+      "label": "Empty filter message",
+      "default": "Nessuna recensione corrisponde a questo filtro."
+    },
+    {
+      "type": "range",
+      "id": "page_count",
+      "label": "Pagination pages",
+      "min": 3,
+      "max": 8,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    }
+  ],
+  "max_blocks": 50,
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Recensione",
+      "settings": [
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author name",
+          "default": "Maria R."
+        },
+        {
+          "type": "text",
+          "id": "country",
+          "label": "Country code",
+          "default": "it"
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Verified reviewer",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "date_display",
+          "label": "Date display",
+          "default": "15/03/26"
+        },
+        {
+          "type": "text",
+          "id": "date",
+          "label": "Date (ISO)",
+          "default": "2026-03-15"
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Review text",
+          "default": "Prodotto eccellente, texture leggera e assorbimento rapido. La pelle appare piÃ¹ luminosa dopo pochi giorni."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_product_image",
+          "label": "Show current product image",
+          "default": true
+        },
+        {
+          "type": "number",
+          "id": "helpful_yes",
+          "label": "Helpful yes count",
+          "default": 24
+        },
+        {
+          "type": "number",
+          "id": "helpful_no",
+          "label": "Helpful no count",
+          "default": 0
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lista recensioni",
+      "blocks": [
+        {
+          "type": "review",
+          "settings": {
+            "author": "Maria R.",
+            "country": "it",
+            "text": "Crema gel leggerissima, si assorbe subito e non unge. Dopo una settimana la pelle del viso Ã¨ piÃ¹ morbida e uniforme.",
+            "helpful_yes": 26,
+            "show_product_image": true
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "author": "Giulia P.",
+            "country": "it",
+            "text": "Ottima per la routine quotidiana. Profumo delicato e ingredienti naturali, proprio quello che cercavo in erboristeria.",
+            "helpful_yes": 18,
+            "show_product_image": true
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "author": "Elena S.",
+            "country": "it",
+            "text": "Packaging curato e consegna veloce. Il prodotto lascia un finish glow molto naturale, consigliatissimo.",
+            "helpful_yes": 12,
+            "show_product_image": false
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "author": "Francesco M.",
+            "country": "it",
+            "text": "L'ho acquistato per mia moglie e usa solo questo ora. Texture piacevole e risultati visibili sul contorno occhi.",
+            "helpful_yes": 9,
+            "show_product_image": true
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: |-
+    {% render 'sg-review-item',
+                review_id: review.system.id | default: forloop.index,
+                author: r_author,
+                country: r_country,
+                verified: r_verified,
+                date_display: r_date_display,
+                date: r_date,
+                rating: r_rating,
+                text: r_text,
+                show_product_image: r_show_image,
+                helpful_yes: r_helpful_yes,
+                helpful_no: r_helpful_no,
+                review_image: review_image,
+                verified_label: section.settings.verified_label,
+                helpful_label: section.settings.helpful_label
+              %}
+  to: "{% render 'sg-review-item', review_id: review.system.id, default: forloop.index,
+    author: r_author, country: r_country, verified: r_verified, date_display: r_date_display,
+    date: r_date, rating: r_rating, text: r_text, show_product_image: r_show_image,
+    helpful_yes: r_helpful_yes, helpful_no: r_helpful_no, review_image: review_image,
+    verified_label: section.settings.verified_label, helpful_label: section.settings.helpful_label
+    %}"
+  position: 10320..10750
+{% endcomment %}

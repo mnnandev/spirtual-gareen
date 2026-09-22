@@ -1,0 +1,49 @@
+{%- doc -%}
+  Best Seller / Più venduto badge on product media (top-right).
+  Same corner as the -X% discount badge; stacks below it when both are present.
+
+  @param {product} product - Shopify product
+  @param {string} [label] - Badge text override
+  @param {string} [size] - Optional "sm"
+  @param {string} [class] - Extra classes
+  @param {boolean} [force] - Force show
+{%- enddoc -%}
+
+{%- liquid
+  capture sg_flag
+    render 'sg-bestseller-flag', product: product, force: force
+  endcapture
+  assign sg_flag = sg_flag | strip
+
+  assign badge_label = label | default: 'Più venduto'
+  if badge_label == blank
+    assign badge_label = 'Più venduto'
+  endif
+
+  assign badge_class = 'sg-image-bestseller-badge'
+  if size == 'sm'
+    assign badge_class = badge_class | append: ' sg-image-bestseller-badge--sm'
+  endif
+  if class != blank
+    assign badge_class = badge_class | append: ' ' | append: class
+  endif
+
+  comment
+    Detect sale so CSS can stack this badge under the discount pill.
+  endcomment
+  assign on_sale = false
+  if product != blank
+    assign sale_price = product.price | default: 0
+    assign compare_price = product.compare_at_price_max | default: product.compare_at_price | default: 0
+    if compare_price > sale_price and compare_price > 0
+      assign on_sale = true
+    endif
+  endif
+  if on_sale
+    assign badge_class = badge_class | append: ' sg-image-bestseller-badge--with-discount'
+  endif
+-%}
+
+{%- if sg_flag == 'true' -%}
+  <span class="{{ badge_class }}" aria-label="{{ badge_label | escape }}">{{ badge_label | escape }}</span>
+{%- endif -%}

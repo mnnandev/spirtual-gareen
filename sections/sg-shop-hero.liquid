@@ -1,0 +1,412 @@
+{% liquid
+  assign heading = section.settings.heading
+  assign description = section.settings.description
+  assign overlay_style = section.settings.overlay_style
+  assign background_asset = section.settings.background_asset
+  assign subheading = section.settings.subheading
+
+  assign lookup_handle = collection.handle
+  assign lookup_search = blank
+
+  if template.name == 'search' and search.performed
+    assign lookup_search = search.terms
+    assign lookup_handle = blank
+  endif
+%}
+
+{% capture matched_category_handle %}
+  {% render 'sg-shop-category-meta', handle: lookup_handle, search_terms: lookup_search, output: 'handle' %}
+{% endcapture %}
+{% assign matched_category_handle = matched_category_handle | strip %}
+
+{% if matched_category_handle != blank %}
+  {% capture category_heading %}
+    {% render 'sg-shop-category-meta', handle: matched_category_handle, output: 'title' %}
+  {% endcapture %}
+  {% capture category_subheading %}
+    {% render 'sg-shop-category-meta', handle: matched_category_handle, output: 'subtitle' %}
+  {% endcapture %}
+  {% capture category_overline %}
+    {% render 'sg-shop-category-meta', handle: matched_category_handle, output: 'overline' %}
+  {% endcapture %}
+  {% capture category_description %}
+    {% render 'sg-shop-category-meta', handle: matched_category_handle, output: 'description' %}
+  {% endcapture %}
+  {% capture category_background_asset %}
+    {% render 'sg-shop-category-meta', handle: matched_category_handle, output: 'background_asset' %}
+  {% endcapture %}
+  {% assign category_heading = category_heading | strip %}
+  {% assign category_subheading = category_subheading | strip %}
+  {% assign category_overline = category_overline | strip %}
+  {% assign category_description = category_description | strip %}
+  {% assign category_background_asset = category_background_asset | strip %}
+{% endif %}
+
+{% liquid
+  comment
+    UI language follows the real Shopify locale:
+    it → Italian, en → English.
+  endcomment
+  assign sg_raw_locale = request.locale.iso_code | default: localization.language.iso_code | default: 'it'
+  assign sg_ui_lang = sg_raw_locale
+  if sg_ui_lang != 'en' and sg_ui_lang != 'it'
+    assign sg_ui_lang = 'it'
+  endif
+
+  if sg_ui_lang == 'en'
+    assign default_products_heading = 'Our Products'
+    assign search_results_heading = 'Search results'
+    assign default_products_description = '<p>Natural products and specialist consultations for your everyday wellbeing. Discover our selection of herbs, supplements and personalized treatments.</p>'
+  else
+    assign default_products_heading = 'I Nostri Prodotti'
+    assign search_results_heading = 'Risultati di ricerca'
+    assign default_products_description = '<p>Prodotti naturali e consulenze specialistiche per il tuo benessere quotidiano. Scopri la nostra selezione di erbe, integratori e trattamenti personalizzati.</p>'
+  endif
+
+  case collection.handle
+    when 'erboristeria'
+      if sg_ui_lang == 'en'
+        assign category_heading = 'Traditional Herbalism'
+        assign category_subheading = 'Medicinal plants and essential oils'
+        assign category_description = '<p>Natural products and specialist consultations for your everyday wellbeing. Discover our selection of herbs, supplements and personalized treatments.</p>'
+      else
+        assign category_heading = 'Erboristeria Tradizionale'
+        assign category_subheading = 'Piante officinali e olii essenziali'
+        assign category_description = '<p>Prodotti naturali e consulenze specialistiche per il tuo benessere quotidiano. Scopri la nostra selezione di erbe, integratori e trattamenti personalizzati.</p>'
+      endif
+      assign category_background_asset = 'sg-erboristeria-hero-bg.png'
+      assign category_overlay_style = 'erboristeria'
+    when 'novita'
+      if sg_ui_lang == 'en'
+        assign category_heading = 'New Arrivals'
+        assign category_subheading = 'The latest for your wellbeing.'
+        assign category_description = '<p>Discover newly arrived products, carefully selected to offer the best natural solutions for health, beauty and everyday wellbeing.</p>'
+      else
+        assign category_heading = 'Novità'
+        assign category_subheading = 'Le ultime novità per il tuo benessere.'
+        assign category_description = '<p>Scopri i prodotti appena arrivati, selezionati con cura per offrirti le migliori soluzioni naturali per salute, bellezza e benessere quotidiano. Rimani sempre aggiornato sulle nostre ultime scoperte.</p>'
+      endif
+    when 'offerte'
+      if sg_ui_lang == 'en'
+        assign category_heading = 'Offers'
+        assign category_subheading = 'Natural wellbeing at a special price.'
+        assign category_description = '<p>Take advantage of current promotions and discounted products. The best opportunities to take care of yourself while saving, without compromising on quality.</p>'
+      else
+        assign category_heading = 'Offerte'
+        assign category_subheading = 'Il benessere naturale, a un prezzo speciale.'
+        assign category_description = '<p>Approfitta delle promozioni in corso e dei prodotti scontati. Le migliori occasioni per prenderti cura di te, risparmiando senza rinunciare alla qualità.</p>'
+      endif
+    when 'piu-venduti', 'best-seller', 'best-sellers', 'piu_venduti'
+      if sg_ui_lang == 'en'
+        assign category_heading = 'Best Sellers'
+        assign category_subheading = 'Favorites from our community.'
+        assign category_description = '<p>These are the products most chosen and appreciated by our customers. Supplements, cosmetics and natural remedies loved for their effectiveness.</p>'
+      else
+        assign category_heading = 'Più Venduti'
+        assign category_subheading = 'I preferiti dalla nostra community.'
+        assign category_description = '<p>Questi sono i prodotti più scelti e apprezzati dai nostri clienti. Integratori, cosmetici e rimedi naturali che hanno conquistato migliaia di persone grazie alla loro efficacia.</p>'
+      endif
+    when 'estate'
+      if sg_ui_lang == 'en'
+        assign category_heading = 'Summer'
+        assign category_subheading = 'Everything you need to enjoy summer at its best.'
+        assign category_description = '<p>Sun protection, hydration, energy, light legs, after-sun and supplements to face heat and holidays with maximum wellbeing.</p>'
+      else
+        assign category_heading = 'Estate'
+        assign category_subheading = "Tutto ciò che ti serve per vivere al meglio l'estate."
+        assign category_description = '<p>Protezione solare, idratazione, energia, gambe leggere, doposole e integratori per affrontare caldo e vacanze con il massimo del benessere. La tua estate inizia da qui.</p>'
+      endif
+  endcase
+
+  if subheading == blank and category_subheading != blank
+    assign subheading = category_subheading
+  endif
+
+  if category_heading != blank
+    if heading == blank or heading == 'I Nostri Prodotti' or heading == 'Our Products' or template.name == 'search'
+      assign heading = category_heading
+    endif
+  endif
+
+  if heading == blank and collection.title != blank
+    assign heading = collection.title
+  endif
+
+  if heading == blank and template.name == 'search' and search.performed
+    assign heading = search_results_heading
+  endif
+
+  if heading == blank
+    assign heading = default_products_heading
+  endif
+
+  comment
+    Theme editor often stores Italian defaults; swap default shop heading for English UI.
+  endcomment
+  if sg_ui_lang == 'en' and heading == 'I Nostri Prodotti'
+    assign heading = default_products_heading
+  endif
+
+  comment
+    Theme-editor default description is a shared placeholder. Prefer
+    handle-specific copy whenever that placeholder (or blank) is present.
+  endcomment
+  if description != blank
+    if description contains 'Prodotti naturali e consulenze specialistiche'
+      assign description = ''
+    elsif description contains 'Natural products and specialist consultations for your everyday wellbeing'
+      assign description = ''
+    endif
+  endif
+
+  if category_description != blank
+    if description == blank or template.name == 'search'
+      assign description = category_description
+    endif
+  endif
+
+  if description == blank and collection.description != blank
+    assign description = collection.description
+  endif
+
+  if description == blank and template.name == 'search'
+    assign description = default_products_description
+  endif
+
+  if sg_ui_lang == 'en' and description != blank
+    if description contains 'Prodotti naturali e consulenze specialistiche'
+      assign description = default_products_description
+    endif
+  endif
+
+  if background_asset == blank and category_background_asset != blank
+    assign background_asset = category_background_asset
+  endif
+
+  if overlay_style == blank or overlay_style == 'default'
+    if category_overlay_style != blank
+      assign overlay_style = category_overlay_style
+    endif
+  endif
+
+  if template.name == 'page' and page.handle == 'erboristeria' and overlay_style == 'default'
+    assign overlay_style = 'erboristeria'
+    if background_asset == blank
+      assign background_asset = 'sg-erboristeria-hero-bg.png'
+    endif
+    if heading == blank or heading == 'I Nostri Prodotti' or heading == 'Our Products'
+      if sg_ui_lang == 'en'
+        assign heading = 'Traditional Herbalism'
+      else
+        assign heading = 'Erboristeria Tradizionale'
+      endif
+    endif
+    if subheading == blank
+      if sg_ui_lang == 'en'
+        assign subheading = 'Medicinal plants and essential oils'
+      else
+        assign subheading = 'Piante officinali e olii essenziali'
+      endif
+    endif
+  endif
+
+  if heading != blank
+    capture cleaned_heading
+      render 'sg-sanitize-line-breaks', text: heading, mode: 'title'
+    endcapture
+    assign heading = cleaned_heading | strip
+  endif
+
+  if subheading != blank
+    capture cleaned_subheading
+      render 'sg-sanitize-line-breaks', text: subheading, mode: 'plain'
+    endcapture
+    assign subheading = cleaned_subheading | strip
+  endif
+
+  if description != blank
+    capture cleaned_description
+      render 'sg-sanitize-line-breaks', text: description, mode: 'html'
+    endcapture
+    assign description = cleaned_description | strip
+  endif
+
+  if category_overline != blank
+    capture cleaned_overline
+      render 'sg-sanitize-line-breaks', text: category_overline, mode: 'plain'
+    endcapture
+    assign category_overline = cleaned_overline | strip
+  endif
+
+  if section.settings.image != blank
+    assign bg_image = section.settings.image | image_url: width: 2800
+    assign bg_alt = section.settings.image.alt | default: heading | replace: '~', ' '
+  elsif background_asset != blank
+    assign bg_image = background_asset | asset_url
+    assign bg_alt = heading | replace: '~', ' '
+  else
+    assign bg_image = 'sg-shop-hero-bg.png' | asset_url
+    assign bg_alt = heading | replace: '~', ' '
+  endif
+%}
+
+<section
+  id="SgShopHero-{{ section.id }}"
+  class="sg-shop-hero sg-shop-hero--align-{{ section.settings.text_alignment }}{% if overlay_style == 'erboristeria' %} sg-shop-hero--erboristeria{% elsif overlay_style == 'light' %} sg-shop-hero--light-bg{% endif %}"
+  data-section-id="{{ section.id }}"
+  style="--sg-shop-hero-height: {{ section.settings.banner_height }}vh;"
+>
+  <div class="sg-shop-hero__media" aria-hidden="true">
+    <img
+      class="sg-shop-hero__image"
+      src="{{ bg_image }}"
+      alt=""
+      width="2400"
+      height="1200"
+      loading="eager"
+      fetchpriority="high"
+    >
+    <div class="sg-shop-hero__overlay"></div>
+  </div>
+
+  <div class="sg-shop-hero__inner">
+    <div class="sg-shop-hero__content">
+      {% if category_overline != blank %}
+        <p class="sg-shop-hero__overline">{{ category_overline | escape }}</p>
+      {% endif %}
+
+      {% if heading != blank %}
+        <h1 class="sg-shop-hero__heading">
+          {%- if heading contains '~' -%}
+            {%- assign heading_lines = heading | split: '~' -%}
+            {%- for line in heading_lines -%}
+              {%- unless forloop.first -%}<br>{%- endunless -%}
+              {{- line | strip | escape -}}
+            {%- endfor -%}
+          {%- else -%}
+            {{- heading | escape -}}
+          {%- endif -%}
+        </h1>
+      {% endif %}
+
+      {% if subheading != blank %}
+        <p class="sg-shop-hero__subheading">{{ subheading }}</p>
+      {% endif %}
+
+      {% if description != blank %}
+        <div class="sg-shop-hero__description rte">{{ description }}</div>
+      {% endif %}
+
+      {% if section.settings.show_cta and section.settings.cta_label != blank %}
+        <div class="sg-shop-hero__actions">
+          <a
+            {% if section.settings.cta_link != blank %}
+              href="{{ section.settings.cta_link }}"
+            {% else %}
+              href="#collection-products"
+            {% endif %}
+            class="sg-shop-hero__cta"
+          >
+            {{ section.settings.cta_label }}
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Shop hero (Spiritual)",
+  "tag": "section",
+  "class": "sg-shop-hero-section",
+  "enabled_on": {
+    "templates": ["collection", "page", "search"]
+  },
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background image",
+      "info": "Overrides theme asset default when set."
+    },
+    {
+      "type": "text",
+      "id": "background_asset",
+      "label": "Theme asset filename",
+      "info": "e.g. sg-erboristeria-hero-bg.png — used when no image is uploaded above."
+    },
+    {
+      "type": "select",
+      "id": "overlay_style",
+      "label": "Overlay style",
+      "options": [
+        { "value": "default", "label": "Dark (photo backgrounds)" },
+        { "value": "light", "label": "Green left gradient (light backgrounds)" },
+        { "value": "erboristeria", "label": "Erboristeria (white left, tea photo right)" }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "I Nostri Prodotti"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "info": "Shown below the heading (e.g. Erboristeria tagline)."
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Prodotti naturali selezionati per supportare il tuo benessere quotidiano con ingredienti di qualità.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show scroll link",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Scroll link label",
+      "default": "Scopri la selezione"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Scroll link URL"
+    },
+    {
+      "type": "range",
+      "id": "banner_height",
+      "label": "Banner height (vh)",
+      "min": 45,
+      "max": 90,
+      "step": 5,
+      "unit": "vh",
+      "default": 70
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop hero (Spiritual)"
+    }
+  ]
+}
+{% endschema %}

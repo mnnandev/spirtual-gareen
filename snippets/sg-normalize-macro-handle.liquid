@@ -1,0 +1,30 @@
+{%- doc -%}
+  Map Shopify macro-collection handles to theme canonical handles.
+
+  @param {string} handle - Raw collection handle from Shopify
+{%- enddoc -%}
+
+{%- liquid
+  assign resolved = handle | default: '' | strip
+
+  case resolved
+    when 'sonno-mente-ed-energia'
+      assign resolved = 'sonno-mente-energia'
+    when 'difese-protezione-vie-respiratorie'
+      assign resolved = 'difese-protezione-respiratorie'
+    when 'difese-protezione-e-vie-respiratorie'
+      assign resolved = 'difese-protezione-respiratorie'
+    when 'bellezza-cura-della-persona'
+      assign resolved = 'bellezza-cura-persona'
+    when 'bellezza-e-cura-della-persona'
+      assign resolved = 'bellezza-cura-persona'
+    when 'movimento-dolori-e-recupero'
+      assign resolved = 'movimento-dolori-recupero'
+    when 'intestino-digestione-e-metabolismo'
+      assign resolved = 'intestino-digestione-metabolismo'
+    when 'benessere-ormonale-e-intimo'
+      assign resolved = 'benessere-ormonale-intimo'
+  endcase
+-%}
+
+{{- resolved -}}

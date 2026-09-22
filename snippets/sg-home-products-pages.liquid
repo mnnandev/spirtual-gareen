@@ -1,0 +1,59 @@
+{% doc %}
+  Renders product cards in 4×2 pages (8 products per carousel slide).
+
+  @param {collection} [collection] - Collection to loop
+  @param {number} [limit] - Max products
+  @param {string} [handles] - Optional pipe-separated product handles (fixed order)
+{% enddoc %}
+
+{% liquid
+  assign products_limit = limit | default: 10
+  assign shown = 0
+%}
+
+{% if handles != blank %}
+  {% assign handle_list = handles | split: '|' %}
+  {% for handle in handle_list %}
+    {% if shown >= products_limit %}
+      {% break %}
+    {% endif %}
+    {% assign handle_clean = handle | strip %}
+    {% if handle_clean == blank %}
+      {% continue %}
+    {% endif %}
+    {% assign row_product = all_products[handle_clean] %}
+    {% if row_product != blank %}
+      {% assign page_index = shown | modulo: 8 %}
+      {% if page_index == 0 %}
+        <div class="sg-home-products__page" data-home-products-page>
+          <div class="sg-home-products__page-grid">
+      {% endif %}
+      {% render 'sg-home-product-card', product: row_product %}
+      {% assign shown = shown | plus: 1 %}
+      {% assign page_end = shown | modulo: 8 %}
+      {% if page_end == 0 %}
+          </div>
+        </div>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  {% assign remainder = shown | modulo: 8 %}
+  {% if shown > 0 and remainder != 0 %}
+          </div>
+        </div>
+  {% endif %}
+{% else %}
+  {% for product in collection.products limit: products_limit %}
+    {% assign page_index = forloop.index0 | modulo: 8 %}
+    {% if page_index == 0 %}
+      <div class="sg-home-products__page" data-home-products-page>
+        <div class="sg-home-products__page-grid">
+    {% endif %}
+    {% render 'sg-home-product-card', product: product %}
+    {% assign page_end = forloop.index | modulo: 8 %}
+    {% if page_end == 0 or forloop.last %}
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endif %}

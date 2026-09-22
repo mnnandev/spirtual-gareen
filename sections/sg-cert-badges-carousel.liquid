@@ -1,0 +1,326 @@
+{% liquid
+  assign scroll_duration = section.settings.scroll_duration | default: 8
+  assign enable_marquee = false
+  if section.settings.autoplay and section.blocks.size > 1
+    assign enable_marquee = true
+  endif
+%}
+
+<section
+  id="SgCertBadges-{{ section.id }}"
+  class="sg-cert-badges"
+  data-section-id="{{ section.id }}"
+>
+  <div class="sg-cert-badges__container">
+    <div class="sg-cert-badges__viewport">
+      <div
+        class="sg-cert-badges__track{% if enable_marquee %} sg-cert-badges__track--marquee{% endif %}"
+        style="{% if enable_marquee %}--cert-marquee-duration: {{ scroll_duration }}s;{% endif %}"
+      >
+        {% if enable_marquee %}
+          {% for group_index in (1..2) %}
+            <div
+              class="sg-cert-badges__group"
+              data-cert-group
+              {% if group_index == 2 %}
+                aria-hidden="true"
+                data-cert-clone-group
+              {% endif %}
+            >
+              {% for repeat in (1..10) %}
+                {% for block in section.blocks %}
+                  {% liquid
+                    assign hidden_clone = true
+                    if group_index == 1 and repeat == 1
+                      assign hidden_clone = false
+                    endif
+                  %}
+                  {% render 'sg-cert-badge-card', block: block, hidden_clone: hidden_clone %}
+                {% endfor %}
+              {% endfor %}
+            </div>
+          {% endfor %}
+        {% else %}
+          {% for block in section.blocks %}
+            {% render 'sg-cert-badge-card', block: block %}
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if enable_marquee %}
+  <script src="{{ 'sg-cert-badges-marquee.js' | asset_url }}" defer></script>
+{% endif %}
+
+{% stylesheet %}
+  .sg-cert-badges {
+    background: #ffffff;
+    border-bottom: 1px solid #EFF5ED;
+    padding: 36px 0 40px;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .sg-cert-badges__container {
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sg-cert-badges__viewport {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .sg-cert-badges__track {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: max-content;
+    will-change: transform;
+  }
+
+  .sg-cert-badges__track:not(.sg-cert-badges__track--marquee) {
+    gap: clamp(4rem, 10vw, 7.5rem);
+    padding-inline: clamp(1rem, 3vw, 2rem);
+  }
+
+  .sg-cert-badges__group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 0 0 auto;
+    gap: clamp(4rem, 10vw, 7.5rem);
+    padding-inline: clamp(1rem, 3vw, 2rem);
+  }
+
+  .sg-cert-badges__track--marquee {
+    gap: 0;
+  }
+
+  .sg-cert-badges__track--marquee:not(.is-ready) {
+    visibility: hidden;
+  }
+
+  .sg-cert-badges__track--marquee.is-ready {
+    visibility: visible;
+  }
+
+  .sg-cert-badges__track--marquee {
+    animation: sg-cert-marquee var(--cert-marquee-duration, 8s) linear infinite;
+    animation-play-state: running;
+  }
+
+  .sg-cert-badges__item {
+    flex: 0 0 auto;
+    width: max-content;
+    min-width: max-content;
+    box-sizing: border-box;
+  }
+
+  .sg-cert-badge {
+    display: flex;
+    align-items: center;
+    gap: clamp(14px, 2.5vw, 22px);
+  }
+
+  .sg-cert-badge__ring {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: clamp(56px, 8.5vw, 68px);
+    height: clamp(56px, 8.5vw, 68px);
+    border-radius: 50%;
+    border: 1.5px solid var(--sg-cert-ring, #C5DFBD);
+    color: var(--sg-cert-icon, #7FAF72);
+    background: radial-gradient(circle at 32% 28%, #F7FAF6 0%, #ffffff 52%, #EFF5ED 100%);
+    box-shadow:
+      0 2px 10px rgba(127, 175, 114, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  }
+
+  .sg-cert-badge__svg {
+    display: block;
+    width: clamp(32px, 5vw, 40px);
+    height: clamp(32px, 5vw, 40px);
+    filter: drop-shadow(0 1px 1px rgba(127, 175, 114, 0.12));
+  }
+
+  .sg-cert-badge__image {
+    display: block;
+    width: clamp(36px, 5.5vw, 44px);
+    height: clamp(36px, 5.5vw, 44px);
+    object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(127, 175, 114, 0.12));
+  }
+
+  .sg-cert-badge__label {
+    margin: 0;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    color: #1a1a1a;
+  }
+
+  @keyframes sg-cert-marquee {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+
+    to {
+      transform: translate3d(calc(-1 * var(--marquee-loop-px, 50%)), 0, 0);
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .sg-cert-badges {
+      padding: 28px 0 32px;
+    }
+
+    .sg-cert-badges__group {
+      gap: clamp(2.5rem, 8vw, 4.5rem);
+      padding-inline: clamp(0.75rem, 4vw, 1.25rem);
+    }
+
+    .sg-cert-badges__track:not(.sg-cert-badges__track--marquee) {
+      gap: clamp(2.5rem, 8vw, 4.5rem);
+      padding-inline: clamp(0.75rem, 4vw, 1.25rem);
+    }
+
+    .sg-cert-badge__label {
+      font-size: clamp(1rem, 3.2vw, 1.2rem);
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .sg-cert-badges {
+      padding: 24px 0 28px;
+    }
+
+    .sg-cert-badge__label {
+      font-size: clamp(0.95rem, 4vw, 1.1rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sg-cert-badges__track--marquee {
+      animation-duration: calc(var(--cert-marquee-duration, 8s) * 1.5);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Cert badges carousel",
+  "tag": "section",
+  "class": "sg-cert-badges-section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Auto-rotate carousel",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "scroll_duration",
+      "label": "Full scroll duration (seconds)",
+      "info": "Lower = faster. One full loop across all badges.",
+      "min": 5,
+      "max": 40,
+      "step": 1,
+      "default": 16
+    }
+  ],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Badge",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "100% Naturale"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "natural",
+          "options": [
+            { "value": "natural", "label": "Natural" },
+            { "value": "organic", "label": "Organic" },
+            { "value": "chemicals-free", "label": "Chemicals free" },
+            { "value": "vegan", "label": "Vegan" },
+            { "value": "gluten-free", "label": "Gluten free" },
+            { "value": "cruelty-free", "label": "Cruelty free" },
+            { "value": "no-animal-testing", "label": "No animal testing" },
+            { "value": "paraben-free", "label": "Paraben free" }
+          ]
+        },
+        {
+          "type": "color",
+          "id": "ring_color",
+          "label": "Icon ring color",
+          "default": "#C5DFBD"
+        },
+        {
+          "type": "color",
+          "id": "icon_color",
+          "label": "Icon color",
+          "default": "#7FAF72"
+        },
+        {
+          "type": "text",
+          "id": "image_url",
+          "label": "Badge image URL",
+          "info": "Optional CDN image URL. Replaces the icon when set."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Badge image upload",
+          "info": "Optional. Used if image URL is empty."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cert badges carousel",
+      "category": "Banners",
+      "blocks": [
+        {
+          "type": "badge",
+          "settings": {
+            "label": "100% Naturale",
+            "icon": "natural"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "label": "Senza Sostanze Chimiche",
+            "icon": "chemicals-free"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "label": "100% Biologico",
+            "icon": "organic"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

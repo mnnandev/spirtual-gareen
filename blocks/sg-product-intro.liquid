@@ -1,0 +1,96 @@
+
+{% liquid
+  assign product = closest.product
+  assign char_limit = block.settings.character_limit | default: 220
+
+  # Pack size / quantity is now shown as a subtitle under the product title
+  # (see blocks/sg-product-header.liquid), so it is intentionally omitted here.
+
+  capture intro
+    render 'sg-product-intro-body', product: product, character_limit: char_limit
+  endcapture
+  assign intro = intro | strip
+%}
+
+{% if intro != blank %}
+  <div
+    class="sg-product-intro text-block spacing-style"
+    style="{% render 'spacing-style', settings: block.settings %}"
+    {{ block.shopify_attributes }}
+  >
+    <p class="sg-product-intro__text">{{ intro }}</p>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .sg-product-intro {
+    width: 100%;
+  }
+
+  .sg-product-intro__contenuto {
+    margin: 0 0 8px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #1a1a1a;
+  }
+
+  .sg-product-intro__contenuto .product-contenuto__label {
+    font-weight: 700;
+    margin-inline-end: 6px;
+  }
+
+  .sg-product-intro__contenuto .product-contenuto__value {
+    color: #4a5568;
+  }
+
+  .sg-product-intro__text {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #4a5568;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "SG Short description",
+  "tag": null,
+  "settings": [
+    {
+      "type": "range",
+      "id": "character_limit",
+      "label": "Character limit",
+      "min": 80,
+      "max": 400,
+      "step": 10,
+      "default": 220
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    }
+  ],
+  "presets": [
+    {
+      "name": "SG Short description",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,15 @@
+{%- doc -%}
+  Resolve Calendly URL for Consulenza booking (section setting → theme setting).
+
+  @param {string} [calendly_url] - Optional override
+{%- enddoc -%}
+
+{%- liquid
+  assign resolved = calendly_url | default: '' | strip
+
+  if resolved == blank
+    assign resolved = settings.sg_consulenza_calendly_url | default: '' | strip
+  endif
+
+  echo resolved
+-%}

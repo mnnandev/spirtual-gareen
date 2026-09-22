@@ -1,0 +1,45 @@
+{%- doc -%}
+  Returns "true" or "false" — whether product price is within active collection price filters.
+
+  @param {product} product
+  @param {collection} collection
+{%- enddoc -%}
+
+{%- liquid
+  assign sg_price_min = nil
+  assign sg_price_max = nil
+  assign sg_in_range = true
+
+  for filter in collection.filters
+    if filter.type == 'price_range'
+      if filter.min_value.value != null
+        assign sg_price_min = filter.min_value.value
+      endif
+      if filter.max_value.value != null
+        assign sg_price_max = filter.max_value.value
+      endif
+      break
+    endif
+  endfor
+
+  if sg_price_min == nil and sg_price_max == nil
+    echo 'true'
+    break
+  endif
+
+  assign sg_product_price = product.price
+
+  if sg_price_min != nil and sg_product_price < sg_price_min
+    assign sg_in_range = false
+  endif
+
+  if sg_price_max != nil and sg_product_price > sg_price_max
+    assign sg_in_range = false
+  endif
+
+  if sg_in_range
+    echo 'true'
+  else
+    echo 'false'
+  endif
+-%}

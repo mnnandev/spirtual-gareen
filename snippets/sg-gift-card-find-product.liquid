@@ -1,0 +1,43 @@
+{%- doc -%}
+  Resolve the store gift card product handle.
+
+  @param {product} [configured_product] - Product selected in theme settings
+  @param {product} [context_product] - Current product when on a gift card PDP
+{%- enddoc -%}
+
+{%- liquid
+  assign resolved_handle = blank
+
+  if context_product != blank and context_product.gift_card?
+    assign resolved_handle = context_product.handle
+  endif
+
+  if resolved_handle == blank and configured_product != blank and configured_product.gift_card?
+    assign resolved_handle = configured_product.handle
+  endif
+
+  if resolved_handle == blank
+    assign sg_gift_handles = 'gift-card,carta-regalo,carta-regalo-spiritual-green,gift-card-spiritual-green,buono-regalo,giftcard,carta-regalo-spiritualgreen,spiritual-green-gift-card,carta-regalo-spiritual-green-it' | split: ','
+
+    for sg_gift_handle in sg_gift_handles
+      assign sg_gift_handle = sg_gift_handle | strip
+      if all_products[sg_gift_handle] != blank and all_products[sg_gift_handle].gift_card?
+        assign resolved_handle = sg_gift_handle
+        break
+      endif
+    endfor
+  endif
+
+  if resolved_handle == blank
+    paginate collections.all.products by 50
+      for sg_gift_product in collections.all.products
+        if sg_gift_product.gift_card?
+          assign resolved_handle = sg_gift_product.handle
+          break
+        endif
+      endfor
+    endpaginate
+  endif
+-%}
+
+{{- resolved_handle -}}

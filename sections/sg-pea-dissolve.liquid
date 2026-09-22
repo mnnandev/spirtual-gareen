@@ -1,0 +1,231 @@
+{%- doc -%}
+  PEA Complex 1200 — animated sachet dissolve section.
+  Shows on the homepage when enabled, and on matching product pages
+  (configurable handles / title match).
+{%- enddoc -%}
+
+{%- liquid
+  assign enabled = section.settings.enabled
+  assign handles_raw = section.settings.product_handles | default: 'pea-1200-complex-stick,pea-1200-complex,pea-complex-1200,pea-1200,pea-complex'
+  assign match_title = section.settings.match_title_contains | default: 'PEA Complex 1200'
+  assign show = false
+
+  if enabled == false
+    assign show = false
+  elsif request.design_mode
+    assign show = true
+  elsif template.name == 'index'
+    assign show = true
+  elsif product != blank
+    assign handle_list = handles_raw | downcase | split: ','
+    assign product_handle = product.handle | downcase
+    for h in handle_list
+      assign h_clean = h | strip
+      if h_clean != blank and product_handle == h_clean
+        assign show = true
+        break
+      endif
+    endfor
+    if show == false and match_title != blank
+      assign title_down = product.title | downcase
+      assign needle = match_title | downcase
+      if title_down contains needle
+        assign show = true
+      endif
+      if show == false
+        if title_down contains 'pea' and title_down contains '1200'
+          assign show = true
+        endif
+      endif
+    endif
+  endif
+
+  assign heading = section.settings.heading | default: 'PEA Complex 1200'
+  assign description = section.settings.description
+  assign product_image = section.settings.product_image
+  assign product_image_url = section.settings.product_image_url
+  assign product_image_alt = heading
+  assign primary_handle = handles_raw | split: ',' | first | strip
+  assign linked_product = all_products[primary_handle]
+  assign linked_product_image = blank
+  if linked_product != blank and linked_product.featured_image != blank
+    assign linked_product_image = linked_product.featured_image
+    assign product_image_alt = linked_product.title
+  endif
+-%}
+
+{%- if show -%}
+  <section
+    class="sg-pea-dissolve sg-pea-dissolve--static"
+    id="sg-pea-dissolve-{{ section.id }}"
+    data-sg-pea-dissolve
+    data-sg-pea-static
+    data-section-id="{{ section.id }}"
+    aria-label="{{ heading | escape }}"
+  >
+    <div class="sg-pea-dissolve__inner">
+      <div class="sg-pea-dissolve__visual">
+        <div class="sg-pea-dissolve__stage">
+          {%- if product_image != blank -%}
+            {{
+              product_image
+              | image_url: width: 1200
+              | image_tag:
+                class: 'sg-pea-dissolve__product-photo',
+                loading: 'lazy',
+                widths: '400, 600, 800, 1000, 1200',
+                sizes: '(min-width: 850px) 40vw, 90vw',
+                alt: product_image_alt | escape
+            }}
+          {%- elsif product_image_url != blank -%}
+            <img
+              class="sg-pea-dissolve__product-photo"
+              src="{{ product_image_url }}"
+              alt="{{ product_image_alt | escape }}"
+              width="800"
+              height="800"
+              loading="lazy"
+              decoding="async"
+            >
+          {%- elsif linked_product_image != blank -%}
+            {{
+              linked_product_image
+              | image_url: width: 1200
+              | image_tag:
+                class: 'sg-pea-dissolve__product-photo',
+                loading: 'lazy',
+                widths: '400, 600, 800, 1000, 1200',
+                sizes: '(min-width: 850px) 40vw, 90vw',
+                alt: product_image_alt | escape
+            }}
+          {%- endif -%}
+        </div>
+
+        <ul class="sg-pea-dissolve__benefits" role="list">
+          {%- for block in section.blocks -%}
+            <li class="sg-pea-dissolve__benefit" {{ block.shopify_attributes }} style="--b: {{ forloop.index }};">
+              <span class="sg-pea-dissolve__benefit-icon" aria-hidden="true">{{ block.settings.icon }}</span>
+              <span class="sg-pea-dissolve__benefit-text">{{ block.settings.text }}</span>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+
+      <div class="sg-pea-dissolve__copy">
+        {% if heading != blank %}
+          <h2 class="sg-pea-dissolve__heading">{{ heading }}</h2>
+        {% endif %}
+        {% if description != blank %}
+          <div class="sg-pea-dissolve__description rte">{{ description }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  {{ 'sg-pea-dissolve.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'sg-pea-dissolve.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "PEA dissolve animation",
+  "tag": "section",
+  "class": "section-sg-pea-dissolve",
+  "enabled_on": {
+    "templates": ["index", "product"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enabled",
+      "label": "Enable section",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "product_handles",
+      "label": "Show on product handles",
+      "default": "pea-1200-complex-stick,pea-1200-complex,pea-complex-1200,pea-1200,pea-complex",
+      "info": "Used on product templates only. Homepage always shows when enabled. Comma-separated handles."
+    },
+    {
+      "type": "text",
+      "id": "match_title_contains",
+      "label": "Or match product title containing",
+      "default": "PEA Complex 1200"
+    },
+    {
+      "type": "image_picker",
+      "id": "product_image",
+      "label": "Left product image",
+      "info": "PEA box photo. If empty, the default Shopify file URL below is used."
+    },
+    {
+      "type": "text",
+      "id": "product_image_url",
+      "label": "Default image URL",
+      "default": "https://cdn.shopify.com/s/files/1/0998/9482/1248/files/pea.png?v=1788757471"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "PEA Complex 1200"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>La PEA micronizzata sostiene la fisiologica risposta dell'organismo all'infiammazione e al dolore. Aiuta il benessere del sistema nervoso, di muscoli e articolazioni e supporta l'equilibrio della barriera intestinale, anche in presenza di intestino infiammato.</p>"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon (emoji)",
+          "default": "🛡️"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Modula la risposta infiammatoria"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "PEA dissolve animation",
+      "blocks": [
+        {
+          "type": "benefit",
+          "settings": {
+            "icon": "🛡️",
+            "text": "Modula la risposta infiammatoria"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "icon": "🧠",
+            "text": "Supporta nervi, muscoli e articolazioni"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "icon": "🌿",
+            "text": "Favorisce l'equilibrio della barriera intestinale"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,373 @@
+{% liquid
+  assign section_heading = section.settings.heading | default: 'Le Nostre Categorie'
+  assign section_subheading = section.settings.subheading | default: 'Trova ciò di cui hai bisogno'
+  assign cta_label = section.settings.cta_label | default: 'Scopri di più'
+
+  assign category_handles = 'sonno-mente-energia,difese-protezione-respiratorie,intestino-digestione-metabolismo,movimento-dolori-recupero,benessere-ormonale-intimo,bellezza-cura-persona,mondo-zen' | split: ','
+  assign category_titles = 'Sonno, Mente ed Energia|Difese, Protezione e Vie Respiratorie|Intestino, Digestione e Metabolismo|Movimento, Dolori e Recupero|Benessere Ormonale e Intimo|Bellezza e Cura della Persona|Mondo Zen' | split: '|'
+  assign category_subtitles = 'Dormire meglio, stress, ansia e relax, energia e concentrazione|Difese immunitarie, naso e gola, allergie, antiossidanti|Digestione, gonfiore, metabolismo e depurazione|Dolori, articolazioni, muscoli, circolazione, sport|Benessere femminile, equilibrio ormonale, vie urinarie|Pelle, capelli e unghie, profumi e trucco naturale|Casa, animali, oli essenziali, aromaterapia, fitoterapia' | split: '|'
+%}
+
+<section
+  id="MacroCategoriesGlass-{{ section.id }}"
+  class="macro-categories-glass"
+  data-section-id="{{ section.id }}"
+>
+  <div class="macro-categories-glass__grid-bg" aria-hidden="true"></div>
+
+  <div class="macro-categories-glass__container">
+    <header class="macro-categories-glass__header">
+      {% if section_heading != blank %}
+        <h2 class="macro-categories-glass__title">{{ section_heading }}</h2>
+      {% endif %}
+      {% if section_subheading != blank %}
+        <p class="macro-categories-glass__subtitle">{{ section_subheading }}</p>
+      {% endif %}
+    </header>
+
+    <div class="macro-categories-glass__grid">
+      {% for handle in category_handles %}
+        {% render 'macro-category-glass-card',
+          handle: handle,
+          title: category_titles[forloop.index0],
+          subtitle: category_subtitles[forloop.index0],
+          index: forloop.index,
+          delay: forloop.index,
+          cta_label: cta_label
+        %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .macro-categories-glass {
+    position: relative;
+    background: linear-gradient(165deg, #1a331a 0%, #243f24 42%, #2d4f2d 100%);
+    padding: clamp(64px, 7vw, 88px) 0;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .macro-categories-glass__grid-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(151, 196, 138, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(151, 196, 138, 0.08) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, #000 20%, transparent 100%);
+  }
+
+  .macro-categories-glass__container {
+    position: relative;
+    z-index: 1;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 3vw, 2.5rem);
+    box-sizing: border-box;
+  }
+
+  .macro-categories-glass__header {
+    text-align: center;
+    margin-bottom: clamp(36px, 4.5vw, 48px);
+  }
+
+  .macro-categories-glass__title {
+    margin: 0 0 10px;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.75rem, 2.5vw, 2rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.03em;
+    color: #ffffff;
+  }
+
+  .macro-categories-glass__subtitle {
+    margin: 0;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.68);
+  }
+
+  .macro-categories-glass__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(16px, 2vw, 22px);
+  }
+
+  .macro-category-glass-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 260px;
+    padding: clamp(22px, 2.5vw, 28px);
+    border: 1px solid rgba(151, 196, 138, 0.22);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    text-decoration: none !important;
+    color: #ffffff;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+    transition:
+      transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.35s ease,
+      background 0.35s ease,
+      box-shadow 0.45s ease;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .macro-category-glass-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(145deg, rgba(151, 196, 138, 0.1) 0%, transparent 55%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+  }
+
+  .macro-category-glass-card:hover,
+  .macro-category-glass-card.sg-animate.sg-visible:hover {
+    transform: translateY(-6px);
+    border-color: rgba(168, 232, 120, 0.45);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  }
+
+  .macro-category-glass-card:hover::before {
+    opacity: 1;
+  }
+
+  .macro-category-glass-card__number {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #B0D4A6 0%, #97C48A 55%, #7FAF72 100%);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(151, 196, 138, 0.35);
+  }
+
+  .macro-category-glass-card__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding-right: 36px;
+  }
+
+  .macro-category-glass-card__icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #97C48A 0%, #7FAF72 100%);
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(151, 196, 138, 0.3);
+  }
+
+  .macro-category-glass-card__icon,
+  .macro-category-glass-card__icon-wrap .category-icon,
+  .macro-category-glass-card__icon-wrap .sg-category-icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+  }
+
+  .macro-category-glass-card__icon-wrap .category-icon--24,
+  .macro-category-glass-card__icon-wrap .sg-category-icon--image {
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+  }
+
+  .macro-category-glass-card__title {
+    margin: 4px 0 0;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: clamp(1rem, 1.35vw, 1.15rem);
+    font-weight: 700;
+    line-height: 1.25;
+    color: #a8e878;
+    letter-spacing: -0.01em;
+  }
+
+  .macro-category-glass-card__text {
+    margin: 0;
+    flex: 1;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: clamp(13px, 1.1vw, 14px);
+    font-weight: 400;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.78);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+  }
+
+  .macro-category-glass-card__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    margin-top: auto;
+    padding: 12px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+    transition:
+      background 0.3s ease,
+      border-color 0.3s ease,
+      color 0.3s ease;
+  }
+
+  .macro-category-glass-card:hover .macro-category-glass-card__cta {
+    background: linear-gradient(90deg, #B0D4A6 0%, #97C48A 50%, #7FAF72 100%);
+    border-color: transparent;
+    color: #ffffff;
+  }
+
+  .macro-category-glass-card:nth-child(7) {
+    grid-column: 2;
+  }
+
+  .macro-categories-glass .sg-animate {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+
+  .macro-categories-glass .sg-animate.sg-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .macro-categories-glass .sg-animate[data-delay='1'] { transition-delay: 0.05s; }
+  .macro-categories-glass .sg-animate[data-delay='2'] { transition-delay: 0.1s; }
+  .macro-categories-glass .sg-animate[data-delay='3'] { transition-delay: 0.15s; }
+  .macro-categories-glass .sg-animate[data-delay='4'] { transition-delay: 0.2s; }
+  .macro-categories-glass .sg-animate[data-delay='5'] { transition-delay: 0.25s; }
+  .macro-categories-glass .sg-animate[data-delay='6'] { transition-delay: 0.3s; }
+  .macro-categories-glass .sg-animate[data-delay='7'] { transition-delay: 0.35s; }
+
+  @media screen and (max-width: 1024px) {
+    .macro-categories-glass__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .macro-category-glass-card:nth-child(7) {
+      grid-column: 1 / -1;
+      max-width: min(100%, 520px);
+      margin-inline: auto;
+      width: 100%;
+    }
+  }
+
+  @media screen and (max-width: 640px) {
+    .macro-categories-glass__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .macro-category-glass-card:nth-child(7) {
+      grid-column: auto;
+      max-width: none;
+    }
+
+    .macro-category-glass-card {
+      min-height: 0;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  function initMacroCategoriesGlassAnimate(root = document) {
+    const items = root.querySelectorAll('.macro-categories-glass .sg-animate');
+    if (!items.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      items.forEach((item) => item.classList.add('sg-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('sg-visible');
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -30px 0px' }
+    );
+
+    items.forEach((item) => {
+      if (!item.classList.contains('sg-visible')) {
+        observer.observe(item);
+      }
+    });
+  }
+
+  initMacroCategoriesGlassAnimate();
+
+  document.addEventListener('shopify:section:load', (event) => {
+    if (event.target instanceof HTMLElement) {
+      initMacroCategoriesGlassAnimate(event.target);
+    }
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Macro Categories Glass",
+  "tag": "section",
+  "class": "macro-categories-glass-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section heading",
+      "default": "Le Nostre Categorie"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Section subheading",
+      "default": "Trova ciò di cui hai bisogno"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Card button label",
+      "default": "Scopri di più"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Macro Categories Glass",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

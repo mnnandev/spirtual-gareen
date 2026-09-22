@@ -1,0 +1,123 @@
+{% liquid
+  assign email = contact_email | default: 'info@spiritualgreen.it'
+  assign privacy_url = '/pages/privacy'
+  if shop.privacy_policy != blank
+    assign privacy_url = shop.privacy_policy.url
+  elsif pages.privacy != blank
+    assign privacy_url = pages.privacy.url
+  endif
+  assign refund_url = '/pages/politica-di-reso'
+  if shop.refund_policy != blank
+    assign refund_url = shop.refund_policy.url
+  endif
+%}
+
+<p class="sg-legal-page__disclaimer">
+  I presenti Termini e Condizioni di Vendita regolano l'utilizzo del sito
+  <strong>Spiritual Green</strong> e l'acquisto di prodotti tramite il nostro negozio online.
+  Si prega di leggerli con attenzione prima di effettuare un ordine.
+</p>
+
+<p class="sg-legal-page__notice-link">
+  Consulta anche la nostra
+  <a href="{{ privacy_url }}">Informativa sulla Privacy</a>
+  e la nostra <a href="{{ refund_url }}">Politica di Reso</a>.
+</p>
+
+<h2 class="sg-legal-page__content-heading">1. Informazioni generali</h2>
+<p>
+  Il presente sito web è gestito da <strong>Spiritual Green</strong>, servizio gestito da
+  <strong>Andrea Michieletto</strong>, con sede in Via Triestina 48/12, 30173 Favaro Veneto (Venezia), Italia.
+  In tutto il sito, i termini «noi», «ci» e «nostro» si riferiscono a Spiritual Green.
+</p>
+
+<h2 class="sg-legal-page__content-heading">2. Accettazione dei termini</h2>
+<p>
+  Utilizzando il nostro sito e/o acquistando i nostri prodotti, dichiari di avere almeno 18 anni e di accettare
+  integralmente i presenti Termini e Condizioni. Se non accetti questi termini, ti invitiamo a non utilizzare
+  il sito né a completare ordini.
+</p>
+
+<h2 class="sg-legal-page__content-heading">3. Prodotti</h2>
+<p>
+  I prodotti offerti (erboristeria, cosmetici, integratori e articoli per il benessere) sono descritti con la
+  massima accuratezza possibile. Ci riserviamo il diritto di modificare o interrompere la vendita di qualsiasi
+  prodotto in qualsiasi momento senza preavviso. Le immagini hanno valore puramente illustrativo.
+</p>
+
+<h2 class="sg-legal-page__content-heading">4. Prezzi</h2>
+<p>
+  I prezzi dei nostri prodotti sono indicati in euro e possono essere soggetti a modifiche senza preavviso.
+  Il prezzo applicato è quello visualizzato al momento della conclusione dell'ordine, salvo errori manifesti
+  che potremo correggere contattandoti prima della spedizione.
+</p>
+
+<h2 class="sg-legal-page__content-heading">5. Ordini</h2>
+<p>
+  Ci riserviamo il diritto di rifiutare qualsiasi ordine effettuato. Possiamo, a nostra discrezione, limitare
+  o annullare le quantità acquistate per persona, per nucleo familiare o per ordine. La conclusione del
+  contratto avviene con l'invio dell'ordine e la ricezione della conferma via email.
+</p>
+
+<h2 class="sg-legal-page__content-heading">6. Pagamenti</h2>
+<p>Accettiamo i seguenti metodi di pagamento, ove disponibili al momento del pagamento:</p>
+<ul>
+  <li>Carta di credito/debito</li>
+  <li>PayPal</li>
+  <li>Altri metodi di pagamento indicati durante il pagamento</li>
+</ul>
+<p>
+  I pagamenti sono gestiti da provider certificati (ad esempio Shopify Payments). Non memorizziamo i dati
+  completi della carta di credito.
+</p>
+
+<h2 class="sg-legal-page__content-heading">7. Spedizione e consegna</h2>
+<p>
+  Le consegne vengono effettuate all'indirizzo indicato al momento del pagamento. I tempi di consegna sono indicativi
+  e possono variare in base alla destinazione e alla disponibilità del corriere. Al momento della consegna
+  verifica il contenuto del pacco e segnala tempestivamente eventuali anomalie.
+</p>
+
+<h2 class="sg-legal-page__content-heading">8. Resi e rimborsi</h2>
+<p>
+  Il cliente Consumatore ha diritto di recedere dal contratto entro <strong>14 giorni</strong> dalla ricezione
+  della merce, senza necessità di fornire alcuna motivazione, ai sensi del D.Lgs. 206/2005 (Codice del Consumo),
+  salvo eccezioni previste dalla legge. Per maggiori dettagli consulta la
+  <a href="{{ refund_url }}">Politica di Reso</a>.
+</p>
+
+<h2 class="sg-legal-page__content-heading">9. Privacy</h2>
+<p>
+  Il trattamento dei dati personali è descritto nella nostra
+  <a href="{{ privacy_url }}">Informativa sulla Privacy</a>, disponibile sul sito, in conformità al
+  Regolamento UE 2016/679 (GDPR) e al D.Lgs. 196/2003.
+</p>
+
+<h2 class="sg-legal-page__content-heading">10. Legge applicabile</h2>
+<p>
+  I presenti Termini e Condizioni sono regolati dalla legge italiana. Per ogni controversia relativa
+  all'utilizzo del sito o all'acquisto dei prodotti, ove previsto dalla normativa a tutela dei consumatori,
+  è competente il foro del luogo di residenza o domicilio del Consumatore.
+</p>
+
+<h2 class="sg-legal-page__content-heading">11. Modifiche ai termini</h2>
+<p>
+  Ci riserviamo il diritto di aggiornare o modificare i presenti Termini e Condizioni in qualsiasi momento.
+  Le modifiche saranno efficaci dalla pubblicazione su questa pagina. Ti invitiamo a consultare periodicamente
+  questa sezione.
+</p>
+
+<h2 class="sg-legal-page__content-heading">Contatti</h2>
+<p>
+  <strong>Ultimo aggiornamento:</strong> Giugno 2026<br>
+  <strong>E-mail:</strong>
+  <a href="mailto:{{ email }}">{{ email }}</a>,
+  <a href="mailto:erboristeriaspiritualgreen@gmail.com">erboristeriaspiritualgreen@gmail.com</a><br>
+  <strong>Indirizzo:</strong> Via Triestina 48/12, 30173 Favaro Veneto (Venezia), Italia<br>
+  <strong>Telefono:</strong> contattaci via email per assistenza telefonica
+</p>
+
+<p class="sg-legal-page__disclaimer">
+  Questo documento ha valore informativo. Spiritual Green consiglia di far revisionare i testi da un
+  professionista legale prima dell'utilizzo definitivo in ambito commerciale.
+</p>

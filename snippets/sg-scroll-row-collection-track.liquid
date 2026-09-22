@@ -1,0 +1,47 @@
+{%- doc -%}
+  Horizontal product track for a collection (homepage scroll-row filters).
+  Falls back to explicit product handles when the collection is empty.
+
+  @param {collection} [collection] - Shopify collection
+  @param {number} [limit] - Max products (default 16)
+  @param {string} [fallback_handles] - Pipe-separated product handles
+{%- enddoc -%}
+
+{% liquid
+  assign max = limit | default: 16
+  assign rendered = 0
+-%}
+
+<div class="sg-scroll-row__viewport sg-scroll-row__viewport--filter">
+  <ul class="sg-scroll-row__track" role="list">
+    {% if collection != blank and collection.products_count > 0 %}
+      {% for product in collection.products limit: max %}
+        {% assign rendered = rendered | plus: 1 %}
+        <li class="sg-scroll-row__item">
+          {% render 'sg-home-product-card', product: product %}
+        </li>
+      {% endfor %}
+    {% elsif fallback_handles != blank %}
+      {% assign handle_list = fallback_handles | split: '|' %}
+      {% for handle in handle_list %}
+        {% if rendered >= max %}
+          {% break %}
+        {% endif %}
+        {% assign handle_clean = handle | strip %}
+        {% if handle_clean != blank %}
+          {% assign fallback_product = all_products[handle_clean] %}
+          {% if fallback_product != blank %}
+            {% assign rendered = rendered | plus: 1 %}
+            <li class="sg-scroll-row__item">
+              {% render 'sg-home-product-card', product: fallback_product %}
+            </li>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </ul>
+</div>
+
+{% if rendered == 0 %}
+  <p class="sg-scroll-row__empty">Nessun prodotto in questa collezione.</p>
+{% endif %}

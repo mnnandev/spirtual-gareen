@@ -1,0 +1,17 @@
+{%- doc -%}
+  Returns the customer-facing language code for the current Shopify locale.
+
+  @param {string} [output] - 'code' (default) | 'html_lang' | 'label'
+{%- enddoc -%}
+{%- liquid
+  assign out = output | default: 'code'
+  assign mapped = request.locale.iso_code | default: localization.language.iso_code | default: 'it'
+
+  if out == 'html_lang' or out == 'code'
+    echo mapped
+  elsif out == 'label'
+    echo mapped | upcase
+  else
+    echo mapped
+  endif
+-%}

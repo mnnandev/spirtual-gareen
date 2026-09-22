@@ -1,0 +1,29 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "sg_legal": {
+      "type": "sg-legal-page",
+      "settings": {
+        "layout_style": "spiritual",
+        "show_structured_layout": false,
+        "use_admin_legal_body": false,
+        "heading": "Informativa sui cookie",
+        "sidebar_label": "Documenti legali",
+        "last_updated": "Ultimo aggiornamento: 23 gennaio 2026",
+        "intro_heading": "Cookie e tecnologie di tracciamento",
+        "contact_email": "info@spiritualgreen.it",
+        "legal_active_tab": "cookie",
+        "legal_content_snippet": "sg-legal-cookie-content"
+      }
+    }
+  },
+  "order": ["sg_legal"]
+}

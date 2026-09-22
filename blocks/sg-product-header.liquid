@@ -1,0 +1,181 @@
+
+{% liquid
+  assign product = closest.product
+  assign badge_text = block.settings.badge_text
+
+  if badge_text == blank and block.settings.use_sku_as_badge
+    assign badge_text = product.selected_or_first_available_variant.sku
+  endif
+
+  if badge_text == blank and block.settings.use_vendor_as_badge
+    assign badge_text = product.vendor
+  endif
+
+  if badge_text == blank
+    assign badge_text = block.settings.badge_fallback
+  endif
+
+  assign rating = product.metafields.reviews.rating.value.rating
+  assign rating_count = product.metafields.reviews.rating_count
+
+  if rating == blank and block.settings.fallback_rating > 0
+    assign rating = block.settings.fallback_rating
+  endif
+
+  if rating_count == blank or rating_count == 0
+    if block.settings.fallback_review_count > 0
+      assign rating_count = block.settings.fallback_review_count
+    endif
+  endif
+
+  assign show_rating_row = false
+  if rating != blank and rating_count != blank and rating_count > 0
+    assign show_rating_row = true
+  endif
+
+  assign reviews_label = block.settings.reviews_label
+  if reviews_label == blank
+    assign reviews_label = 'Recensioni'
+  endif
+%}
+
+<div
+  class="sg-product-header spacing-style"
+  style="{% render 'spacing-style', settings: block.settings %}"
+  {{ block.shopify_attributes }}
+>
+  {%- capture clean_title -%}
+    {%- render 'sg-sanitize-line-breaks', text: product.title, mode: 'title' -%}
+  {%- endcapture -%}
+  {%- assign clean_title = clean_title | strip -%}
+  {%- capture pdp_title_name -%}{%- render 'sg-extract-pack-size', title: clean_title, output: 'name' -%}{%- endcapture -%}
+  {%- capture pdp_pack_size -%}{%- render 'sg-extract-pack-size', title: clean_title, output: 'pack' -%}{%- endcapture -%}
+  {%- assign pdp_title_name = pdp_title_name | strip -%}
+  {%- assign pdp_pack_size = pdp_pack_size | strip -%}
+  {%- if pdp_title_name == blank -%}
+    {%- assign pdp_title_name = clean_title -%}
+  {%- endif -%}
+
+  <div class="sg-product-header__title-row">
+    {% if block.settings.show_badge and badge_text != blank %}
+      <span class="sg-product-badge">{{ badge_text }}</span>
+    {% endif %}
+    <h1 class="sg-product-header__title">{{- pdp_title_name -}}</h1>
+  </div>
+  {%- if pdp_pack_size != blank -%}
+    <p class="sg-product-header__pack">{{ pdp_pack_size }}</p>
+  {%- endif -%}
+
+  {% if show_rating_row %}
+    <div class="sg-product-header__rating-row">
+      <span class="sg-product-header__rating-value">{{ rating | round: 1 }}</span>
+      <span class="sg-product-header__stars" aria-hidden="true">
+        {%- for i in (1..5) -%}
+          <svg class="sg-product-header__star" viewBox="0 0 20 20" width="16" height="16" focusable="false">
+            <path fill="currentColor" d="M10 1.5l2.47 5.01 5.53.8-4 3.9.94 5.5L10 14.2l-4.94 2.6.94-5.5-4-3.9 5.53-.8L10 1.5z"/>
+          </svg>
+        {%- endfor -%}
+      </span>
+      {% if block.settings.reviews_link != blank %}
+        <a href="{{ block.settings.reviews_link }}" class="sg-product-header__reviews-link">
+          {{- rating_count }} {{ reviews_label -}}
+        </a>
+      {% else %}
+        <span class="sg-product-header__reviews-link">{{ rating_count }} {{ reviews_label }}</span>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "SG Product header",
+  "tag": null,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_badge",
+      "label": "Show product badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge text (overrides SKU/vendor)"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_sku_as_badge",
+      "label": "Use variant SKU as badge",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "use_vendor_as_badge",
+      "label": "Use vendor as badge if SKU empty",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "badge_fallback",
+      "label": "Badge fallback text",
+      "default": "SG-01®"
+    },
+    {
+      "type": "range",
+      "id": "fallback_rating",
+      "label": "Rating (when no review app)",
+      "min": 0,
+      "max": 5,
+      "step": 0.1,
+      "default": 0,
+      "info": "Set to 0 to hide the rating row unless a review app provides data."
+    },
+    {
+      "type": "number",
+      "id": "fallback_review_count",
+      "label": "Review count fallback",
+      "default": 0,
+      "info": "Set to 0 to hide fake counts. Trustpilot widget shows real product reviews below."
+    },
+    {
+      "type": "text",
+      "id": "reviews_label",
+      "label": "Reviews link label",
+      "default": "Recensioni"
+    },
+    {
+      "type": "text",
+      "id": "reviews_link",
+      "label": "Reviews link (e.g. #recensioni)",
+      "info": "Leave empty for plain text without link."
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 8
+    }
+  ],
+  "presets": [
+    {
+      "name": "SG Product header",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

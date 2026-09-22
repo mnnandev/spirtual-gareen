@@ -1,0 +1,129 @@
+{% liquid
+  assign section_heading = section.settings.heading | default: 'Trova il prodotto giusto per te'
+  assign section_subheading = section.settings.subheading
+  assign hide_heading = false
+  if section_heading == blank and section_subheading == blank
+    assign hide_heading = true
+  endif
+%}
+
+{% render 'sg-category-circles-grid',
+  section_id: section.id,
+  blocks: section.blocks,
+  hide_heading: hide_heading,
+  heading: section_heading,
+  subheading: section_subheading
+%}
+
+<script src="{{ 'sg-category-circles.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Category circles (7)",
+  "tag": "section",
+  "class": "category-circles-section",
+  "max_blocks": 7,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section heading",
+      "default": "Trova il prodotto giusto per te"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Section subheading",
+      "default": "Trova ciò di cui hai bisogno"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Category name",
+          "default": "Categoria"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Circle image",
+          "info": "Optional lifestyle photo. Defaults to curated category image."
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "text",
+          "id": "handle",
+          "label": "Collection handle (fallback)",
+          "info": "Used when no collection is selected. Required for subcategory dropdowns."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Category circles (7)",
+      "category": "Custom",
+      "blocks": [
+        {
+          "type": "category",
+          "settings": {
+            "title": "Sonno, Mente ed Energia",
+            "handle": "sonno-mente-energia"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Difese, Protezione e Vie Respiratorie",
+            "handle": "difese-protezione-respiratorie"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Intestino, Digestione e Metabolismo",
+            "handle": "intestino-digestione-metabolismo"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Movimento, Dolori e Recupero",
+            "handle": "movimento-dolori-recupero"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Benessere Ormonale e Intimo",
+            "handle": "benessere-ormonale-intimo"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Bellezza e Cura della Persona",
+            "handle": "bellezza-cura-persona"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Mondo Zen",
+            "handle": "mondo-zen"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

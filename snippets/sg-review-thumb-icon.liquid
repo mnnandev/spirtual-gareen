@@ -1,0 +1,27 @@
+{%- comment -%}
+  Like / dislike circle icons (theme assets)
+  @param {string} direction - "up" or "down"
+{%- endcomment -%}
+{%- if direction == 'down' -%}
+  <img
+    class="sg-reviews-list__vote-img"
+    src="{{ 'sg-thumb-down.png' | asset_url }}"
+    alt=""
+    width="20"
+    height="20"
+    loading="lazy"
+    decoding="async"
+    draggable="false"
+  >
+{%- else -%}
+  <img
+    class="sg-reviews-list__vote-img"
+    src="{{ 'sg-thumb-up.png' | asset_url }}"
+    alt=""
+    width="20"
+    height="20"
+    loading="lazy"
+    decoding="async"
+    draggable="false"
+  >
+{%- endif -%}

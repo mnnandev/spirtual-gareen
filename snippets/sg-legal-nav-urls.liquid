@@ -1,0 +1,48 @@
+{% doc %}
+  Spiritual Green legal page URLs.
+
+  @param {string} [type] - privacy | cookie | terms | refund | faq
+{% enddoc %}
+
+{% liquid
+  assign nav_type = type | default: 'privacy'
+
+  case nav_type
+    when 'privacy'
+      if pages.privacy != blank
+        assign nav_url = pages.privacy.url
+      elsif shop.privacy_policy != blank
+        assign nav_url = shop.privacy_policy.url
+      else
+        assign nav_url = '/policies/privacy-policy'
+      endif
+    when 'cookie'
+      if pages['cookie-policy'] != blank
+        assign nav_url = pages['cookie-policy'].url
+      else
+        assign nav_url = '/pages/cookie-policy'
+      endif
+    when 'terms'
+      if pages['termini-e-condizioni'] != blank
+        assign nav_url = pages['termini-e-condizioni'].url
+      elsif shop.terms_of_service != blank
+        assign nav_url = shop.terms_of_service.url
+      else
+        assign nav_url = '/pages/termini-e-condizioni'
+      endif
+    when 'refund'
+      if shop.refund_policy != blank
+        assign nav_url = shop.refund_policy.url
+      elsif pages['politica-di-reso'] != blank
+        assign nav_url = pages['politica-di-reso'].url
+      else
+        assign nav_url = '/policies/refund-policy'
+      endif
+    when 'faq'
+      if pages.faq != blank
+        assign nav_url = pages.faq.url
+      else
+        assign nav_url = '/pages/faq'
+      endif
+  endcase
+%}{{ nav_url }}

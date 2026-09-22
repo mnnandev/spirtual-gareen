@@ -1,0 +1,364 @@
+{% liquid
+  assign body_content = blank
+  if request.page_type == 'policy'
+    assign page_title = policy.title | default: section.settings.heading
+    assign body_content = policy.body
+    assign current_url = policy.url
+  else
+    assign page_title = page.title | default: section.settings.heading
+    assign body_content = page.content
+    assign current_url = page.url
+  endif
+
+  assign active_path = request.path
+  assign nav_blocks = section.blocks | where: 'type', 'nav_link'
+  assign data_blocks = section.blocks | where: 'type', 'data_category'
+  assign layout_style = section.settings.layout_style
+
+  if body_content != blank
+    capture cleaned_body
+      render 'sg-sanitize-line-breaks', text: body_content, mode: 'html'
+    endcapture
+    assign body_content = cleaned_body | strip
+  endif
+
+  if page_title != blank
+    capture cleaned_page_title
+      render 'sg-sanitize-line-breaks', text: page_title, mode: 'title'
+    endcapture
+    assign page_title = cleaned_page_title | strip
+  endif
+
+  assign use_iubenda_grid = false
+  if layout_style == 'iubenda_grid' and section.settings.show_structured_layout
+    assign use_iubenda_grid = true
+  endif
+
+  assign use_default_grid = false
+  if use_iubenda_grid and data_blocks.size == 0
+    assign use_default_grid = true
+  endif
+
+  assign show_spiritual_content = false
+  unless use_iubenda_grid
+    assign show_spiritual_content = true
+  endunless
+
+  assign use_spiritual_layout = false
+  if layout_style == 'spiritual' or layout_style == 'seed'
+    assign use_spiritual_layout = true
+  endif
+
+  assign show_admin_body = false
+  if show_spiritual_content and section.settings.use_admin_legal_body and body_content != blank
+    assign show_admin_body = true
+  endif
+
+  assign display_heading = section.settings.heading
+  if display_heading == blank
+    assign display_heading = page_title
+  endif
+%}
+
+<section
+  id="SgLegalPage-{{ section.id }}"
+  class="sg-legal-page sg-legal-page--spiritual color-scheme-6"
+  data-section-id="{{ section.id }}"
+  data-layout="{{ layout_style }}"
+  style="--color-background: #ffffff; --color-foreground: #1a1a1a; --color-foreground-heading: #1a1a1a; background: #ffffff; color: #1a1a1a;"
+>
+  <div class="sg-legal-page__wrap">
+    <div class="sg-legal-page__layout">
+      {%- if use_spiritual_layout -%}
+        {% render 'sg-legal-sidebar', active_tab: section.settings.legal_active_tab %}
+      {%- else -%}
+        <aside class="sg-legal-page__sidebar" aria-label="{{ section.settings.sidebar_label }}">
+          <nav class="sg-legal-page__nav">
+            <ul class="sg-legal-page__nav-list" role="list">
+              {%- for block in nav_blocks -%}
+                {%- liquid
+                  assign nav_url = block.settings.url
+                  assign is_active = false
+                  if nav_url != blank
+                    if nav_url == current_url or nav_url == active_path
+                      assign is_active = true
+                    endif
+                  endif
+                  if block.settings.highlight_current
+                    assign is_active = true
+                  endif
+                -%}
+                <li
+                  class="sg-legal-page__nav-item{% if is_active %} sg-legal-page__nav-item--active{% endif %}"
+                  {{ block.shopify_attributes }}
+                >
+                  {%- if is_active -%}
+                    <span class="sg-legal-page__nav-current" aria-current="page">{{ block.settings.label }}</span>
+                  {%- else -%}
+                    <a class="sg-legal-page__nav-link" href="{{ nav_url }}">{{ block.settings.label }}</a>
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+          </nav>
+        </aside>
+      {%- endif -%}
+
+      <article class="sg-legal-page__main">
+        <header class="sg-legal-page__header">
+          <h1 class="sg-legal-page__title">{{ display_heading }}</h1>
+          {%- if section.settings.last_updated != blank -%}
+            <p class="sg-legal-page__updated">{{ section.settings.last_updated }}</p>
+          {%- endif -%}
+        </header>
+
+        {%- if use_iubenda_grid -%}
+          <div class="sg-legal-page__structured">
+            {%- if section.settings.data_section_heading != blank -%}
+              <h2 class="sg-legal-page__section-heading">{{ section.settings.data_section_heading }}</h2>
+            {%- endif -%}
+
+            {%- if use_default_grid -%}
+              {% render 'sg-legal-default-grid', personal_data_label: section.settings.personal_data_label %}
+            {%- else -%}
+              <div class="sg-legal-page__grid">
+                {%- for block in data_blocks -%}
+                  <div class="sg-legal-page__card" {{ block.shopify_attributes }}>
+                    <div class="sg-legal-page__card-icon-wrap">
+                      {% render 'sg-legal-icon', icon: block.settings.icon %}
+                    </div>
+                    <div class="sg-legal-page__card-body">
+                      <h3 class="sg-legal-page__card-title">{{ block.settings.heading }}</h3>
+                      {%- if block.settings.services != blank -%}
+                        <p class="sg-legal-page__card-services">{{ block.settings.services }}</p>
+                      {%- endif -%}
+                      {%- if block.settings.personal_data != blank -%}
+                        <p class="sg-legal-page__card-data">
+                          <span class="sg-legal-page__card-data-label">{{ section.settings.personal_data_label }}</span>
+                          {{ block.settings.personal_data }}
+                        </p>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
+
+            {%- if section.settings.footer_note != blank -%}
+              <p class="sg-legal-page__footer-note">{{ section.settings.footer_note }}</p>
+            {%- endif -%}
+          </div>
+        {%- elsif show_admin_body -%}
+          <div class="sg-legal-page__content rte">
+            {{ body_content }}
+          </div>
+        {%- elsif section.settings.default_content != blank -%}
+          <div class="sg-legal-page__content rte">
+            {{ section.settings.default_content }}
+          </div>
+        {%- else -%}
+          <div class="sg-legal-page__content rte">
+            {%- case section.settings.legal_content_snippet -%}
+              {%- when 'sg-legal-cookie-content' -%}
+                {% render 'sg-legal-cookie-content', contact_email: section.settings.contact_email %}
+              {%- when 'sg-legal-terms-content' -%}
+                {% render 'sg-legal-terms-content', contact_email: section.settings.contact_email %}
+              {%- when 'sg-legal-refund-content' -%}
+                {% render 'sg-legal-refund-content', contact_email: section.settings.contact_email %}
+              {%- when 'sg-legal-spiritual-content', 'sg-legal-seed-content' -%}
+              {%- else -%}
+                {% render 'sg-legal-spiritual-content',
+                  intro_heading: section.settings.intro_heading,
+                  contact_email: section.settings.contact_email
+                %}
+            {%- endcase -%}
+          </div>
+        {%- endif -%}
+      </article>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "SG Legal page",
+  "tag": "section",
+  "class": "sg-legal-page-section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout_style",
+      "label": "Layout style",
+      "default": "spiritual",
+      "options": [
+        { "value": "spiritual", "label": "Spiritual — sidebar and prose" },
+        { "value": "iubenda_grid", "label": "Iubenda — data grid" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "show_structured_layout",
+      "label": "Enable data grid (iubenda layout only)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "use_admin_legal_body",
+      "label": "Use Shopify policy or page body text",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Page heading",
+      "default": "Informativa sulla privacy"
+    },
+    {
+      "type": "text",
+      "id": "sidebar_label",
+      "label": "Sidebar navigation label",
+      "default": "Documenti legali"
+    },
+    {
+      "type": "text",
+      "id": "last_updated",
+      "label": "Last updated line",
+      "default": "Ultimo aggiornamento: 23 gennaio 2026"
+    },
+    {
+      "type": "text",
+      "id": "intro_heading",
+      "label": "Intro section heading",
+      "default": "Introduzione"
+    },
+    {
+      "type": "text",
+      "id": "contact_email",
+      "label": "Contact email",
+      "default": "info@spiritualgreen.it"
+    },
+    {
+      "type": "select",
+      "id": "legal_active_tab",
+      "label": "Active sidebar tab",
+      "default": "privacy",
+      "options": [
+        { "value": "privacy", "label": "Privacy + Cookie" },
+        { "value": "cookie", "label": "Cookie Policy" },
+        { "value": "terms", "label": "Termini e Condizioni" },
+        { "value": "refund", "label": "Politica di Reso" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "legal_content_snippet",
+      "label": "Default page content",
+      "default": "sg-legal-spiritual-content",
+      "options": [
+        { "value": "sg-legal-spiritual-content", "label": "Privacy — Introduzione" },
+        { "value": "sg-legal-cookie-content", "label": "Cookie Policy" },
+        { "value": "sg-legal-terms-content", "label": "Termini e Condizioni" },
+        { "value": "sg-legal-refund-content", "label": "Politica di Reso" }
+      ]
+    },
+    {
+      "type": "richtext",
+      "id": "default_content",
+      "label": "Custom body (overrides default intro)"
+    },
+    {
+      "type": "text",
+      "id": "data_section_heading",
+      "label": "Data grid heading",
+      "default": "Dati Personali trattati per le seguenti finalita"
+    },
+    {
+      "type": "text",
+      "id": "personal_data_label",
+      "label": "Personal data label",
+      "default": "Dati Personali:"
+    },
+    {
+      "type": "text",
+      "id": "footer_note",
+      "label": "Note below grid",
+      "default": "Per informazioni contatta info@spiritualgreen.it."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "nav_link",
+      "name": "Sidebar link",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Link"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        },
+        {
+          "type": "checkbox",
+          "id": "highlight_current",
+          "label": "Mark as current page",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "data_category",
+      "name": "Data category",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "contact",
+          "options": [
+            { "value": "contact", "label": "Contact" },
+            { "value": "tags", "label": "Tag management" },
+            { "value": "hosting", "label": "Hosting" },
+            { "value": "social", "label": "Social" },
+            { "value": "stats", "label": "Statistics" },
+            { "value": "optimize", "label": "A/B testing" },
+            { "value": "external", "label": "External content" }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Category heading",
+          "default": "Categoria"
+        },
+        {
+          "type": "textarea",
+          "id": "services",
+          "label": "Services used",
+          "default": "Servizio di esempio"
+        },
+        {
+          "type": "textarea",
+          "id": "personal_data",
+          "label": "Personal data types",
+          "default": "email; nome"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "SG Legal page",
+      "settings": {
+        "layout_style": "spiritual",
+        "heading": "Informativa sulla privacy",
+        "last_updated": "Ultimo aggiornamento: 23 gennaio 2026"
+      }
+    }
+  ]
+}
+{% endschema %}

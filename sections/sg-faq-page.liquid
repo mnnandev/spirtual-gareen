@@ -1,0 +1,32 @@
+<section
+  id="SgFaqPage-{{ section.id }}"
+  class="sg-faq-page sg-faq-page-section"
+  data-section-id="{{ section.id }}"
+>
+  {% render 'sg-faq-page-body',
+    heading: section.settings.heading,
+    intro: section.settings.intro
+  %}
+</section>
+
+{% schema %}
+{
+  "name": "SG FAQ Page",
+  "tag": "section",
+  "class": "sg-faq-page-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Domande frequenti"
+    },
+    {
+      "type": "textarea",
+      "id": "intro",
+      "label": "Intro",
+      "default": "Trova risposte rapide su ordini, spedizioni, resi e consulenza. Per altre richieste scrivici a info@spiritualgreen.it."
+    }
+  ]
+}
+{% endschema %}

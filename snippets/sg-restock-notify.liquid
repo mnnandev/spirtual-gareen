@@ -1,0 +1,124 @@
+{%- doc -%}
+  Back-in-stock email capture — always visible on PDPs.
+  Active only when the selected variant is out of stock; disabled when in stock.
+  Uses Shopify customer form + tags (same pattern as newsletter).
+  Must sit OUTSIDE the product add-to-cart form (no nested forms).
+
+  @param {object} product - Product object
+  @param {object} variant - Selected variant
+  @param {boolean} is_available - Whether the current variant can be purchased
+{%- enddoc -%}
+
+{%- liquid
+  assign restock_variant = variant | default: product.selected_or_first_available_variant
+  assign restock_available = is_available
+  if restock_available == nil
+    if restock_variant != blank and restock_variant.available
+      assign restock_available = true
+    else
+      assign restock_available = false
+    endif
+  endif
+
+  assign notify_label = 'spiritual_green.restock_notify_link' | t
+  if notify_label == blank or notify_label contains 'Translation missing'
+    assign notify_label = 'Fammi sapere quando torna disponibile'
+  endif
+
+  assign email_placeholder = 'spiritual_green.restock_notify_email_placeholder' | t
+  if email_placeholder == blank or email_placeholder contains 'Translation missing'
+    assign email_placeholder = 'La tua email'
+  endif
+
+  assign submit_label = 'spiritual_green.restock_notify_submit' | t
+  if submit_label == blank or submit_label contains 'Translation missing'
+    assign submit_label = 'Avvisami'
+  endif
+
+  assign success_message = 'spiritual_green.restock_notify_success' | t
+  if success_message == blank or success_message contains 'Translation missing'
+    assign success_message = 'Ti avviseremo quando il prodotto sarà di nuovo disponibile!'
+  endif
+
+  assign error_message = 'spiritual_green.restock_notify_error' | t
+  if error_message == blank or error_message contains 'Translation missing'
+    assign error_message = 'Si è verificato un errore. Riprova tra poco.'
+  endif
+
+  assign form_id = 'SgRestockNotify-' | append: product.id | append: '-' | append: section.id
+  assign tag_list = 'restock-notify,newsletter,product-' | append: product.id | append: ',variant-' | append: restock_variant.id
+-%}
+
+<script src="{{ 'sg-restock-notify.js' | asset_url }}" type="module" defer></script>
+
+<sg-restock-notify
+  class="sg-restock-notify{% if restock_available %} is-disabled{% endif %}"
+  data-product-id="{{ product.id }}"
+  data-product-title="{{ product.title | escape }}"
+  data-variant-id="{{ restock_variant.id }}"
+  data-available="{{ restock_available }}"
+>
+  <button
+    type="button"
+    class="sg-restock-notify__trigger"
+    data-sg-restock-open
+    aria-expanded="false"
+    aria-controls="{{ form_id }}-panel"
+    {% if restock_available %}
+      disabled
+      aria-disabled="true"
+    {% else %}
+      aria-disabled="false"
+    {% endif %}
+  >
+    {{ notify_label }}
+  </button>
+
+  <div
+    id="{{ form_id }}-panel"
+    class="sg-restock-notify__panel"
+    data-sg-restock-panel
+    hidden
+  >
+    {% form 'customer', id: form_id, class: 'sg-restock-notify__form' %}
+      <input
+        type="hidden"
+        name="contact[tags]"
+        value="{{ tag_list }}"
+        data-sg-restock-tags
+      >
+      <input
+        type="hidden"
+        name="contact[note]"
+        value="Restock notify — {{ product.title | escape }} (variant {{ restock_variant.id }})"
+        data-sg-restock-note
+      >
+
+      <label class="visually-hidden" for="{{ form_id }}-email">
+        {{ 'spiritual_green.email_label' | t | default: 'E-mail' }}
+      </label>
+      <div class="sg-restock-notify__row">
+        <input
+          id="{{ form_id }}-email"
+          class="sg-restock-notify__input"
+          type="email"
+          name="contact[email]"
+          autocomplete="email"
+          required
+          placeholder="{{ email_placeholder | escape }}"
+          {% if customer %}value="{{ customer.email }}"{% endif %}
+        >
+        <button class="sg-restock-notify__submit button" type="submit" name="commit">
+          {{ submit_label }}
+        </button>
+      </div>
+
+      <p class="sg-restock-notify__message sg-restock-notify__message--success" data-sg-restock-success hidden>
+        {{ success_message }}
+      </p>
+      <p class="sg-restock-notify__message sg-restock-notify__message--error" data-sg-restock-error hidden>
+        {{ error_message }}
+      </p>
+    {% endform %}
+  </div>
+</sg-restock-notify>

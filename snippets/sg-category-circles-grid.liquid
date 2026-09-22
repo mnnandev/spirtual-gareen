@@ -1,0 +1,74 @@
+{%- doc -%}
+  Shared category circles grid (homepage + shop/categories page).
+
+  @param {string} section_id - Unique section id for panels/JS
+  @param {array} [blocks] - Optional section blocks
+  @param {boolean} [hide_heading] - Hide title/subtitle header
+  @param {string} [heading] - Section heading override
+  @param {string} [subheading] - Section subheading override
+  @param {string} [modifier_class] - Extra section class e.g. category-circles--shop
+  @param {string} [active_parent_handle] - Canonical handle of active macro-category
+  @param {string} [current_sub_handle] - Active subcategory handle
+{%- enddoc -%}
+
+{% liquid
+  assign default_handles = 'sonno-mente-energia,difese-protezione-respiratorie,intestino-digestione-metabolismo,movimento-dolori-recupero,benessere-ormonale-intimo,bellezza-cura-persona,mondo-zen' | split: ','
+  assign default_titles = 'Sonno, Mente ed Energia|Difese, Protezione e Vie Respiratorie|Intestino, Digestione e Metabolismo|Movimento, Dolori e Recupero|Benessere Ormonale e Intimo|Bellezza e Cura della Persona|Mondo Zen' | split: '|'
+
+  assign section_heading = heading
+  assign section_subheading = subheading
+  assign category_blocks = blocks | where: 'type', 'category'
+  assign extra_class = modifier_class | default: ''
+  assign grid_active_parent_handle = active_parent_handle | default: '' | strip
+  assign grid_sub_handle = current_sub_handle | default: '' | strip
+%}
+
+<section
+  id="CategoryCircles-{{ section_id }}"
+  class="category-circles {{ extra_class }}"
+  data-section-id="{{ section_id }}"
+>
+  <div class="category-circles__container">
+    {% unless hide_heading %}
+      {% if section_heading != blank or section_subheading != blank %}
+        <header class="category-circles__header">
+          {% if section_heading != blank %}
+            <h2 class="category-circles__title">{{ section_heading }}</h2>
+          {% endif %}
+          {% if section_subheading != blank %}
+            <p class="category-circles__subtitle">{{ section_subheading }}</p>
+          {% endif %}
+        </header>
+      {% endif %}
+    {% endunless %}
+
+    <div class="category-circles__slider" data-category-circles-slider>
+      <ul class="category-circles__grid" role="list" data-category-circles-grid>
+        {% if category_blocks.size > 0 %}
+          {% for block in category_blocks %}
+            {% render 'sg-category-circle-item',
+              block: block,
+              title: block.settings.title,
+              handle: block.settings.handle,
+              section_id: section_id,
+              index: forloop.index,
+              active_parent_handle: grid_active_parent_handle,
+              current_sub_handle: grid_sub_handle
+            %}
+          {% endfor %}
+        {% else %}
+          {% for handle in default_handles %}
+            {% render 'sg-category-circle-item',
+              title: default_titles[forloop.index0],
+              handle: handle,
+              section_id: section_id,
+              index: forloop.index,
+              active_parent_handle: grid_active_parent_handle,
+              current_sub_handle: grid_sub_handle
+            %}
+          {% endfor %}
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,509 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */{
+  "sections": {
+    "main": {
+      "type": "product-information",
+      "blocks": {
+        "media-gallery": {
+          "type": "_product-media-gallery",
+          "static": true,
+          "settings": {
+            "media_presentation": "carousel",
+            "media_columns": "one",
+            "image_gap": 8,
+            "large_first_image": false,
+            "icons_style": "none",
+            "slideshow_controls_style": "thumbnails",
+            "slideshow_mobile_controls_style": "dots",
+            "thumbnail_position": "left",
+            "thumbnail_width": 72,
+            "aspect_ratio": "adapt",
+            "constrain_to_viewport": true,
+            "media_fit": "contain",
+            "media_radius": 0,
+            "extend_media": false,
+            "zoom": true,
+            "video_loop": false,
+            "hide_variants": true,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "product-details": {
+          "type": "_product-details",
+          "static": true,
+          "settings": {
+            "width": "fill",
+            "custom_width": 100,
+            "width_mobile": "fill",
+            "custom_width_mobile": 100,
+            "height": "fit",
+            "details_position": "flex-start",
+            "gap": 12,
+            "sticky_details_desktop": true,
+            "inherit_color_scheme": true,
+            "color_scheme": "scheme-6",
+            "background_media": "none",
+            "video_position": "cover",
+            "background_image_position": "cover",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "sg_product_header": {
+              "type": "sg-product-header",
+              "settings": {
+                "show_badge": true,
+                "badge_text": "",
+                "use_sku_as_badge": true,
+                "use_vendor_as_badge": false,
+                "badge_fallback": "SG-01®",
+                "fallback_rating": 0,
+                "fallback_review_count": 0,
+                "reviews_label": "Recensioni",
+                "reviews_link": "#recensioni",
+                "padding-block-start": 0,
+                "padding-block-end": 0
+              },
+              "blocks": {}
+            },
+            "sg_product_price_row": {
+              "type": "sg-product-price-row",
+              "settings": {
+                "show_bestseller": true,
+                "bestseller_label": "Più venduto",
+                "show_sale_price_first": true,
+                "padding-block-start": 0,
+                "padding-block-end": 0
+              },
+              "blocks": {}
+            },
+            "text_sg_supply": {
+              "type": "text",
+              "name": "Supply note",
+              "settings": {
+                "text": "<p>Fornitura di 30 giorni con consegna mensile. Metti in pausa o annulla quando vuoi.</p>",
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "paragraph",
+                "font": "var(--font-body--family)",
+                "font_size": "0.875rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "color": "",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "variant_picker_R3rGDr": {
+              "type": "variant-picker",
+              "settings": {
+                "variant_style": "dropdowns",
+                "show_swatches": false,
+                "alignment": "left",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "buy_buttons_eYQEYi": {
+              "type": "buy-buttons",
+              "settings": {
+                "stacking": true,
+                "show_pickup_availability": false,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {
+                "quantity": {
+                  "type": "quantity",
+                  "static": true,
+                  "settings": {},
+                  "blocks": {}
+                },
+                "add-to-cart": {
+                  "type": "add-to-cart",
+                  "static": true,
+                  "settings": {
+                    "style_class": "button"
+                  },
+                  "blocks": {}
+                },
+                "accelerated-checkout": {
+                  "type": "accelerated-checkout",
+                  "static": true,
+                  "settings": {},
+                  "blocks": {}
+                }
+              },
+              "block_order": []
+            },
+            "text_sg_trust": {
+              "type": "text",
+              "name": "Trust line",
+              "settings": {
+                "text": "<p>Garanzia soddisfatti o rimborsati 30 giorni. Spedizione gratuita in Italia.</p>",
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "center",
+                "type_preset": "paragraph",
+                "font": "var(--font-body--family)",
+                "font_size": "0.875rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "color": "",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "sg_accordion": {
+              "type": "accordion",
+              "settings": {
+                "icon": "plus",
+                "dividers": true,
+                "type_preset": "h6",
+                "inherit_color_scheme": true,
+                "color_scheme": "",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "padding-block-start": 8,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {
+                "sg_row_benefits": {
+                  "type": "_accordion-row",
+                  "settings": {
+                    "heading": "Benefici*",
+                    "open_by_default": false,
+                    "icon": "none"
+                  },
+                  "blocks": {
+                    "sg_benefits_text": {
+                      "type": "sg-product-benefici",
+                      "settings": {
+                        "empty_message": "Benefici disponibili a breve."
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "sg_benefits_text"
+                  ]
+                },
+                "sg_row_ingredients": {
+                  "type": "_accordion-row",
+                  "settings": {
+                    "heading": "Ingredienti",
+                    "open_by_default": false,
+                    "icon": "none"
+                  },
+                  "blocks": {
+                    "sg_ingredients_text": {
+                      "type": "sg-product-ingredienti",
+                      "settings": {
+                        "empty_message": "Ingredienti non disponibili.",
+                        "updating_message": "Ingredienti in aggiornamento..."
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "sg_ingredients_text"
+                  ]
+                },
+                "sg_row_description": {
+                  "type": "_accordion-row",
+                  "settings": {
+                    "heading": "Descrizione",
+                    "open_by_default": false,
+                    "icon": "none"
+                  },
+                  "blocks": {
+                    "sg_description_text": {
+                      "type": "sg-product-descrizione",
+                      "settings": {
+                        "empty_message": "Descrizione non disponibile."
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "sg_description_text"
+                  ]
+                }
+              },
+              "block_order": [
+                "sg_row_benefits",
+                "sg_row_ingredients",
+                "sg_row_description"
+              ]
+            },
+            "sg_product_bundle": {
+              "type": "sg-product-bundle",
+              "settings": {
+                "auto_use_current_product": true,
+                "auto_description": true,
+                "use_product_image": true,
+                "use_product_prices": true,
+                "use_default_asset_image": false,
+                "heading": "Pacchetto + Risparmia",
+                "description": "",
+                "price": "",
+                "compare_at_price": "",
+                "button_label": "Aggiungi",
+                "button_add_to_cart": true,
+                "button_link": "",
+                "padding-block-start": 16,
+                "padding-block-end": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "sg_product_header",
+            "sg_product_price_row",
+            "text_sg_supply",
+            "variant_picker_R3rGDr",
+            "buy_buttons_eYQEYi",
+            "text_sg_trust",
+            "sg_accordion",
+            "sg_product_bundle"
+          ]
+        }
+      },
+      "settings": {
+        "content_width": "content-center-aligned",
+        "desktop_media_position": "left",
+        "equal_columns": false,
+        "limit_details_width": false,
+        "gap": 48,
+        "color_scheme": "scheme-6",
+        "padding-block-start": 32,
+        "padding-block-end": 48
+      }
+    },
+    "product_recommendations_qggXJq": {
+      "type": "product-recommendations",
+      "blocks": {
+        "text_cbcgyb": {
+          "type": "text",
+          "name": "t:names.header",
+          "settings": {
+            "text": "<h3>Potrebbe piacerti anche</h3>",
+            "width": "fit-content",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h4",
+            "font": "var(--font-primary--family)",
+            "font_size": "",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "static-product-card": {
+          "type": "_product-card",
+          "name": "t:names.product_card",
+          "static": true,
+          "settings": {
+            "product_card_gap": 8,
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 8,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "product_card_gallery_DNizbJ": {
+              "type": "_product-card-gallery",
+              "name": "t:names.product_card_media",
+              "settings": {
+                "image_ratio": "adapt",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "product_title_M7MJkb": {
+              "type": "product-title",
+              "name": "t:names.product_title",
+              "settings": {
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "rte",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "color": "var(--color-foreground)",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 4,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "price_gLWgA6": {
+              "type": "price",
+              "settings": {
+                "show_sale_price_first": true,
+                "show_installments": false,
+                "show_tax_info": false,
+                "type_preset": "h6",
+                "width": "100%",
+                "alignment": "left",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "color": "var(--color-foreground)",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "product_card_gallery_DNizbJ",
+            "product_title_M7MJkb",
+            "price_gLWgA6"
+          ]
+        }
+      },
+      "block_order": [
+        "text_cbcgyb"
+      ],
+      "name": "t:names.product_recommendations",
+      "settings": {
+        "product": "{{ closest.product }}",
+        "recommendation_type": "related",
+        "layout_type": "grid",
+        "carousel_on_mobile": false,
+        "max_products": 4,
+        "columns": 4,
+        "mobile_columns": "2",
+        "columns_gap": 12,
+        "rows_gap": 24,
+        "icons_style": "arrow",
+        "icons_shape": "none",
+        "section_width": "page-width",
+        "gap": 28,
+        "color_scheme": "scheme-6",
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
+    },
+    "sg_pea_dissolve": {
+      "type": "sg-pea-dissolve",
+      "blocks": {
+        "benefit_1": {
+          "type": "benefit",
+          "settings": {
+            "icon": "🛡️",
+            "text": "Modula la risposta infiammatoria"
+          }
+        },
+        "benefit_2": {
+          "type": "benefit",
+          "settings": {
+            "icon": "🧠",
+            "text": "Supporta nervi, muscoli e articolazioni"
+          }
+        },
+        "benefit_3": {
+          "type": "benefit",
+          "settings": {
+            "icon": "🌿",
+            "text": "Favorisce l'equilibrio della barriera intestinale"
+          }
+        }
+      },
+      "block_order": ["benefit_1", "benefit_2", "benefit_3"],
+      "settings": {
+        "enabled": true,
+        "product_handles": "pea-1200-complex-stick,pea-1200-complex,pea-complex-1200,pea-1200,pea-complex",
+        "match_title_contains": "PEA Complex 1200",
+        "product_image": "",
+        "product_image_url": "https://cdn.shopify.com/s/files/1/0998/9482/1248/files/pea.png?v=1788757471",
+        "heading": "PEA Complex 1200",
+        "description": "<p>La PEA micronizzata sostiene la fisiologica risposta dell'organismo all'infiammazione e al dolore. Aiuta il benessere del sistema nervoso, di muscoli e articolazioni e supporta l'equilibrio della barriera intestinale, anche in presenza di intestino infiammato.</p>"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "sg_pea_dissolve",
+    "product_recommendations_qggXJq"
+  ]
+}

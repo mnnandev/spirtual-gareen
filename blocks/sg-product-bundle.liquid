@@ -1,0 +1,320 @@
+
+{% liquid
+  assign current_product = closest.product
+  if current_product == blank
+    assign current_product = product
+  endif
+
+  if current_product == blank
+    assign show_card = false
+  else
+    assign show_card = true
+  endif
+
+  if show_card and current_product.metafields.custom.sg_bundle_hide.value == true
+    assign show_card = false
+  endif
+
+  assign display_product = current_product
+  assign bundle_product = block.settings.bundle_product
+
+  if current_product.metafields.custom.sg_bundle_product.value != blank
+    assign bundle_product = current_product.metafields.custom.sg_bundle_product.value
+  endif
+
+  if block.settings.auto_use_current_product == false and bundle_product != blank and bundle_product.id != blank
+    assign display_product = bundle_product
+  elsif bundle_product != blank and bundle_product.id != blank and bundle_product.id != current_product.id
+    assign display_product = bundle_product
+  endif
+
+  assign heading = block.settings.heading
+  if current_product.metafields.custom.sg_bundle_heading.value != blank
+    assign heading = current_product.metafields.custom.sg_bundle_heading.value
+  endif
+  if heading contains '[product]'
+    assign heading = heading | replace: '[product]', display_product.title
+  endif
+
+  assign description = block.settings.description
+  if current_product.metafields.custom.sg_bundle_description.value != blank
+    assign description = current_product.metafields.custom.sg_bundle_description.value
+  elsif block.settings.auto_description
+    assign description = 'Aggiungi ' | append: display_product.title | append: ' alla tua routine e risparmia sul primo ordine.'
+  endif
+  if description contains '[product]'
+    assign description = description | replace: '[product]', display_product.title
+  endif
+
+  if heading != blank
+    capture cleaned_heading
+      render 'sg-sanitize-line-breaks', text: heading, mode: 'title'
+    endcapture
+    assign heading = cleaned_heading | strip
+  endif
+
+  if description != blank
+    capture cleaned_description
+      render 'sg-sanitize-line-breaks', text: description, mode: 'plain'
+    endcapture
+    assign description = cleaned_description | strip
+  endif
+
+  assign button_label = block.settings.button_label
+  assign bundle_url = block.settings.button_link
+
+  if bundle_url == blank
+    assign bundle_url = display_product.url
+  endif
+
+  assign bundle_image = blank
+  if block.settings.use_product_image and display_product.featured_image != blank
+    assign bundle_image = display_product.featured_image
+  endif
+
+  if bundle_image == blank and block.settings.image != blank
+    assign bundle_image = block.settings.image
+  endif
+
+  assign use_asset_fallback = false
+  if bundle_image == blank and block.settings.use_default_asset_image
+    assign use_asset_fallback = true
+    assign bundle_asset_alt = display_product.title | default: heading
+  endif
+
+  assign show_live_prices = block.settings.use_product_prices
+  assign price_variant = display_product.selected_or_first_available_variant
+  assign bundle_form_id = 'sg-bundle-form-' | append: block.id | append: '-' | append: display_product.id
+
+  comment
+    Strip hardcoded % from merchant heading — discount lives on the image badge only.
+  endcomment
+  if heading != blank
+    assign heading = heading | replace: '[pct]', '' | strip
+    assign heading = heading | replace: ' 25%', '' | replace: ' 20%', '' | replace: ' 15%', '' | replace: ' 30%', '' | replace: ' 10%', '' | strip
+    assign heading = heading | replace: '25%', '' | replace: '20%', '' | replace: '15%', '' | replace: '30%', '' | replace: '10%', '' | strip
+    assign heading = heading | replace: ' + Risparmia', '' | replace: ' + risparmia', '' | replace: '+ Risparmia', '' | replace: '+ risparmia', '' | strip
+    if heading == blank or heading == 'Pacchetto' or heading == 'pacchetto'
+      assign heading = 'Pacchetto'
+    endif
+  endif
+%}
+
+{% if show_card %}
+  {% if heading != blank or description != blank %}
+  <div
+    class="sg-bundle-card spacing-style"
+    style="{% render 'spacing-style', settings: block.settings %}"
+    {{ block.shopify_attributes }}
+  >
+    <div class="sg-bundle-card__inner">
+      {% if bundle_image != blank or use_asset_fallback %}
+        <a
+          class="sg-bundle-card__media"
+          href="{{ bundle_url | default: '#' }}"
+        >
+          {% if display_product != blank %}
+            {% render 'sg-discount-badge', product: display_product, variant: price_variant, size: 'sm' %}
+          {% endif %}
+          {% if bundle_image != blank %}
+            {{
+              bundle_image
+              | image_url: width: 160
+              | image_tag:
+                loading: 'lazy',
+                widths: '80, 120, 160',
+                sizes: '88px',
+                class: 'sg-bundle-card__image',
+                alt: bundle_image.alt | default: display_product.title
+            }}
+          {% else %}
+            <img
+              class="sg-bundle-card__image"
+              src="{{ 'sg-bundle-product.png' | asset_img_url: width: 160 }}"
+              srcset="
+                {{ 'sg-bundle-product.png' | asset_img_url: width: 80 }} 80w,
+                {{ 'sg-bundle-product.png' | asset_img_url: width: 120 }} 120w,
+                {{ 'sg-bundle-product.png' | asset_img_url: width: 160 }} 160w
+              "
+              sizes="88px"
+              width="88"
+              height="88"
+              loading="lazy"
+              alt="{{ bundle_asset_alt | escape }}"
+            >
+          {% endif %}
+        </a>
+      {% endif %}
+
+      <div class="sg-bundle-card__content">
+        {% if heading != blank %}
+          <p class="sg-bundle-card__heading">{{ heading }}</p>
+        {% endif %}
+
+        {% if description != blank %}
+          <p class="sg-bundle-card__description">{{ description }}</p>
+        {% endif %}
+
+        <div class="sg-bundle-card__footer">
+          {% if show_live_prices and display_product != blank %}
+            <div class="sg-bundle-card__prices">
+              {% render 'price',
+                product_resource: display_product,
+                show_sale_price_first: true
+              %}
+            </div>
+          {% elsif block.settings.price != blank %}
+            <div class="sg-bundle-card__prices">
+              <span class="sg-bundle-card__price">{{ block.settings.price }}</span>
+              {% if block.settings.compare_at_price != blank %}
+                <span class="sg-bundle-card__compare">{{ block.settings.compare_at_price }}</span>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          {% if button_label != blank %}
+            <div class="sg-bundle-card__button-wrap">
+              {% if block.settings.button_add_to_cart and price_variant != blank %}
+                {%- form 'product', display_product, id: bundle_form_id, class: 'sg-bundle-card__form' -%}
+                  <input type="hidden" name="id" value="{{ price_variant.id }}">
+                  <button
+                    type="submit"
+                    name="add"
+                    class="sg-bundle-card__button"
+                    {% unless price_variant.available %}
+                      disabled
+                    {% endunless %}
+                  >
+                    <span class="sg-bundle-card__button-text">{{ button_label }}</span>
+                  </button>
+                {%- endform -%}
+              {% else %}
+                <a class="sg-bundle-card__button" href="{{ bundle_url }}">
+                  <span class="sg-bundle-card__button-text">{{ button_label }}</span>
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "SG Bundle upsell",
+  "tag": null,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "auto_use_current_product",
+      "label": "Use opened product (recommended)",
+      "info": "Image, prices, and description follow the product page you are viewing. Optional metafields can override per product.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_description",
+      "label": "Auto description from product title",
+      "default": true
+    },
+    {
+      "type": "product",
+      "id": "bundle_product",
+      "label": "Different bundle product (optional)",
+      "info": "Leave empty to use the current product. Per-product override: metafield custom.sg_bundle_product."
+    },
+    {
+      "type": "checkbox",
+      "id": "use_product_image",
+      "label": "Show product image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "use_product_prices",
+      "label": "Show live product prices",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Custom image override"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_default_asset_image",
+      "label": "Fallback placeholder image if product has no image",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Pacchetto",
+      "info": "Discount % is calculated from product prices. Use [pct] to place it manually (e.g. Save [pct]%). Use [product] for the product title."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description (optional)",
+      "info": "Leave empty when auto description is on. Use [product] for the product title."
+    },
+    {
+      "type": "text",
+      "id": "price",
+      "label": "Price (manual fallback)"
+    },
+    {
+      "type": "text",
+      "id": "compare_at_price",
+      "label": "Compare at price (manual fallback)"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button text",
+      "default": "Aggiungi"
+    },
+    {
+      "type": "checkbox",
+      "id": "button_add_to_cart",
+      "label": "Add to cart (single-variant products)",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link override"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "SG Bundle upsell",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

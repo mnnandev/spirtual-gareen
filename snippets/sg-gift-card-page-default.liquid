@@ -1,0 +1,136 @@
+{%- doc -%}
+
+  Default Gift Card page markup for virtual/fallback routes.
+
+{%- enddoc -%}
+
+
+
+{% liquid
+
+  assign gift_product = product_override
+
+  assign heading = heading_override | default: ''
+
+  if heading == blank
+
+    assign heading = 'spiritual_green.gift_card_heading' | t
+
+  endif
+
+  assign breadcrumb_label = breadcrumb_label_override | default: ''
+
+  if breadcrumb_label == blank
+
+    assign breadcrumb_label = 'spiritual_green.nav.gift_card' | t
+
+  endif
+
+  assign description = description_override | default: ''
+
+  if description == blank
+
+    assign description = 'spiritual_green.gift_card_description' | t
+
+  endif
+
+  assign amount_label = amount_label_override | default: "Scegli l'importo"
+
+  assign button_label = button_label_override | default: 'Aggiungi al carrello'
+
+  assign product_missing_text = product_missing_text_override | default: ''
+
+  if product_missing_text == blank
+
+    assign product_missing_text = 'spiritual_green.gift_card_product_missing' | t
+
+  endif
+
+  assign form_id = 'SgGiftCardForm-virtual'
+
+  assign root_id = 'SgGiftCard-virtual'
+
+
+
+  if gift_product == blank
+    capture sg_gift_handle
+      render 'sg-gift-card-find-product'
+    endcapture
+    assign sg_gift_handle = sg_gift_handle | strip
+    if sg_gift_handle != blank
+      assign gift_product = all_products[sg_gift_handle]
+    endif
+  endif
+
+%}
+
+
+
+<section
+
+  id="{{ root_id }}"
+
+  class="sg-gift-card-page sg-gift-card-page--pdp"
+
+  data-section-id="virtual"
+
+>
+
+  <div class="sg-gift-card-page__wrap">
+
+    <nav class="sg-gift-card-page__breadcrumb" aria-label="{{ 'spiritual_green.breadcrumb' | t }}">
+
+      <a href="{{ routes.root_url }}" class="sg-gift-card-page__breadcrumb-home" aria-label="{{ 'spiritual_green.home' | t }}">
+
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+
+          <path d="M2.5 6.5 8 2l5.5 4.5V13a1 1 0 0 1-1 1h-3.5v-4H7v4H3.5a1 1 0 0 1-1-1V6.5Z" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/>
+
+        </svg>
+
+      </a>
+
+      <span class="sg-gift-card-page__breadcrumb-sep" aria-hidden="true">›</span>
+
+      <span class="sg-gift-card-page__breadcrumb-current">{{ breadcrumb_label }}</span>
+
+    </nav>
+
+
+
+    <div class="sg-gift-card-page__layout">
+
+      {% render 'sg-gift-card-media', alt: heading, card_label: 'Carta regalo', show_card_overlay: false %}
+
+
+
+      {% render 'sg-gift-card-purchase',
+
+        gift_product: gift_product,
+
+        heading: heading,
+
+        description: description,
+
+        amount_label: amount_label,
+
+        button_label: button_label,
+
+        product_missing_text: product_missing_text,
+
+        form_id: form_id,
+
+        section_id: 'virtual'
+
+      %}
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+{% render 'sg-gift-card-scripts', root_id: root_id %}
+

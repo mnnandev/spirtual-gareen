@@ -1,0 +1,107 @@
+{%- doc -%}
+  Extract ingredienti / INCI / composizione from legacy product description HTML.
+
+  @param {string} html - Source HTML
+{%- enddoc -%}
+
+{%- liquid
+  assign source = html | default: ''
+  assign result = ''
+
+  if source == blank
+    echo ''
+  else
+    capture section_extracted
+      render 'sg-pdp-extract-section', html: source, section_key: 'ingredienti'
+    endcapture
+    assign section_extracted = section_extracted | strip
+    assign section_plain = section_extracted | strip_html | strip
+
+    if section_plain.size > 15
+      assign result = section_extracted
+    endif
+
+    if result == blank and source contains 'id="ingredienti"'
+      assign tab_chunks = source | split: 'id="ingredienti"'
+      if tab_chunks.size > 1
+        assign tab_chunk = tab_chunks[1]
+        if tab_chunk contains 'rte-content'
+          assign rte_tail = tab_chunk | split: 'rte-content' | last
+          assign rte_value = rte_tail | split: '>' | last | split: '</div>' | first | strip_html | strip
+          if rte_value.size > 15
+            assign result = rte_value
+          endif
+        endif
+      endif
+    endif
+
+    if result == blank
+      assign block_markers = '<h4>Ingredienti</h4>|<h4>INGREDIENTI</h4>|<h3>Ingredienti</h3>|<strong>Ingredienti</strong>|<strong>INGREDIENTI</strong>' | split: '|'
+      for block_marker in block_markers
+        if source contains block_marker
+          assign after_marker = source | split: block_marker | last
+          assign end_markers = '<h4>|<h3>|<strong>|Modo d|MODI D|Avvertenze|Warnings|Benefici|Benefits|Descrizione|Description|DESCRIPTION' | split: '|'
+          for end_marker in end_markers
+            if after_marker contains end_marker
+              assign after_marker = after_marker | split: end_marker | first
+            endif
+          endfor
+          assign block_plain = after_marker | strip_html | strip
+          if block_plain.size > 15
+            assign result = after_marker | strip
+            break
+          endif
+        endif
+      endfor
+    endif
+
+    if result == blank
+      assign composizione_markers = '<strong>Composizione</strong>|<strong>COMPOSIZIONE</strong>|Composizione:|COMPOSIZIONE:' | split: '|'
+      for comp_marker in composizione_markers
+        if source contains comp_marker
+          assign after_comp = source | split: comp_marker | last
+          assign end_markers = '<strong>|<h4>|Modo d|MODI D|Avvertenze|Benefici' | split: '|'
+          for end_marker in end_markers
+            if after_comp contains end_marker
+              assign after_comp = after_comp | split: end_marker | first
+            endif
+          endfor
+          assign comp_plain = after_comp | strip_html | strip
+          if comp_plain.size > 15
+            assign result = after_comp | strip
+            break
+          endif
+        endif
+      endfor
+    endif
+
+    if result == blank
+      assign attivi_markers = '<strong>Attivi:</strong>|<strong>Attivi</strong>|<strong>ATTIVI</strong>|Attivi:' | split: '|'
+      for att_marker in attivi_markers
+        if source contains att_marker
+          assign after_att = source | split: att_marker | last
+          assign end_markers = '<strong>|<h4>|Quali sono|Modo d|MODI D|Benefici|Ingredienti' | split: '|'
+          for end_marker in end_markers
+            if after_att contains end_marker
+              assign after_att = after_att | split: end_marker | first
+            endif
+          endfor
+          assign att_plain = after_att | strip_html | strip
+          if att_plain.size > 10
+            assign result = after_att | strip
+            break
+          endif
+        endif
+      endfor
+    endif
+
+    if result != blank
+      capture stripped_result
+        render 'sg-pdp-strip-for-ingredienti', html: result
+      endcapture
+      assign result = stripped_result | strip
+    endif
+
+    echo result
+  endif
+-%}

@@ -1,0 +1,264 @@
+{% comment %}
+  Trustpilot Product Reviews TrustBox (per-product via SKU).
+  Docs: https://help.trustpilot.com/s/article/Add-a-product-review-TrustBox-widget
+  Requires Product Reviews add-on + matching SKUs in Trustpilot.
+{% endcomment %}
+
+{%- liquid
+  assign business_unit_id = section.settings.business_unit_id | strip
+  if business_unit_id == blank
+    assign business_unit_id = settings.sg_trustpilot_business_unit_id | strip
+  endif
+
+  assign template_id = section.settings.custom_template_id | strip
+  if template_id == blank
+    assign template_id = section.settings.template_id | strip
+  endif
+  if template_id == blank
+    assign template_id = '5717796816f630043868e2e8'
+  endif
+
+  assign locale = section.settings.locale | strip
+  if locale == blank
+    assign locale = settings.sg_trustpilot_locale | strip
+  endif
+  if locale == blank
+    assign locale = 'it-IT'
+  endif
+
+  assign theme = section.settings.theme | default: 'light'
+  assign review_url = section.settings.review_url | strip
+  if review_url == blank
+    assign review_url = settings.sg_trustpilot_review_url | strip
+  endif
+  if review_url == blank
+    assign review_url = 'https://it.trustpilot.com'
+  endif
+  assign style_height = section.settings.style_height | default: '700px' | strip
+
+  assign sku_list = ''
+  if product != blank
+    for variant in product.variants
+      if variant.sku != blank
+        if sku_list == blank
+          assign sku_list = variant.sku
+        else
+          assign sku_list = sku_list | append: ',' | append: variant.sku
+        endif
+      endif
+    endfor
+    if sku_list == blank and product.selected_or_first_available_variant.sku != blank
+      assign sku_list = product.selected_or_first_available_variant.sku
+    endif
+  endif
+  if section.settings.sku_override != blank
+    assign sku_list = section.settings.sku_override | strip
+  endif
+
+  assign product_name = product.title | default: ''
+  assign product_url = request.origin | append: product.url
+-%}
+
+<section
+  id="recensioni"
+  class="sg-tp-product section-{{ section.id }}"
+  style="
+    --sg-tp-pad-top: {{ section.settings.padding_top }}px;
+    --sg-tp-pad-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="sg-tp-product__inner">
+    {% if section.settings.heading != blank %}
+      <h2 class="sg-tp-product__heading">{{ section.settings.heading }}</h2>
+    {% endif %}
+
+    {% if business_unit_id != blank and sku_list != blank %}
+      <!-- TrustBox widget - Product reviews -->
+      <div
+        class="trustpilot-widget"
+        data-locale="{{ locale | escape }}"
+        data-template-id="{{ template_id | escape }}"
+        data-businessunit-id="{{ business_unit_id | escape }}"
+        data-style-height="{{ style_height | escape }}"
+        data-style-width="100%"
+        data-theme="{{ theme | escape }}"
+        data-sku="{{ sku_list | escape }}"
+        data-name="{{ product_name | escape }}"
+        data-review-languages="{{ section.settings.review_languages | default: 'it' | escape }}"
+        {% if section.settings.review_number != blank %}
+          data-reviewnumber="{{ section.settings.review_number | escape }}"
+        {% endif %}
+      >
+        <a href="{{ review_url }}" target="_blank" rel="noopener">Trustpilot</a>
+      </div>
+      <!-- End TrustBox widget -->
+    {% elsif request.design_mode %}
+      <p class="sg-tp-product__setup">
+        {% if business_unit_id == blank %}
+          Imposta l’ID Business Unit Trustpilot in <strong>Impostazioni tema → Trustpilot</strong>.
+        {% elsif sku_list == blank %}
+          Aggiungi uno SKU alle varianti di questo prodotto (deve corrispondere allo SKU su Trustpilot).
+        {% endif %}
+      </p>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .sg-tp-product {
+    background: #ffffff;
+    padding: var(--sg-tp-pad-top, 40px) 0 var(--sg-tp-pad-bottom, 64px);
+  }
+
+  .sg-tp-product__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .sg-tp-product__heading {
+    margin: 0 0 24px;
+    text-align: center;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    font-weight: 500;
+    color: #1a1a1a;
+  }
+
+  .sg-tp-product__setup {
+    margin: 0;
+    padding: 24px;
+    text-align: center;
+    border: 1px dashed #c5d4be;
+    background: #f7faf5;
+    color: #3d5a34;
+    font-size: 0.9rem;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "SG TP product reviews",
+  "tag": "section",
+  "class": "sg-trustpilot-product-reviews",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Official Trustpilot product review TrustBox. SKUs are taken from product variants automatically. Requires Trustpilot Product Reviews add-on."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Recensioni di questo prodotto"
+    },
+    {
+      "type": "text",
+      "id": "business_unit_id",
+      "label": "Business Unit ID override",
+      "info": "Leave blank to use the theme setting."
+    },
+    {
+      "type": "select",
+      "id": "template_id",
+      "label": "Product TrustBox layout",
+      "options": [
+        {
+          "value": "5717796816f630043868e2e8",
+          "label": "Product Reviews MultiSource SEO"
+        },
+        {
+          "value": "54d0e4f7254d57c85ccd6aab",
+          "label": "Product Mini"
+        },
+        {
+          "value": "577258ce31ee5a540e73ffed",
+          "label": "Product Reviews"
+        }
+      ],
+      "default": "5717796816f630043868e2e8",
+      "info": "Or paste a custom template ID from Trustpilot Business → Get code."
+    },
+    {
+      "type": "text",
+      "id": "custom_template_id",
+      "label": "Custom template ID (optional)",
+      "info": "If set, overrides the layout dropdown. Copy from Trustpilot Get code."
+    },
+    {
+      "type": "text",
+      "id": "sku_override",
+      "label": "SKU override",
+      "info": "Comma-separated. Leave blank to use all variant SKUs."
+    },
+    {
+      "type": "text",
+      "id": "locale",
+      "label": "Locale override",
+      "info": "e.g. it-IT"
+    },
+    {
+      "type": "select",
+      "id": "theme",
+      "label": "Widget theme",
+      "options": [
+        { "value": "light", "label": "Light" },
+        { "value": "dark", "label": "Dark" }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "text",
+      "id": "style_height",
+      "label": "Widget height",
+      "default": "700px"
+    },
+    {
+      "type": "text",
+      "id": "review_number",
+      "label": "Number of reviews (optional)",
+      "info": "data-reviewnumber, e.g. 5"
+    },
+    {
+      "type": "text",
+      "id": "review_languages",
+      "label": "Review languages",
+      "default": "it",
+      "info": "e.g. it or it,en"
+    },
+    {
+      "type": "url",
+      "id": "review_url",
+      "label": "Trustpilot profile URL override"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 64
+    }
+  ],
+  "presets": [
+    {
+      "name": "SG TP product reviews"
+    }
+  ]
+}
+{% endschema %}

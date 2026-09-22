@@ -1,0 +1,144 @@
+{%- doc -%}
+  Homepage left promo panel — orange sale text by default.
+  Optional Alice / welcome photo only when an image picker or URL is set.
+
+  @param {string} [background] - Brand orange
+  @param {image} [image] - Optional welcome photo (image picker)
+  @param {string} [image_url] - Optional CDN URL when picker is empty
+  @param {string} [kicker] - Headline, e.g. Sconti estivi!
+  @param {string} [percent] - Large percentage graphic, e.g. -20%
+  @param {string} [subheading] - Subline, e.g. *su tutto il sito
+  @param {string} [heading] - Fallback text if kicker/percent/sub are empty
+  @param {string} [welcome_caption] - Caption over photo (photo mode only)
+  @param {boolean} [use_theme_welcome_asset] - Use bundled sg-alice-welcome (webp/jpg) when picker/URL empty
+  @param {string} [link] - Optional click-through URL
+{%- enddoc -%}
+
+{%- liquid
+  assign sg_promo_bg = background | default: '#e8913a'
+  assign sg_promo_kicker = kicker
+  assign sg_promo_percent = percent
+  assign sg_promo_sub = subheading
+  assign sg_promo_heading = heading
+  assign sg_promo_link = link
+  assign sg_welcome_caption = welcome_caption
+  assign sg_promo_image_url = image_url | strip
+
+  assign sg_promo_alt = 'Alice, la nostra farmacista, ti dà il benvenuto in Spiritual Green'
+
+  assign sg_has_photo = false
+  assign sg_use_theme_welcome_asset = false
+  if image != blank or sg_promo_image_url != blank
+    assign sg_has_photo = true
+  elsif use_theme_welcome_asset != false and use_theme_welcome_asset != 'false'
+    assign sg_has_photo = true
+    assign sg_use_theme_welcome_asset = true
+  endif
+-%}
+
+{%- if sg_promo_link != blank -%}
+  <a
+    class="sg-split-hero__panel sg-split-hero__promo{% if sg_has_photo %} sg-split-hero__promo--photo{% endif %}"
+    href="{{ sg_promo_link }}"
+    style="--sg-split-orange: {{ sg_promo_bg }};"
+  >
+{%- else -%}
+  <div
+    class="sg-split-hero__panel sg-split-hero__promo{% if sg_has_photo %} sg-split-hero__promo--photo{% endif %}"
+    style="--sg-split-orange: {{ sg_promo_bg }};"
+  >
+{%- endif -%}
+  {%- if image != blank -%}
+    {{
+      image
+      | image_url: width: 1800
+      | image_tag:
+        class: 'sg-split-hero__promo-bg',
+        loading: 'eager',
+        fetchpriority: 'high',
+        widths: '600, 900, 1200, 1800',
+        sizes: '(min-width: 1180px) 70vw, 100vw',
+        alt: sg_promo_alt
+    }}
+  {%- elsif sg_promo_image_url != blank -%}
+    {%- liquid
+      assign sg_promo_src_main = sg_promo_image_url
+      if sg_promo_image_url contains 'cdn.shopify.com'
+        if sg_promo_image_url contains '?'
+          assign sg_promo_src_main = sg_promo_image_url | append: '&width=1200'
+        else
+          assign sg_promo_src_main = sg_promo_image_url | append: '?width=1200'
+        endif
+      endif
+    -%}
+    <img
+      class="sg-split-hero__promo-bg"
+      src="{{ sg_promo_src_main }}"
+      alt="{{ sg_promo_alt | escape }}"
+      width="1200"
+      height="1600"
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+      sizes="(min-width: 1180px) 42vw, (min-width: 750px) 50vw, 100vw"
+      {%- if sg_promo_image_url contains 'cdn.shopify.com' -%}
+        srcset="
+          {%- if sg_promo_image_url contains '?' -%}
+            {{- sg_promo_image_url -}}&width=480 480w,
+            {{- sg_promo_image_url -}}&width=720 720w,
+            {{- sg_promo_image_url -}}&width=960 960w,
+            {{- sg_promo_image_url -}}&width=1200 1200w,
+            {{- sg_promo_image_url -}}&width=1600 1600w
+          {%- else -%}
+            {{- sg_promo_image_url -}}?width=480 480w,
+            {{- sg_promo_image_url -}}?width=720 720w,
+            {{- sg_promo_image_url -}}?width=960 960w,
+            {{- sg_promo_image_url -}}?width=1200 1200w,
+            {{- sg_promo_image_url -}}?width=1600 1600w
+          {%- endif -%}
+        "
+      {%- endif -%}
+    >
+  {%- elsif sg_use_theme_welcome_asset -%}
+    <picture class="sg-split-hero__promo-picture">
+      <source
+        type="image/webp"
+        srcset="{{ 'sg-alice-welcome.webp' | asset_url }}"
+      >
+      <img
+        class="sg-split-hero__promo-bg"
+        src="{{ 'sg-alice-welcome.jpg' | asset_url }}"
+        alt="{{ sg_promo_alt | escape }}"
+        width="2000"
+        height="2000"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+      >
+    </picture>
+  {%- endif -%}
+
+  {%- if sg_has_photo and sg_welcome_caption != blank -%}
+    <div class="sg-split-hero__promo-copy sg-split-hero__promo-copy--welcome">
+      <p class="sg-split-hero__promo-welcome">{{ sg_welcome_caption | escape }}</p>
+    </div>
+  {%- elsif sg_has_photo == false -%}
+    <div class="sg-split-hero__promo-copy">
+      {%- if sg_promo_kicker != blank -%}
+        <p class="sg-split-hero__promo-kicker">{{ sg_promo_kicker | escape }}</p>
+      {%- endif -%}
+      {%- if sg_promo_percent != blank -%}
+        <p class="sg-split-hero__promo-pct" aria-hidden="true">{{ sg_promo_percent | escape }}</p>
+      {%- endif -%}
+      {%- if sg_promo_sub != blank -%}
+        <p class="sg-split-hero__promo-sub">{{ sg_promo_sub | escape }}</p>
+      {%- elsif sg_promo_heading != blank -%}
+        <p class="sg-split-hero__promo-text">{{ sg_promo_heading | newline_to_br }}</p>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+{%- if sg_promo_link != blank -%}
+  </a>
+{%- else -%}
+  </div>
+{%- endif -%}

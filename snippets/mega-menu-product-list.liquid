@@ -1,0 +1,277 @@
+{% doc %}
+  Spiritual Green mega menu — vertical product list (Spiritual-style).
+
+  @param {object} parent_link - Top-level navigation link (Shop, Products, etc.)
+  @param {number} [max_products] - Max products to show
+  @param {number} [image_border_radius] - Image corner radius in px
+{% enddoc %}
+
+{% liquid
+  assign max_products = max_products | default: 8
+  assign collection_object = null
+  assign shop_all_url = parent_link.url
+  assign use_child_products = false
+  assign use_prodotti_catalog = false
+
+  if prodotti_mode
+    assign use_prodotti_catalog = true
+    if collections['all-products'] != blank
+      assign collection_object = collections['all-products']
+      assign shop_all_url = collection_object.url
+    else
+      assign collection_object = collections.all
+      assign shop_all_url = routes.all_products_collection_url
+    endif
+  elsif parent_link.type == 'collection_link' and parent_link.object != blank
+    assign collection_object = parent_link.object
+    assign shop_all_url = collection_object.url
+  elsif parent_link.type == 'catalog_link' or parent_link.type == 'collections_link'
+    assign collection_object = collections.all
+    assign shop_all_url = routes.all_products_collection_url
+  endif
+
+  assign child_product_links = parent_link.links | where: 'type', 'product_link'
+  if child_product_links.size > 0 and prodotti_mode == false
+    assign use_child_products = true
+  endif
+%}
+
+<div class="sg-mega-menu">
+  <ul class="sg-mega-menu__list list-unstyled" role="list">
+    {% if use_child_products %}
+      {% for child_link in parent_link.links limit: max_products %}
+        {% if child_link.type != 'product_link' %}
+          {% continue %}
+        {% endif %}
+        {% assign product = child_link.object %}
+        {% if product == blank %}
+          {% continue %}
+        {% endif %}
+        <li class="sg-mega-menu__item-wrap">
+          <a href="{{ child_link.url }}" class="sg-mega-menu__item">
+            <span class="sg-mega-menu__media">
+              {% if product.featured_image %}
+                {{
+                  product.featured_image
+                  | image_url: width: 160
+                  | image_tag:
+                    class: 'sg-mega-menu__image',
+                    loading: 'lazy',
+                    widths: '80, 120, 160',
+                    sizes: '72px',
+                    alt: product.featured_image.alt | default: product.title
+                }}
+              {% else %}
+                <span class="sg-mega-menu__image-placeholder" aria-hidden="true"></span>
+              {% endif %}
+            </span>
+            <span class="sg-mega-menu__info">
+              {%- capture mm_title -%}
+                {%- render 'sg-product-card-fields', product: product, output: 'title' -%}
+              {%- endcapture -%}
+              {%- capture mm_format -%}
+                {%- render 'sg-product-card-fields', product: product, output: 'format' -%}
+              {%- endcapture -%}
+              <span class="sg-mega-menu__title">{{ mm_title | strip | default: child_link.title | default: product.title }}</span>
+              {% if mm_format != blank %}
+                <span class="sg-mega-menu__format">{{ mm_format | strip | escape }}</span>
+              {% endif %}
+            </span>
+          </a>
+        </li>
+      {% endfor %}
+    {% elsif collection_object != blank %}
+      {% for product in collection_object.products limit: max_products %}
+        <li class="sg-mega-menu__item-wrap">
+          <a href="{{ product.url }}" class="sg-mega-menu__item">
+            <span class="sg-mega-menu__media">
+              {% if product.featured_image %}
+                {{
+                  product.featured_image
+                  | image_url: width: 160
+                  | image_tag:
+                    class: 'sg-mega-menu__image',
+                    loading: 'lazy',
+                    widths: '80, 120, 160',
+                    sizes: '72px',
+                    alt: product.featured_image.alt | default: product.title
+                }}
+              {% else %}
+                <span class="sg-mega-menu__image-placeholder" aria-hidden="true"></span>
+              {% endif %}
+            </span>
+            <span class="sg-mega-menu__info">
+              {%- capture mm_title -%}
+                {%- render 'sg-product-card-fields', product: product, output: 'title' -%}
+              {%- endcapture -%}
+              {%- capture mm_format -%}
+                {%- render 'sg-product-card-fields', product: product, output: 'format' -%}
+              {%- endcapture -%}
+              <span class="sg-mega-menu__title">{{ mm_title | strip | default: product.title }}</span>
+              {% if mm_format != blank %}
+                <span class="sg-mega-menu__format">{{ mm_format | strip | escape }}</span>
+              {% endif %}
+            </span>
+          </a>
+        </li>
+      {% endfor %}
+    {% else %}
+      <li class="sg-mega-menu__empty">
+        <p>{{ 'spiritual_green.mega_menu_empty' | t }}</p>
+      </li>
+    {% endif %}
+  </ul>
+
+  {% if collection_object != blank or use_child_products or use_prodotti_catalog %}
+    <a href="{{ shop_all_url }}" class="sg-mega-menu__shop-all">
+      {{ 'spiritual_green.mega_menu_shop_all' | t }}
+      <span class="sg-mega-menu__arrow" aria-hidden="true">→</span>
+    </a>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .sg-mega-menu {
+    --sg-mega-menu-width: 380px;
+    width: var(--sg-mega-menu-width);
+    max-width: min(var(--sg-mega-menu-width), calc(100vw - 2rem));
+    max-height: min(70vh, 520px);
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    background: rgba(151, 196, 138, 0.4);
+    backdrop-filter: blur(38px);
+    -webkit-backdrop-filter: blur(38px);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 0 12px 40px rgba(28, 58, 19, 0.14);
+    padding: 12px 10px 14px 14px;
+    overflow: hidden;
+  }
+
+  /* Header Shop dropdown: one glass layer in custom.css (avoids stacked blur) */
+  .header-menu .sg-mega-menu {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
+    box-shadow: none;
+  }
+
+  .sg-mega-menu__list {
+    flex: 1 1 auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0 6px 0 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.75) transparent;
+  }
+
+  .sg-mega-menu__list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .sg-mega-menu__list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.75);
+    border-radius: 999px;
+  }
+
+  .sg-mega-menu__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+  }
+
+  .sg-mega-menu__item:hover,
+  .sg-mega-menu__item:focus-visible {
+    background: rgba(255, 255, 255, 0.14);
+    outline: none;
+  }
+
+  .sg-mega-menu__media {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.18);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sg-mega-menu__image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .sg-mega-menu__image-placeholder {
+    display: block;
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .sg-mega-menu__info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .sg-mega-menu__code {
+    display: none !important;
+  }
+
+  .sg-mega-menu__format {
+    font-size: 11px;
+    line-height: 1.3;
+    letter-spacing: 0.02em;
+    color: rgba(255, 255, 255, 0.68);
+  }
+
+  .sg-mega-menu__title {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #ffffff;
+  }
+
+  .sg-mega-menu__shop-all {
+    flex-shrink: 0;
+    align-self: flex-end;
+    margin-top: 10px;
+    padding: 4px 6px 2px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .sg-mega-menu__shop-all:hover {
+    color: #ffffff;
+    opacity: 0.9;
+  }
+
+  .sg-mega-menu__arrow {
+    margin-inline-start: 2px;
+  }
+
+  .sg-mega-menu__empty {
+    padding: 12px 8px;
+  }
+
+  .sg-mega-menu__empty p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.88);
+  }
+{% endstylesheet %}

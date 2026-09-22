@@ -1,0 +1,15 @@
+
+
+<rte-formatter>
+  {%- capture page_body -%}
+    {{ page.content }}
+  {%- endcapture -%}
+  {%- render 'sg-sanitize-line-breaks', text: page_body, mode: 'html' -%}
+</rte-formatter>
+
+{% schema %}
+{
+  "name": "t:names.page_content",
+  "class": "rte"
+}
+{% endschema %}

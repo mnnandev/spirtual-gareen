@@ -1,0 +1,74 @@
+{% comment %}
+  Brand typography — Pietro Zanetti Home audit (2026-07)
+  Body/UI: Config (ITF Free Font License; self-hosted woff2)
+  Headings: Zanetti uses commercial "Wulkan Display" (The Designers Foundry).
+            We self-host Fontshare Zodiak (free) as the legal display stand-in.
+            Drop licensed Wulkan Display woff2 files into assets/ and swap the
+            @font-face family below if you obtain a TDF license.
+{% endcomment %}
+{% # theme-check-disable AssetPreload,RemoteAsset %}
+<link rel="preload" href="{{ 'sg-config-regular.woff2' | asset_url }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ 'sg-config-medium.woff2' | asset_url }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ 'sg-zodiak-variable.woff2' | asset_url }}" as="font" type="font/woff2" crossorigin>
+
+<style id="sg-brand-fonts">
+  @font-face {
+    font-family: 'Config';
+    src: url('{{ 'sg-config-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Config';
+    src: url('{{ 'sg-config-medium.woff2' | asset_url }}') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Config';
+    src: url('{{ 'sg-config-semibold.woff2' | asset_url }}') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Config';
+    src: url('{{ 'sg-config-bold.woff2' | asset_url }}') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Zodiak';
+    src: url('{{ 'sg-zodiak-variable.woff2' | asset_url }}') format('woff2');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Zodiak';
+    src: url('{{ 'sg-zodiak-variable-italic.woff2' | asset_url }}') format('woff2');
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+  }
+  /* Alias so CSS that requests Wulkan Display resolves to the licensed stand-in */
+  @font-face {
+    font-family: 'Wulkan Display';
+    src: url('{{ 'sg-zodiak-variable.woff2' | asset_url }}') format('woff2');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Wulkan Display';
+    src: url('{{ 'sg-zodiak-variable-italic.woff2' | asset_url }}') format('woff2');
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+  }
+</style>
+{% # theme-check-enable AssetPreload,RemoteAsset %}

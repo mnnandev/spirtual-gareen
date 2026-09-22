@@ -1,0 +1,306 @@
+{% liquid
+  assign section_heading = section.settings.heading | default: 'Le Nostre Categorie'
+  assign section_subheading = section.settings.subheading | default: 'Trova ciò di cui hai bisogno'
+
+  assign category_handles = 'sonno-mente-energia,difese-protezione-respiratorie,intestino-digestione-metabolismo,movimento-dolori-recupero,benessere-ormonale-intimo,bellezza-cura-persona,mondo-zen' | split: ','
+
+  assign show_section = true
+  assign is_collection_circles = false
+  assign active_parent_handle = ''
+  assign current_sub_handle = ''
+
+  if template.name == 'collection'
+    assign show_section = true
+    assign is_collection_circles = true
+
+    capture active_parent_handle_raw
+      render 'sg-collection-macro-nav-context', collection: collection, output: 'active_parent'
+    endcapture
+    assign active_parent_handle = active_parent_handle_raw | strip
+
+    capture current_sub_handle_raw
+      render 'sg-collection-macro-nav-context', collection: collection, output: 'current_sub'
+    endcapture
+    assign current_sub_handle = current_sub_handle_raw | strip
+  endif
+%}
+
+{%- if show_section -%}
+  {%- if is_collection_circles -%}
+    {% render 'sg-category-circles-grid',
+      section_id: section.id,
+      hide_heading: true,
+      modifier_class: 'category-circles--shop category-circles--collection',
+      active_parent_handle: active_parent_handle,
+      current_sub_handle: current_sub_handle
+    %}
+    {% render 'sg-category-circles-scripts' %}
+  {%- else -%}
+    <section
+      id="MacroCategories-{{ section.id }}"
+      class="macro-categories"
+      data-section-id="{{ section.id }}"
+    >
+      <div class="macro-categories__container">
+        <header class="macro-categories__header">
+          {% if section_heading != blank %}
+            <h2 class="macro-categories__title">{{ section_heading }}</h2>
+          {% endif %}
+          {% if section_subheading != blank %}
+            <p class="macro-categories__subtitle">{{ section_subheading }}</p>
+          {% endif %}
+        </header>
+
+        <div class="macro-categories__grid">
+          {% assign category_titles = 'Sonno, Mente ed Energia|Difese, Protezione e Vie Respiratorie|Intestino, Digestione e Metabolismo|Movimento, Dolori e Recupero|Benessere Ormonale e Intimo|Bellezza e Cura della Persona|Mondo Zen' | split: '|' %}
+          {% for handle in category_handles %}
+            {% render 'macro-category-card',
+              handle: handle,
+              title: category_titles[forloop.index0],
+              delay: forloop.index
+            %}
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {%- endif -%}
+{%- endif -%}
+
+{% stylesheet %}
+  .macro-categories {
+    background: #ffffff;
+    padding: 72px 0 80px;
+    box-sizing: border-box;
+  }
+
+  .macro-categories__container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 3vw, 2.5rem);
+    box-sizing: border-box;
+  }
+
+  .macro-categories__header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-top: 4px;
+  }
+
+  .macro-categories__title {
+    margin: 0 0 10px;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.75rem, 2.5vw, 2rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.03em;
+    color: #1a1a1a;
+  }
+
+  .macro-categories__subtitle {
+    margin: 0;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: #666666;
+  }
+
+  .macro-categories__grid {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: clamp(12px, 1.6vw, 18px);
+    box-sizing: border-box;
+  }
+
+  .macro-category-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(14px, 2vw, 22px);
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    padding: clamp(18px, 2.4vw, 28px) clamp(12px, 1.6vw, 18px);
+    background: #ffffff;
+    border: 1.5px solid #cfe8cf;
+    border-radius: 8px;
+    text-decoration: none !important;
+    color: #1a1a1a;
+    box-sizing: border-box;
+    transition:
+      border-color 0.3s ease,
+      box-shadow 0.35s ease,
+      transform 0.35s ease;
+    transform: translateY(0);
+  }
+
+  .macro-category-card:hover,
+  .macro-category-card.sg-animate.sg-visible:hover {
+    border-color: var(--color-button, #7FAF72);
+    box-shadow: 0 8px 24px rgba(30, 60, 30, 0.08);
+    transform: translateY(-4px);
+  }
+
+  .macro-category-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #1a1a1a;
+  }
+
+  .macro-category-card__svg,
+  .macro-category-card__icon .category-icon,
+  .macro-category-card__icon .sg-category-icon {
+    display: block;
+    width: clamp(44px, 5vw, 56px);
+    height: clamp(44px, 5vw, 56px);
+  }
+
+  .macro-category-card__icon .category-icon--48,
+  .macro-category-card__icon .sg-category-icon--image {
+    object-fit: contain;
+  }
+
+  .macro-category-card__label {
+    display: block;
+    max-width: 100%;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: clamp(13px, 1.15vw, 15px);
+    font-weight: 500;
+    line-height: 1.35;
+    text-align: center;
+    letter-spacing: 0.01em;
+    color: #1a1a1a;
+  }
+
+  @media screen and (min-width: 901px) {
+    .macro-category-card:nth-child(1) { grid-column: 1 / span 2; }
+    .macro-category-card:nth-child(2) { grid-column: 3 / span 2; }
+    .macro-category-card:nth-child(3) { grid-column: 5 / span 2; }
+    .macro-category-card:nth-child(4) { grid-column: 7 / span 2; }
+    .macro-category-card:nth-child(5) { grid-column: 2 / span 2; }
+    .macro-category-card:nth-child(6) { grid-column: 4 / span 2; }
+    .macro-category-card:nth-child(7) { grid-column: 6 / span 2; }
+  }
+
+  .macro-categories .sg-animate {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .macro-categories .sg-animate.sg-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .macro-categories .sg-animate[data-delay='1'] { transition-delay: 0.05s; }
+  .macro-categories .sg-animate[data-delay='2'] { transition-delay: 0.1s; }
+  .macro-categories .sg-animate[data-delay='3'] { transition-delay: 0.15s; }
+  .macro-categories .sg-animate[data-delay='4'] { transition-delay: 0.2s; }
+  .macro-categories .sg-animate[data-delay='5'] { transition-delay: 0.25s; }
+  .macro-categories .sg-animate[data-delay='6'] { transition-delay: 0.3s; }
+  .macro-categories .sg-animate[data-delay='7'] { transition-delay: 0.35s; }
+
+  @media screen and (max-width: 900px) {
+    .macro-categories {
+      padding: 56px 0 64px;
+    }
+
+    .macro-categories__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .macro-category-card:nth-child(n) {
+      grid-column: auto;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .macro-categories {
+      padding: 48px 0 56px;
+    }
+
+    .macro-categories__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .macro-category-card {
+      gap: 12px;
+      padding: 16px 10px;
+    }
+
+    .macro-category-card__label {
+      font-size: 12px;
+      line-height: 1.3;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  function initMacroCategoriesAnimate(root = document) {
+    const items = root.querySelectorAll('.macro-categories .sg-animate');
+    if (!items.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      items.forEach((item) => item.classList.add('sg-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('sg-visible');
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -30px 0px' }
+    );
+
+    items.forEach((item) => {
+      if (!item.classList.contains('sg-visible')) {
+        observer.observe(item);
+      }
+    });
+  }
+
+  initMacroCategoriesAnimate();
+
+  document.addEventListener('shopify:section:load', (event) => {
+    if (event.target instanceof HTMLElement) {
+      initMacroCategoriesAnimate(event.target);
+    }
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Macro Categories",
+  "tag": "section",
+  "class": "macro-categories-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section heading",
+      "default": "Le Nostre Categorie"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Section subheading",
+      "default": "Trova ciò di cui hai bisogno"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Macro Categories",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

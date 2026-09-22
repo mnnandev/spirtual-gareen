@@ -1,0 +1,27 @@
+{%- doc -%}
+  Sanitize and normalize product rich HTML (tables, spacing).
+
+  @param {string} text - Raw HTML content
+{%- enddoc -%}
+
+{%- capture stripped -%}
+  {%- render 'sg-sanitize-product-html', text: text -%}
+{%- endcapture -%}
+
+{%- capture sanitized -%}
+  {%- render 'sg-sanitize-line-breaks', text: stripped, mode: 'html' -%}
+{%- endcapture -%}
+
+{%- assign formatted = sanitized | strip -%}
+
+{%- if formatted != blank -%}
+  {%- assign formatted = formatted | replace: '<table', '<div class="table-wrapper"><table' -%}
+  {%- assign formatted = formatted | replace: '</table>', '</table></div>' -%}
+  {%- unless formatted contains '<' -%}
+    {%- capture artifact_clean -%}
+      {%- render 'sg-sanitize-display-artifacts', text: formatted -%}
+    {%- endcapture -%}
+    {%- assign formatted = artifact_clean | strip -%}
+  {%- endunless -%}
+  {{- formatted -}}
+{%- endif -%}

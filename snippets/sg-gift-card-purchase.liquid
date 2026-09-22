@@ -1,0 +1,158 @@
+{%- doc -%}
+  Gift card purchase block — price, amount selector, add to cart, description.
+
+  @param {product} gift_product
+  @param {string} heading
+  @param {string} description - HTML description
+  @param {string} amount_label
+  @param {string} button_label
+  @param {string} product_missing_text
+  @param {string} form_id
+  @param {string} section_id - For scoped JS hooks
+{%- enddoc -%}
+
+{% liquid
+  assign amounts = '25,50,100,150' | split: ','
+  assign sg_gc_first_price = blank
+  assign sg_gc_first_amount = amounts[0]
+  assign sg_gc_use_variants = false
+
+  if gift_product != blank and gift_product.variants.size > 0
+    assign sg_gc_use_variants = true
+    assign sg_gc_first_variant = gift_product.selected_or_first_available_variant
+    if sg_gc_first_variant != blank
+      assign sg_gc_first_price = sg_gc_first_variant.price
+    endif
+  endif
+
+  unless sg_gc_use_variants
+    if gift_product != blank
+      for amount in amounts
+        assign amount_cents = amount | times: 100
+        for variant in gift_product.variants
+          if variant.price == amount_cents
+            if sg_gc_first_price == blank
+              assign sg_gc_first_price = variant.price
+              assign sg_gc_first_amount = amount
+            endif
+            break
+          endif
+        endfor
+        if sg_gc_first_price != blank
+          break
+        endif
+      endfor
+
+      if sg_gc_first_price == blank and gift_product.selected_or_first_available_variant != blank
+        assign sg_gc_first_price = gift_product.selected_or_first_available_variant.price
+      endif
+    endif
+  endunless
+%}
+
+<div class="sg-gift-card-page__details">
+  <header class="sg-gift-card-page__header">
+    <p class="sg-gift-card-page__eyebrow">Spiritual Green</p>
+    <h1 class="sg-gift-card-page__title">{{ heading }}</h1>
+
+    {% if sg_gc_first_price != blank %}
+      <p class="sg-gift-card-page__price" data-sg-gift-price>
+        {{ sg_gc_first_price | money }}
+      </p>
+    {% else %}
+      <p class="sg-gift-card-page__price" data-sg-gift-price>€{{ sg_gc_first_amount }}</p>
+    {% endif %}
+  </header>
+
+  {% if gift_product != blank %}
+    {% form 'product', gift_product, id: form_id, class: 'sg-gift-card-page__form' %}
+      <input type="hidden" name="id" value="" data-sg-gift-card-variant>
+
+      <fieldset class="sg-gift-card-page__amounts">
+        <legend class="sg-gift-card-page__amounts-label">{{ amount_label }}</legend>
+        <div class="sg-gift-card-page__amount-grid" role="radiogroup" aria-label="{{ amount_label }}">
+          {% if sg_gc_use_variants %}
+            {% for variant in gift_product.variants %}
+              <button
+                type="button"
+                class="sg-gift-card-page__amount{% if forloop.first %} is-selected{% endif %}"
+                data-variant-id="{{ variant.id }}"
+                data-amount="{{ variant.price | money_without_currency | strip_html | replace: ',', '.' }}"
+                data-price-formatted="{{ variant.price | money }}"
+                role="radio"
+                aria-checked="{% if forloop.first %}true{% else %}false{% endif %}"
+                {% unless variant.available %}disabled{% endunless %}
+              >
+                {{ variant.price | money }}
+              </button>
+            {% endfor %}
+          {% else %}
+            {% for amount in amounts %}
+              {% assign amount_cents = amount | times: 100 %}
+              {% assign matched_variant = nil %}
+              {% for variant in gift_product.variants %}
+                {% if variant.price == amount_cents %}
+                  {% assign matched_variant = variant %}
+                  {% break %}
+                {% endif %}
+              {% endfor %}
+              {% if matched_variant == nil and gift_product.variants.size > 0 %}
+                {% assign variant_index = forloop.index0 %}
+                {% if gift_product.variants[variant_index] != blank %}
+                  {% assign matched_variant = gift_product.variants[variant_index] %}
+                {% endif %}
+              {% endif %}
+
+              <button
+                type="button"
+                class="sg-gift-card-page__amount{% if forloop.first %} is-selected{% endif %}"
+                data-variant-id="{% if matched_variant %}{{ matched_variant.id }}{% endif %}"
+                data-amount="{{ amount }}"
+                data-price-formatted="{% if matched_variant %}{{ matched_variant.price | money }}{% else %}€{{ amount }}{% endif %}"
+                role="radio"
+                aria-checked="{% if forloop.first %}true{% else %}false{% endif %}"
+              >
+                €{{ amount }}
+              </button>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </fieldset>
+
+      {% render 'gift-card-recipient-form',
+        product: gift_product,
+        form: form,
+        id_prefix: form_id,
+        section_id: section_id
+      %}
+
+      <button type="submit" name="add" class="sg-gift-card-page__submit button button--primary">
+        {{ button_label }}
+      </button>
+
+      {% render 'sg-express-checkout', form: form, class: 'sg-express-checkout--gift-card' %}
+    {% endform %}
+
+    <ul class="sg-gift-card-page__highlights" role="list">
+      <li>Consegna immediata via e-mail</li>
+      <li>Valida su tutto il negozio online</li>
+      <li>Regalo perfetto per ogni occasione</li>
+    </ul>
+  {% else %}
+    <p class="sg-gift-card-page__notice">
+      {{ product_missing_text }}
+    </p>
+  {% endif %}
+
+  {% if description != blank %}
+    {% liquid
+      assign description_output = description
+      if description contains '&lt;p&gt;' or description contains '&lt;/p&gt;'
+        assign description_output = description | replace: '&lt;p&gt;', '' | replace: '&lt;/p&gt;', '' | strip
+      endif
+    %}
+    <div class="sg-gift-card-page__description rte">
+      {{ description_output }}
+    </div>
+  {% endif %}
+</div>

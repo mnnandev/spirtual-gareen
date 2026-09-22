@@ -1,0 +1,180 @@
+{%- doc -%}
+  Central SVG icon library for Spiritual Green macro-categories.
+
+  Replace SVG paths inside each {%- comment -%} ICON: … {%- endcomment -%} block
+  when final icons are chosen with the client.
+
+  @param {string} category - Collection handle (e.g. sonno-mente-energia) or legacy key (moon, shield, …)
+  @param {number} [size] - 48 (homepage), 24 (category page), or 20 (navigation). Default: 48
+  @param {string} [class] - Extra CSS classes
+  @param {string} [label] - Accessible name (used when decorative is false)
+  @param {boolean} [decorative] - When true, icon is hidden from assistive tech. Default: false
+{%- enddoc -%}
+
+{%- liquid
+  assign icon_size = size | default: 48 | plus: 0
+  if icon_size != 48 and icon_size != 24 and icon_size != 20
+    assign icon_size = 48
+  endif
+
+  assign icon_key = category | default: '' | strip | downcase
+
+  case icon_key
+    when 'moon'
+      assign icon_key = 'sonno-mente-energia'
+    when 'shield'
+      assign icon_key = 'difese-protezione-respiratorie'
+    when 'digestive', 'leaf'
+      assign icon_key = 'intestino-digestione-metabolismo'
+    when 'movement', 'runner'
+      assign icon_key = 'movimento-dolori-recupero'
+    when 'flower'
+      assign icon_key = 'benessere-ormonale-intimo'
+    when 'beauty', 'sparkle'
+      assign icon_key = 'bellezza-cura-persona'
+    when 'lotus', 'zen', 'spa'
+      assign icon_key = 'mondo-zen'
+  endcase
+
+  assign icon_label = label | strip
+  if icon_label == blank
+    case icon_key
+      when 'sonno-mente-energia'
+        assign icon_label = 'Sonno, mente ed energia'
+      when 'difese-protezione-respiratorie'
+        assign icon_label = 'Difese, protezione e vie respiratorie'
+      when 'intestino-digestione-metabolismo'
+        assign icon_label = 'Intestino, digestione e metabolismo'
+      when 'movimento-dolori-recupero'
+        assign icon_label = 'Movimento, dolori e recupero'
+      when 'benessere-ormonale-intimo'
+        assign icon_label = 'Benessere ormonale e intimo'
+      when 'bellezza-cura-persona'
+        assign icon_label = 'Bellezza e cura della persona'
+      when 'mondo-zen'
+        assign icon_label = 'Mondo Zen'
+      else
+        assign icon_label = 'Categoria prodotto'
+    endcase
+  endif
+
+  assign is_decorative = decorative
+  if is_decorative == nil
+    assign is_decorative = false
+  endif
+
+  assign icon_class = 'category-icon category-icon--' | append: icon_size | append: ' sg-category-icon'
+  if class != blank
+    assign icon_class = icon_class | append: ' ' | append: class
+  endif
+
+  if icon_size == 20
+    assign stroke_width = 2
+  elsif icon_size == 24
+    assign stroke_width = 1.85
+  else
+    assign stroke_width = 1.75
+  endif
+
+  assign mondo_zen_icon_url = 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/download_11.png?v=1781952678'
+  assign bellezza_icon_url = 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/download_10.png?v=1781952747'
+  assign benessere_ormonale_icon_url = 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/sun.png?v=1781952886'
+  assign movimento_icon_url = 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/download_9.png?v=1781952963'
+  assign category_icon_image_url = ''
+
+  case icon_key
+    when 'movimento-dolori-recupero'
+      assign category_icon_image_url = movimento_icon_url
+    when 'benessere-ormonale-intimo'
+      assign category_icon_image_url = benessere_ormonale_icon_url
+    when 'bellezza-cura-persona'
+      assign category_icon_image_url = bellezza_icon_url
+    when 'mondo-zen'
+      assign category_icon_image_url = mondo_zen_icon_url
+  endcase
+-%}
+
+{%- if category_icon_image_url != blank and icon_size == 48 -%}
+  <span
+    class="{{ icon_class }} category-icon--image sg-category-icon--image"
+    style="--sg-category-icon-mask: url('{{ category_icon_image_url }}');"
+    {% if is_decorative %}
+      aria-hidden="true"
+    {% else %}
+      role="img"
+      aria-label="{{ icon_label | escape }}"
+    {% endif %}
+  ></span>
+{%- else -%}
+<svg
+  class="{{ icon_class }}"
+  xmlns="http://www.w3.org/2000/svg"
+  width="{{ icon_size }}"
+  height="{{ icon_size }}"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="{{ stroke_width }}"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  {% if is_decorative %}
+    aria-hidden="true"
+    focusable="false"
+  {% else %}
+    role="img"
+    aria-label="{{ icon_label | escape }}"
+  {% endif %}
+>
+  {%- case icon_key -%}
+    {%- comment -%} ICON: sonno-mente-energia — placeholder (Lucide-style moon) {%- endcomment -%}
+    {%- when 'sonno-mente-energia' -%}
+      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+
+    {%- comment -%} ICON: difese-protezione-respiratorie — placeholder (shield) {%- endcomment -%}
+    {%- when 'difese-protezione-respiratorie' -%}
+      <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+      <path d="m9 12 2 2 4-4" />
+
+    {%- comment -%} ICON: intestino-digestione-metabolismo — placeholder (herbal leaf) {%- endcomment -%}
+    {%- when 'intestino-digestione-metabolismo' -%}
+      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+      <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+
+    {%- comment -%} ICON: movimento-dolori-recupero — lightbulb {%- endcomment -%}
+    {%- when 'movimento-dolori-recupero' -%}
+      <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+      <path d="M9 18h6" />
+      <path d="M10 22h4" />
+
+    {%- comment -%} ICON: benessere-ormonale-intimo — sun {%- endcomment -%}
+    {%- when 'benessere-ormonale-intimo' -%}
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2" />
+      <path d="M12 20v2" />
+      <path d="m4.93 4.93 1.41 1.41" />
+      <path d="m17.66 17.66 1.41 1.41" />
+      <path d="M2 12h2" />
+      <path d="M20 12h2" />
+      <path d="m4.93 19.07 1.41-1.41" />
+      <path d="m17.66 6.34 1.41-1.41" />
+
+    {%- comment -%} ICON: bellezza-cura-persona — placeholder (sparkle / cosmetics) {%- endcomment -%}
+    {%- when 'bellezza-cura-persona' -%}
+      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.062l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+      <path d="M20 3v4" />
+      <path d="M22 5h-4" />
+
+    {%- comment -%} ICON: mondo-zen — yin-yang {%- endcomment -%}
+    {%- when 'mondo-zen' -%}
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 3a9 9 0 0 1 0 18" />
+      <circle cx="12" cy="9" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="15" r="1.5" fill="none" />
+
+    {%- else -%}
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 8v4" />
+      <path d="M12 16h.01" />
+  {%- endcase -%}
+</svg>
+{%- endif -%}

@@ -1,0 +1,60 @@
+{% liquid
+  assign intro_text = section.settings.intro
+  assign cta_text = section.settings.cta_text
+  assign cta_label = section.settings.cta_label | default: 'Prenota la tua consulenza'
+%}
+
+<section
+  class="consulenza-intro"
+  id="consulenza-intro-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="consulenza-intro__inner">
+    {% if intro_text != blank %}
+      <div class="consulenza-intro__body rte">{{ intro_text }}</div>
+    {% endif %}
+    {% if cta_text != blank %}
+      <p class="consulenza-intro__cta-line">{{ cta_text }}</p>
+    {% endif %}
+    <button
+      type="button"
+      class="consulenza-intro__cta btn-prenota-ora"
+      data-sg-consulenza-booking="scroll"
+    >
+      {{ cta_label }}
+    </button>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Consulenza Intro",
+  "tag": "section",
+  "class": "consulenza-section",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "intro",
+      "label": "Intro paragraph",
+      "default": "<p>Ogni persona è unica e merita un approccio realmente personalizzato.</p>"
+    },
+    {
+      "type": "textarea",
+      "id": "cta_text",
+      "label": "CTA line",
+      "default": "Prenota la tua consulenza personalizzata e inizia a prenderti cura di te con un approccio costruito sulle tue reali esigenze."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA button label",
+      "default": "Prenota la tua consulenza"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Consulenza Intro"
+    }
+  ]
+}
+{% endschema %}

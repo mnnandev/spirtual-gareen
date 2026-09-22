@@ -1,0 +1,174 @@
+{%- doc -%}
+  Renders the cart summary totals.
+
+  @param {string} [accelerated_checkout_buttons_layout] - { 'vertical' } Forced layout of the additional checkout buttons, instead of relying on platform's layout.
+  @param {string} [section_id] - The section ID for cart discount component.
+{%- enddoc -%}
+
+{{ 'cart-summary-snippet.css' | asset_url | stylesheet_tag }}
+
+{% render 'sg-cart-incentives' %}
+{% render 'sg-cart-shipping-suggest' %}
+
+<div class="cart-totals">
+  {% # We need to keep this node in place to allow morphing to work properly # %}
+  <div class="cart-totals__original-container cart-primary-typography">
+    {%- if cart.cart_level_discount_applications.size > 0 -%}
+      <span class="cart-totals__item cart-totals__original">
+        <span class="cart-totals__original-label">{{ 'content.cart_subtotal' | t }}</span>
+        <span
+          class="cart-totals__original-value cart-secondary-typography"
+          data-testid="cart-subtotal-value"
+        >
+          {{- cart.items_subtotal_price | money -}}
+        </span>
+      </span>
+      <ul
+        class="cart-discounts"
+        role="list"
+        aria-label="{{ 'content.discounts' | t }}"
+      >
+        {%- for discount in cart.cart_level_discount_applications -%}
+          <li class="cart-discounts__item">
+            <span class="cart-discounts__label">
+              {{- 'icon-discount.svg' | inline_asset_content -}}
+              {{ discount.title | escape }}
+            </span>
+            <span class="cart-discounts__value cart-secondary-typography"
+              >-{{ discount.total_allocated_amount | money -}}
+            </span>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+
+  {% if settings.show_cart_note or settings.show_add_discount_code %}
+    <div class="cart-actions">
+      {% if settings.show_cart_note and template.name != 'cart' %}
+        <script
+          type="module"
+          src="{{ 'cart-note.js' | asset_url }}"
+        ></script>
+
+        <cart-note style="display: flex;">
+          {% capture cart_note_accordion_children %}
+            <details
+              class="details"
+              {% if settings.cart_note_open_by_default %}
+                open
+              {% endif %}
+            >
+              <summary class="cart-note__summary">
+                <span class="cart-note__label cart-primary-typography">
+                  {{ 'content.seller_note' | t }}
+                </span>
+
+                <span class="cart-totals__icon">
+                  {{- 'icon-plus.svg' | inline_asset_content -}}
+                </span>
+              </summary>
+
+              <div class="details-content cart-note__inner">
+                <label
+                  for="cart-note"
+                  class="visually-hidden"
+                >
+                  {{- 'content.seller_note' | t -}}
+                </label>
+                <textarea
+                  form="cart-form"
+                  on:input="/updateCartNote"
+                  id="cart-note"
+                  class="cart-note__instructions"
+                  name="note"
+                >{{ cart.note }}</textarea>
+              </div>
+            </details>
+          {% endcapture %}
+          {% render 'accordion-custom-component',
+            children: cart_note_accordion_children,
+            class: 'cart-note',
+            open_by_default_on_desktop: settings.cart_note_open_by_default,
+            open_by_default_on_mobile: settings.cart_note_open_by_default
+          %}
+        </cart-note>
+      {% endif %}
+      {% if settings.show_cart_note and settings.show_add_discount_code %}
+        <div class="cart-actions__divider"></div>
+      {% endif %}
+      {% if settings.show_add_discount_code %}
+        {% if template.name == 'cart' %}
+          {% render 'sg-cart-promo-flat', section_id: section_id %}
+        {% else %}
+          {% render 'cart-discount-accordion', section_id: section_id %}
+        {% endif %}
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {%- liquid
+    if settings.currency_code_enabled_cart_total
+      assign total_price = cart.total_price | money_with_currency
+    else
+      assign total_price = cart.total_price | money
+    endif
+  -%}
+
+  <div class="cart-totals__container{% if settings.show_installments %} cart-totals__container--has-installments{% endif %}">
+    <span
+      class="cart-totals__item cart-totals__total"
+      role="status"
+    >
+      <span class="cart-totals__total-label cart-primary-typography">{{ 'content.cart_estimated_total' | t }}</span>
+      <text-component
+        ref="cartTotal"
+        value="{{ total_price | strip_html }}"
+        class="cart-totals__total-value cart-secondary-typography"
+        {% comment %} Used by payment_terms web component {% endcomment %}
+        data-testid="cart-total-value"
+        data-cart-subtotal
+      >
+        {{ total_price }}
+      </text-component>
+    </span>
+    {% if settings.show_installments %}
+      <span class="cart-totals__item cart-totals__installments">
+        {% form 'cart', cart %}
+          {{ form | payment_terms }}
+        {% endform %}
+      </span>
+    {% endif %}
+    <div class="cart-totals__item cart-totals__tax-note cart-primary-typography">
+      {% render 'tax-info', has_discounts_enabled: settings.show_add_discount_code %}
+    </div>
+  </div>
+</div>
+
+<div class="cart__ctas">
+  <button
+    type="submit"
+    id="checkout"
+    class="cart__checkout-button button"
+    name="checkout"
+    {% if cart == empty %}
+      disabled
+    {% endif %}
+    form="cart-form"
+  >
+    <span class="button-text">
+      {{ 'content.checkout' | t }}
+    </span>
+  </button>
+
+  {% if additional_checkout_buttons and settings.show_accelerated_checkout_buttons %}
+    <div
+      class="
+        additional-checkout-buttons
+        {% if accelerated_checkout_buttons_layout == 'vertical' %}additional-checkout-buttons--vertical{% endif %}
+      "
+    >
+      {{ content_for_additional_checkout_buttons }}
+    </div>
+  {% endif %}
+</div>

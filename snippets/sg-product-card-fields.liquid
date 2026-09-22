@@ -1,0 +1,187 @@
+{%- doc -%}
+  Shared fields for listing product cards (home, collection, search, best-sellers).
+
+  @param {object} product - Product object
+  @param {string} [output] - title | format | description (default: title)
+  @param {number} [limit] - Description char limit (default: 140)
+{%- enddoc -%}
+
+{%- liquid
+  assign out = output | default: 'title'
+  assign char_limit = limit | default: 140
+
+  assign raw_title = product.title | default: '' | strip
+  capture title_name
+    render 'sg-extract-pack-size', title: raw_title, output: 'name'
+  endcapture
+  assign title_name = title_name | strip
+  if title_name == blank
+    assign title_name = raw_title
+  endif
+
+  capture title_pack
+    render 'sg-extract-pack-size', title: raw_title, output: 'pack'
+  endcapture
+  assign title_pack = title_pack | strip
+
+  assign product_format = ''
+  assign mf_contenuto = product.metafields.custom.contenuto
+  if mf_contenuto != blank and mf_contenuto.value != blank
+    assign product_format = mf_contenuto.value | strip
+  endif
+
+  if product_format == blank and title_pack != blank
+    assign product_format = title_pack
+  endif
+
+  if product_format == blank and product.description != blank
+    capture from_desc
+      render 'sg-pdp-extract-contenuto', product: product, html: product.description
+    endcapture
+    assign product_format = from_desc | strip
+  endif
+
+  if product_format != blank
+    assign product_format = product_format | replace: 'Contenuto:', '' | replace: 'CONTENUTO:', '' | replace: 'Formato:', '' | replace: 'FORMATO:', '' | strip
+    if product_format.size > 60
+      assign product_format = ''
+    endif
+  endif
+
+  assign description = ''
+  if product.description != blank
+    assign description = product.description | strip_html
+    capture cleaned_description
+      render 'sg-sanitize-line-breaks', text: description, mode: 'plain'
+    endcapture
+    assign description = cleaned_description | strip
+
+    comment
+      Availability banners often prepend the body — strip them, keep real copy.
+    endcomment
+    assign description = description | replace: 'PRODOTTO AL MOMENTO NON DISPONIBILE', ' ' | replace: 'Prodotto al momento non disponibile', ' ' | replace: 'prodotto al momento non disponibile', ' '
+
+    assign description = description | replace: 'Descrizione:', ' ' | replace: 'Descrizione :', ' ' | replace: 'DESCRIZIONE:', ' '
+    assign description = description | replace: 'Description:', ' ' | replace: 'Description :', ' ' | replace: 'DESCRIPTION:', ' '
+    assign description = description | replace: 'Descrizione', ' ' | replace: 'Description', ' '
+
+    assign description = description | replace: 'Contenuto:', ' ' | replace: 'CONTENUTO:', ' ' | replace: 'Formato:', ' ' | replace: 'FORMATO:', ' '
+    assign description = description | replace: '  ', ' ' | replace: '  ', ' ' | strip
+
+  comment
+    Strip leading size/format duplicates (e.g. "500 ml", "50 ml") that already show in the format label.
+  endcomment
+    assign strip_prefixes = ''
+
+    if product_format != blank
+      assign strip_prefixes = product_format
+      assign format_compact = product_format | replace: ' ', ''
+      if format_compact != product_format
+        assign strip_prefixes = strip_prefixes | append: '|||' | append: format_compact
+      endif
+      assign format_spaced = product_format | replace: 'ml', ' ml' | replace: 'ML', ' ml' | replace: 'cl', ' cl' | replace: 'CL', ' cl' | replace: 'mg', ' mg' | replace: 'MG', ' mg' | replace: 'kg', ' kg' | replace: 'KG', ' kg' | strip
+      if format_spaced != product_format
+        assign strip_prefixes = strip_prefixes | append: '|||' | append: format_spaced
+      endif
+    endif
+
+    if title_pack != blank
+      if strip_prefixes != blank
+        assign strip_prefixes = strip_prefixes | append: '|||'
+      endif
+      assign strip_prefixes = strip_prefixes | append: title_pack
+      assign pack_compact = title_pack | replace: ' ', ''
+      if pack_compact != title_pack
+        assign strip_prefixes = strip_prefixes | append: '|||' | append: pack_compact
+      endif
+    endif
+
+    if strip_prefixes != blank
+      assign prefix_list = strip_prefixes | split: '|||'
+      for prefix_candidate in prefix_list
+        assign prefix_candidate = prefix_candidate | strip
+        if prefix_candidate != blank
+          capture stripped_description
+            render 'sg-strip-leading-prefix', text: description, prefix: prefix_candidate
+          endcapture
+          assign description = stripped_description | strip
+        endif
+      endfor
+    endif
+
+    comment
+      Generic leading size token strip (e.g. "500 ml", "50ml") when format label already shows size.
+    endcomment
+    if product_format != blank and description != blank
+      assign desc_words = description | split: ' '
+      assign w0 = desc_words[0] | default: '' | strip
+      assign w1 = desc_words[1] | default: '' | strip | downcase
+      assign w0_down = w0 | downcase
+      assign leading_size = ''
+      assign size_units = 'ml,cl,g,gr,mg,kg' | split: ','
+
+      if w0_down contains 'ml' or w0_down contains 'cl' or w0_down contains 'mg' or w0_down contains 'kg'
+        assign leading_size = w0
+      elsif w1 != blank
+        for size_unit in size_units
+          if w1 == size_unit and w0 != blank
+            assign leading_size = w0 | append: ' ' | append: w1
+            break
+          endif
+        endfor
+      endif
+
+      if leading_size != blank
+        assign format_compact_check = product_format | replace: ' ', '' | downcase
+        assign leading_compact = leading_size | replace: ' ', '' | downcase
+        if leading_compact == format_compact_check
+          capture stripped_description
+            render 'sg-strip-leading-prefix', text: description, prefix: leading_size
+          endcapture
+          assign description = stripped_description | strip
+        endif
+      endif
+    endif
+
+    assign first_segment = description | split: '.' | first | strip
+    if first_segment != blank and first_segment.size <= 40
+      assign first_segment_down = first_segment | downcase
+      assign looks_like_size = false
+      if first_segment_down contains ' ml' or first_segment_down contains 'ml' or first_segment_down contains ' cl' or first_segment_down contains 'cl' or first_segment_down contains ' g' or first_segment_down contains 'capsule' or first_segment_down contains 'compresse' or first_segment_down contains 'stick' or first_segment_down contains 'bustine' or first_segment_down contains 'perle' or first_segment_down contains 'flacone'
+        assign looks_like_size = true
+      endif
+
+      if looks_like_size
+        if product_format != blank and first_segment == product_format
+          assign description = description | slice: first_segment.size, 10000 | strip
+          assign lead = description | slice: 0, 1
+          if lead == '.'
+            assign description = description | slice: 1, 10000 | strip
+          endif
+        elsif title_pack != blank and first_segment == title_pack
+          assign description = description | slice: first_segment.size, 10000 | strip
+          assign lead = description | slice: 0, 1
+          if lead == '.'
+            assign description = description | slice: 1, 10000 | strip
+          endif
+        endif
+      endif
+    endif
+
+    assign description = description | replace: '  ', ' ' | replace: '  ', ' ' | strip
+
+    if description.size < 8
+      assign description = ''
+    else
+      assign description = description | truncate: char_limit
+    endif
+  endif
+
+  if out == 'format'
+    echo product_format
+  elsif out == 'description'
+    echo description
+  else
+    echo title_name
+  endif
+-%}

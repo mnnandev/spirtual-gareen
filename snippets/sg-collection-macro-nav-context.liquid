@@ -1,0 +1,62 @@
+{%- doc -%}
+  Resolves active macro-category context for collection page circle navigation.
+
+  @param {collection} collection - Current collection
+  @param {string} output - active_parent | current_sub
+{%- enddoc -%}
+
+{%- liquid
+  assign parent_handles = 'sonno-mente-energia,difese-protezione-respiratorie,intestino-digestione-metabolismo,movimento-dolori-recupero,benessere-ormonale-intimo,bellezza-cura-persona,mondo-zen' | split: ','
+
+  capture sg_normalized_handle_raw
+    render 'sg-normalize-macro-handle', handle: collection.handle
+  endcapture
+  assign sg_normalized_handle = sg_normalized_handle_raw | strip
+
+  assign sg_active_parent = ''
+  for parent_handle in parent_handles
+    if collection.handle == parent_handle or sg_normalized_handle == parent_handle
+      assign sg_active_parent = parent_handle
+      break
+    endif
+  endfor
+
+  if sg_active_parent == blank
+    for parent_handle in parent_handles
+      capture sg_subcategory_handles_csv
+        render 'sg-collection-subcategory-meta', parent_handle: parent_handle, output: 'handles'
+      endcapture
+      assign sg_sub_handles = sg_subcategory_handles_csv | strip | split: ','
+      for sg_sub_handle in sg_sub_handles
+        assign sg_sub_handle = sg_sub_handle | strip
+        if collection.handle == sg_sub_handle
+          assign sg_active_parent = parent_handle
+          break
+        endif
+      endfor
+      if sg_active_parent != blank
+        break
+      endif
+    endfor
+  endif
+
+  assign sg_current_sub_handle = ''
+  if current_tags != blank
+    for active_tag in current_tags
+      assign sg_current_sub_handle = active_tag | handle
+      break
+    endfor
+    if sg_active_parent == blank
+      assign sg_active_parent = sg_normalized_handle
+    endif
+  elsif sg_active_parent != blank and collection.handle != sg_active_parent and sg_normalized_handle != sg_active_parent
+    assign sg_current_sub_handle = sg_normalized_handle
+  endif
+-%}
+
+{%- case output -%}
+  {%- when 'active_parent' -%}
+    {{- sg_active_parent -}}
+  {%- when 'current_sub' -%}
+    {{- sg_current_sub_handle -}}
+{%- endcase -%}

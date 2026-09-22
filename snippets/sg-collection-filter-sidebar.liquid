@@ -1,0 +1,142 @@
+{%- doc -%}
+  Left sidebar — parent categories with accordion subcategories.
+
+  @param {collection} collection - Current collection
+  @param {string} section_id - Section ID for AJAX section rendering
+{%- enddoc -%}
+
+{%- liquid
+  assign parent_handles = 'sonno-mente-energia,difese-protezione-respiratorie,intestino-digestione-metabolismo,movimento-dolori-recupero,benessere-ormonale-intimo,bellezza-cura-persona,mondo-zen' | split: ','
+  assign parent_titles = 'Sonno, Mente ed Energia|Difese, protezione e vie respiratorie|Intestino, digestione e metabolismo|Movimento, dolori e recupero|Benessere ormonale e intimo|Bellezza e cura della persona|Mondo Zen' | split: '|'
+
+  assign current_parent_handle = ''
+  for parent_handle in parent_handles
+    if collection.handle == parent_handle
+      assign current_parent_handle = parent_handle
+      break
+    endif
+  endfor
+
+  assign tutti_active = false
+  if current_parent_handle != blank
+    if current_tags == blank or current_tags.size == 0
+      assign tutti_active = true
+    endif
+  endif
+-%}
+
+<sg-collection-sidebar
+  class="sg-collection-sidebar"
+  data-section-id="{{ section_id }}"
+  data-sidebar-mode="accordion"
+>
+  <button
+    type="button"
+    class="sg-collection-sidebar__toggle"
+    data-sg-sidebar-toggle
+    aria-expanded="false"
+    aria-controls="sg-collection-sidebar-nav-{{ section_id }}"
+  >
+    <span class="sg-collection-sidebar__toggle-label">Filtra prodotti</span>
+    <span class="sg-collection-sidebar__toggle-icon" aria-hidden="true"></span>
+  </button>
+
+  <nav
+    id="sg-collection-sidebar-nav-{{ section_id }}"
+    class="sg-collection-sidebar__nav"
+    aria-label="Categorie e sottocategorie"
+  >
+    <p class="sg-collection-sidebar__heading">Categorie</p>
+
+    <ul class="sg-collection-sidebar__list" role="list">
+      {%- for parent_handle in parent_handles -%}
+        {%- assign parent_title = parent_titles[forloop.index0] -%}
+        {%- assign parent_collection = collections[parent_handle] -%}
+        {%- if parent_collection != blank and parent_collection.url != blank -%}
+          {%- assign parent_url = parent_collection.url -%}
+        {%- else -%}
+          {%- capture parent_url -%}
+            {%- render 'sg-collection-nav-url', handle: parent_handle -%}
+          {%- endcapture -%}
+          {%- assign parent_url = parent_url | strip -%}
+        {%- endif -%}
+
+        {%- capture subcategory_handles_csv -%}
+          {%- render 'sg-collection-subcategory-meta', parent_handle: parent_handle, output: 'handles' -%}
+        {%- endcapture -%}
+        {%- capture subcategory_titles_csv -%}
+          {%- render 'sg-collection-subcategory-meta', parent_handle: parent_handle, output: 'titles' -%}
+        {%- endcapture -%}
+
+        {%- assign subcategory_handles_csv = subcategory_handles_csv | strip -%}
+        {%- assign subcategory_titles_csv = subcategory_titles_csv | strip -%}
+        {%- assign sub_handles = subcategory_handles_csv | split: ',' -%}
+        {%- assign sub_titles = subcategory_titles_csv | split: '|' -%}
+
+        {%- assign is_current_parent = false -%}
+        {%- if collection.handle == parent_handle -%}
+          {%- assign is_current_parent = true -%}
+        {%- endif -%}
+
+        <li
+          class="sg-collection-sidebar__group{% if is_current_parent %} is-expanded{% endif %}"
+          data-sg-sidebar-group="{{ parent_handle }}"
+        >
+          <button
+            type="button"
+            class="sg-collection-sidebar__parent{% if is_current_parent and tutti_active %} is-active-parent{% endif %}"
+            data-sg-sidebar-parent-toggle
+            aria-expanded="{% if is_current_parent %}true{% else %}false{% endif %}"
+            aria-controls="sg-sidebar-sublist-{{ section_id }}-{{ parent_handle }}"
+          >
+            <span class="sg-collection-sidebar__parent-label">{{ parent_title }}</span>
+            <span class="sg-collection-sidebar__chevron" aria-hidden="true"></span>
+          </button>
+
+          <ul
+            id="sg-sidebar-sublist-{{ section_id }}-{{ parent_handle }}"
+            class="sg-collection-sidebar__sublist"
+            role="list"
+          >
+            <li class="sg-collection-sidebar__subitem">
+              <a
+                href="{{ parent_url }}"
+                class="sg-collection-sidebar__sublink{% if is_current_parent and tutti_active %} is-active{% endif %}"
+                data-sg-sidebar-filter
+                {% if is_current_parent and tutti_active %}
+                  aria-current="true"
+                {% endif %}
+              >
+                Tutti i prodotti
+              </a>
+            </li>
+
+            {%- if sub_handles.size > 0 and subcategory_handles_csv != blank -%}
+              {%- for sub_handle in sub_handles -%}
+                {%- assign sub_index = forloop.index0 -%}
+                {%- assign sub_title = sub_titles[sub_index] -%}
+                {%- assign sub_handle = sub_handle | strip -%}
+                {%- assign tag_active = false -%}
+                {%- if is_current_parent and current_tags contains sub_handle -%}
+                  {%- assign tag_active = true -%}
+                {%- endif -%}
+                <li class="sg-collection-sidebar__subitem">
+                  <a
+                    href="{{ parent_url }}/{{ sub_handle }}"
+                    class="sg-collection-sidebar__sublink{% if tag_active %} is-active{% endif %}"
+                    data-sg-sidebar-filter
+                    {% if tag_active %}
+                      aria-current="true"
+                    {% endif %}
+                  >
+                    {{ sub_title }}
+                  </a>
+                </li>
+              {%- endfor -%}
+            {%- endif -%}
+          </ul>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </nav>
+</sg-collection-sidebar>

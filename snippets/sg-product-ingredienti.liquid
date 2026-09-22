@@ -1,0 +1,104 @@
+{%- liquid
+  assign current_product = product
+  if closest.product != blank
+    assign current_product = closest.product
+  endif
+
+  assign html = current_product.description | default: ''
+  assign mf_ingredienti = current_product.metafields.custom.ingredienti
+  assign empty_message = empty_message | default: 'Ingredienti non disponibili.'
+  assign updating_message = updating_message | default: 'Ingredienti in aggiornamento...'
+
+  capture html_clean
+    render 'sg-sanitize-product-html', text: html
+  endcapture
+  assign html_clean = html_clean | strip
+
+  assign use_metafield = false
+  if mf_ingredienti != blank and mf_ingredienti.value != blank
+    capture mf_preview
+      echo mf_ingredienti | metafield_tag
+    endcapture
+    assign mf_plain = mf_preview | strip_html | strip
+    if mf_plain.size > 15
+      unless mf_preview contains 'iqit-accordion' or mf_preview contains 'id="wrapper"' or mf_preview contains 'js-product-container'
+        assign use_metafield = true
+      endunless
+    endif
+  endif
+
+  capture extracted_ingredients
+    render 'sg-pdp-extract-ingredienti', html: html_clean
+  endcapture
+  assign extracted_ingredients = extracted_ingredients | strip
+  if extracted_ingredients == blank and html_clean != html
+    capture extracted_ingredients
+      render 'sg-pdp-extract-ingredienti', html: html
+    endcapture
+    assign extracted_ingredients = extracted_ingredients | strip
+  endif
+-%}
+
+<div class="product-ingredienti sg-pdp-panel">
+  {%- if use_metafield -%}
+    {%- case mf_ingredienti.type -%}
+      {%- when 'list.single_line_text_field', 'list.multi_line_text_field' -%}
+        <ul class="ingredienti-list sg-pdp-panel__list sg-pdp-panel__list--bullets">
+          {%- for ingredient in mf_ingredienti.value -%}
+            {%- capture clean_ingredient -%}
+              {%- render 'sg-sanitize-line-breaks', text: ingredient, mode: 'plain' -%}
+            {%- endcapture -%}
+            <li class="ingredienti-item sg-pdp-panel__item">
+              <span class="sg-pdp-panel__text">{{ clean_ingredient | strip }}</span>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- when 'rich_text_field', 'multi_line_text_field' -%}
+        <div class="ingredienti-content sg-product-pdp-content sg-pdp-panel__body rte">
+          {%- capture ingredienti_rich_text -%}
+            {{ mf_ingredienti | metafield_tag }}
+          {%- endcapture -%}
+          {%- capture ingredienti_stripped -%}
+            {%- render 'sg-pdp-strip-for-ingredienti', html: ingredienti_rich_text -%}
+          {%- endcapture -%}
+          {%- render 'sg-format-product-html', text: ingredienti_stripped -%}
+        </div>
+      {%- else -%}
+        {%- if mf_ingredienti.value.first -%}
+          <ul class="ingredienti-list sg-pdp-panel__list sg-pdp-panel__list--bullets">
+            {%- for ingredient in mf_ingredienti.value -%}
+              {%- capture clean_ingredient -%}
+                {%- render 'sg-sanitize-line-breaks', text: ingredient, mode: 'plain' -%}
+              {%- endcapture -%}
+              <li class="ingredienti-item sg-pdp-panel__item">
+                <span class="sg-pdp-panel__text">{{ clean_ingredient | strip }}</span>
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- else -%}
+          <div class="ingredienti-content sg-product-pdp-content sg-pdp-panel__body rte">
+            {%- capture ingredienti_rich_text -%}
+              {{ mf_ingredienti | metafield_tag }}
+            {%- endcapture -%}
+            {%- capture ingredienti_stripped -%}
+              {%- render 'sg-pdp-strip-for-ingredienti', html: ingredienti_rich_text -%}
+            {%- endcapture -%}
+            {%- render 'sg-format-product-html', text: ingredienti_stripped -%}
+          </div>
+        {%- endif -%}
+    {%- endcase -%}
+  {%- elsif extracted_ingredients != blank -%}
+    <div class="ingredienti-content sg-product-pdp-content sg-pdp-panel__body rte">
+      {%- render 'sg-format-product-html', text: extracted_ingredients -%}
+    </div>
+  {%- elsif html != blank -%}
+    {%- assign html_down = html | downcase -%}
+    {%- if html_down contains 'ingredienti' or html_down contains 'ingredients' or html_down contains 'composizione' or html_down contains 'attivi:' or html_down contains 'attivi</strong>' -%}
+      <p class="ingredienti-notice sg-pdp-panel__empty">{{ updating_message }}</p>
+    {%- else -%}
+      <p class="ingredienti-empty sg-pdp-panel__empty">{{ empty_message }}</p>
+    {%- endif -%}
+  {%- else -%}
+    <p class="ingredienti-empty sg-pdp-panel__empty">{{ empty_message }}</p>
+  {%- endif -%}
+</div>

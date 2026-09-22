@@ -1,0 +1,423 @@
+{% comment %}
+  Store-wide "Dicono di noi" — featured review cards (always) + optional Trustpilot TrustBox.
+  Configure Business Unit ID in Theme settings → Trustpilot.
+{% endcomment %}
+
+{%- liquid
+  assign business_unit_id = section.settings.business_unit_id | strip
+  if business_unit_id == blank
+    assign business_unit_id = settings.sg_trustpilot_business_unit_id | strip
+  endif
+
+  assign template_id = section.settings.template_id | strip
+  if template_id == blank
+    assign template_id = '53aa8912dec7e10d38f59f36'
+  endif
+
+  assign locale = section.settings.locale | strip
+  if locale == blank
+    assign locale = settings.sg_trustpilot_locale | strip
+  endif
+  if locale == blank
+    assign locale = 'it-IT'
+  endif
+
+  assign theme = section.settings.theme | default: 'light'
+  assign review_url = section.settings.review_url | strip
+  if review_url == blank
+    assign review_url = settings.sg_trustpilot_review_url | strip
+  endif
+  if review_url == blank
+    assign review_url = 'https://it.trustpilot.com'
+  endif
+
+  assign style_height = section.settings.style_height | default: '260px' | strip
+  assign show_trustpilot = section.settings.show_trustpilot_widget | default: true
+  assign show_featured = section.settings.show_featured_cards | default: true
+
+  assign anchor_id = section.settings.anchor_id | strip
+  if anchor_id == blank
+    assign anchor_id = 'recensioni'
+  endif
+-%}
+
+<section
+  id="{{ anchor_id | escape }}"
+  class="sg-tp-store section-{{ section.id }}"
+  style="
+    --sg-tp-pad-top: {{ section.settings.padding_top }}px;
+    --sg-tp-pad-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="sg-tp-store__inner">
+    {% if section.settings.heading != blank %}
+      <h2 class="sg-tp-store__heading">{{ section.settings.heading }}</h2>
+    {% endif %}
+    {% if section.settings.subheading != blank %}
+      <p class="sg-tp-store__subheading">{{ section.settings.subheading }}</p>
+    {% endif %}
+
+    {% if show_trustpilot and business_unit_id != blank %}
+      <div class="sg-tp-store__widget">
+        <!-- TrustBox widget - Service reviews -->
+        <div
+          class="trustpilot-widget"
+          data-locale="{{ locale | escape }}"
+          data-template-id="{{ template_id | escape }}"
+          data-businessunit-id="{{ business_unit_id | escape }}"
+          data-style-height="{{ style_height | escape }}"
+          data-style-width="100%"
+          data-theme="{{ theme | escape }}"
+          data-stars="{{ section.settings.stars | escape }}"
+          {% if section.settings.tags != blank %}
+            data-tags="{{ section.settings.tags | escape }}"
+          {% endif %}
+        >
+          <a href="{{ review_url }}" target="_blank" rel="noopener noreferrer">Trustpilot</a>
+        </div>
+        <!-- End TrustBox widget -->
+      </div>
+    {% elsif show_trustpilot and request.design_mode %}
+      <p class="sg-tp-store__setup">
+        Imposta l’ID Business Unit Trustpilot in
+        <strong>Impostazioni tema → Trustpilot</strong>
+        per mostrare anche il carosello Trustpilot live. Le tre recensioni in evidenza sotto restano visibili.
+      </p>
+    {% endif %}
+
+    {% if show_featured %}
+      <div class="sg-tp-store__featured">
+        {% render 'sg-featured-reviews-cards', blocks: section.blocks %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .sg-tp-store {
+    background: linear-gradient(180deg, #f7faf5 0%, #ffffff 100%);
+    padding: var(--sg-tp-pad-top, 40px) 0 var(--sg-tp-pad-bottom, 48px);
+  }
+
+  .sg-tp-store__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .sg-tp-store__heading {
+    margin: 0 0 8px;
+    text-align: center;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+    font-weight: 500;
+    color: #1a1a1a;
+  }
+
+  .sg-tp-store__subheading {
+    margin: 0 0 28px;
+    text-align: center;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #5a5a5a;
+  }
+
+  .sg-tp-store__widget {
+    margin-bottom: 32px;
+    min-height: 240px;
+  }
+
+  .sg-tp-store__widget .trustpilot-widget {
+    display: block;
+    width: 100%;
+    min-height: 240px;
+  }
+
+  .sg-tp-store__featured .sg-featured-reviews__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  @media (min-width: 768px) {
+    .sg-tp-store__featured .sg-featured-reviews__grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+  }
+
+  .sg-tp-store__featured .sg-featured-reviews__card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px 18px;
+    background: #ffffff;
+    border: 1px solid rgba(151, 196, 138, 0.22);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  }
+
+  .sg-tp-store__featured .sg-featured-reviews__stars {
+    display: flex;
+    gap: 2px;
+    color: #c4a35a;
+  }
+
+  .sg-tp-store__featured .sg-featured-reviews__quote {
+    margin: 0;
+    flex: 1;
+  }
+
+  .sg-tp-store__featured .sg-featured-reviews__quote p {
+    margin: 0;
+    font-size: 0.98rem;
+    line-height: 1.55;
+    color: #2a2a2a;
+  }
+
+  .sg-tp-store__featured .sg-featured-reviews__footer {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .sg-tp-store__featured .sg-featured-reviews__author {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #1a1a1a;
+  }
+
+  .sg-tp-store__featured .sg-featured-reviews__source {
+    font-size: 0.8rem;
+    color: #6b6b6b;
+  }
+
+  .sg-tp-store__setup {
+    margin: 0 0 24px;
+    padding: 24px;
+    text-align: center;
+    border: 1px dashed #c5d4be;
+    background: #f7faf5;
+    color: #3d5a34;
+    font-size: 0.9rem;
+  }
+
+  @media screen and (max-width: 768px) {
+    .sg-tp-store__inner {
+      padding: 0 16px;
+    }
+
+    .sg-tp-store__featured .sg-featured-reviews__quote p {
+      font-size: 0.94rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "SG Dicono di noi",
+  "tag": "section",
+  "class": "sg-trustpilot-store-reviews",
+  "max_blocks": 3,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Shows three featured review cards on every page. Optionally adds a live Trustpilot carousel when Business Unit ID is set (Theme settings → Trustpilot)."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Dicono di noi"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Recensioni verificate sugli ordini Spiritual Green"
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Section anchor ID",
+      "default": "recensioni",
+      "info": "Used for in-page links (e.g. #recensioni on product pages)."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_featured_cards",
+      "label": "Show featured review cards",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trustpilot_widget",
+      "label": "Show Trustpilot carousel (when Business Unit ID is set)",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "business_unit_id",
+      "label": "Business Unit ID override",
+      "info": "Leave blank to use the theme setting."
+    },
+    {
+      "type": "select",
+      "id": "template_id",
+      "label": "TrustBox layout",
+      "options": [
+        {
+          "value": "53aa8912dec7e10d38f59f36",
+          "label": "Carousel"
+        },
+        {
+          "value": "539adbd6dec7e10e686debee",
+          "label": "Grid"
+        },
+        {
+          "value": "5406e65db0d04a09e042d5fc",
+          "label": "Horizontal"
+        },
+        {
+          "value": "53aa8807dec7e10d38f59f32",
+          "label": "Mini"
+        },
+        {
+          "value": "5419b6a8b0d04a076446a9ad",
+          "label": "Micro Review Count"
+        }
+      ],
+      "default": "53aa8912dec7e10d38f59f36"
+    },
+    {
+      "type": "text",
+      "id": "locale",
+      "label": "Locale override",
+      "info": "e.g. it-IT. Leave blank to use theme setting."
+    },
+    {
+      "type": "select",
+      "id": "theme",
+      "label": "Widget theme",
+      "options": [
+        { "value": "light", "label": "Light" },
+        { "value": "dark", "label": "Dark" }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "text",
+      "id": "style_height",
+      "label": "Trustpilot widget height",
+      "default": "260px"
+    },
+    {
+      "type": "text",
+      "id": "stars",
+      "label": "Star filter",
+      "default": "4,5",
+      "info": "Comma-separated, e.g. 4,5"
+    },
+    {
+      "type": "text",
+      "id": "tags",
+      "label": "Review tags (optional)"
+    },
+    {
+      "type": "url",
+      "id": "review_url",
+      "label": "Trustpilot profile URL override"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Stars",
+          "default": 5
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Review text",
+          "default": "Prodotti naturali di qualità e spedizione puntuale. Tornerò sicuramente."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "Cliente"
+        },
+        {
+          "type": "text",
+          "id": "source",
+          "label": "Source label",
+          "default": "Ordine verificato"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "SG Dicono di noi",
+      "blocks": [
+        {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "author": "Giulia P.",
+            "source": "Ordine verificato",
+            "text": "Ottima per la routine quotidiana. Profumo delicato e ingredienti naturali, proprio quello che cercavo."
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "author": "Maria R.",
+            "source": "Ordine verificato",
+            "text": "Crema gel leggerissima, si assorbe subito e non unge. Dopo una settimana la pelle è più morbida e uniforme."
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "author": "Elena S.",
+            "source": "Ordine verificato",
+            "text": "Confezione curata e consegna veloce. Effetto luminoso naturale, consigliatissimo per chi ama i cosmetici botanici."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

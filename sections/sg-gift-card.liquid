@@ -1,0 +1,304 @@
+{% liquid
+
+  assign gift_product = section.settings.product
+
+  if gift_product != blank and gift_product.gift_card? == false
+    assign gift_product = blank
+  endif
+
+  if gift_product == blank
+    capture sg_gift_handle
+      render 'sg-gift-card-find-product', configured_product: section.settings.product, context_product: product
+    endcapture
+    assign sg_gift_handle = sg_gift_handle | strip
+    if sg_gift_handle != blank
+      assign gift_product = all_products[sg_gift_handle]
+    endif
+  endif
+
+  if gift_product == blank and product != blank and product.gift_card?
+    assign gift_product = product
+  endif
+
+  assign heading = section.settings.heading
+
+  if heading == blank
+
+    assign heading = 'spiritual_green.gift_card_heading' | t
+
+  endif
+
+  assign description = section.settings.description
+
+  assign breadcrumb_label = section.settings.breadcrumb_label
+
+  if breadcrumb_label == blank
+
+    assign breadcrumb_label = 'spiritual_green.nav.gift_card' | t
+
+  endif
+
+  assign form_id = 'SgGiftCardForm-' | append: section.id
+
+  assign root_id = 'SgGiftCard-' | append: section.id
+
+%}
+
+
+
+<section
+
+  id="{{ root_id }}"
+
+  class="sg-gift-card-page sg-gift-card-page--pdp"
+
+  data-section-id="{{ section.id }}"
+
+>
+
+  <div class="sg-gift-card-page__wrap">
+
+    <nav class="sg-gift-card-page__breadcrumb" aria-label="{{ 'spiritual_green.breadcrumb' | t }}">
+
+      <a href="{{ routes.root_url }}" class="sg-gift-card-page__breadcrumb-home" aria-label="{{ 'spiritual_green.home' | t }}">
+
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+
+          <path d="M2.5 6.5 8 2l5.5 4.5V13a1 1 0 0 1-1 1h-3.5v-4H7v4H3.5a1 1 0 0 1-1-1V6.5Z" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/>
+
+        </svg>
+
+      </a>
+
+      <span class="sg-gift-card-page__breadcrumb-sep" aria-hidden="true">›</span>
+
+      <span class="sg-gift-card-page__breadcrumb-current">{{ breadcrumb_label }}</span>
+
+    </nav>
+
+
+
+    <div class="sg-gift-card-page__layout">
+
+      {% render 'sg-gift-card-media',
+
+        image: section.settings.image,
+
+        image_url: section.settings.default_image_url,
+
+        card_image: section.settings.card_image,
+
+        card_label: section.settings.card_label,
+
+        show_card_overlay: section.settings.show_card_overlay,
+
+        alt: heading
+
+      %}
+
+
+
+      {% render 'sg-gift-card-purchase',
+
+        gift_product: gift_product,
+
+        heading: heading,
+
+        description: description,
+
+        amount_label: section.settings.amount_label,
+
+        button_label: section.settings.button_label,
+
+        product_missing_text: section.settings.product_missing_text,
+
+        form_id: form_id,
+
+        section_id: section.id
+
+      %}
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+{% render 'sg-gift-card-scripts', root_id: root_id %}
+
+
+
+{% schema %}
+
+{
+
+  "name": "Gift Card page",
+
+  "tag": "section",
+
+  "class": "sg-gift-card-section",
+
+  "settings": [
+
+    {
+
+      "type": "text",
+
+      "id": "breadcrumb_label",
+
+      "label": "Breadcrumb label",
+
+      "default": "Carta regalo"
+
+    },
+
+    {
+
+      "type": "text",
+
+      "id": "heading",
+
+      "label": "Heading",
+
+      "default": "Carta regalo Spiritual Green"
+
+    },
+
+    {
+
+      "type": "richtext",
+
+      "id": "description",
+
+      "label": "Description",
+
+      "default": "<p>Regala benessere con una carta regalo Spiritual Green. Scegli l'importo, aggiungi al carrello e ricevi il buono regalo via e-mail. Il destinatario potrà utilizzarlo su tutto il nostro negozio online.</p>"
+
+    },
+
+    {
+
+      "type": "image_picker",
+
+      "id": "image",
+
+      "label": "Lifestyle background image",
+
+      "info": "Optional photo behind the gift card. Does not change the card design."
+
+    },
+
+    {
+
+      "type": "image_picker",
+
+      "id": "card_image",
+
+      "label": "Gift card design image",
+
+      "info": "Upload the client gift card graphic here. Until then, a placeholder card with logo + Gift Card is shown. You can also add gift-card-banner.png in Shopify Admin → Content → Files."
+
+    },
+
+    {
+
+      "type": "checkbox",
+
+      "id": "show_card_overlay",
+
+      "label": "Show logo and Gift Card text on the card",
+
+      "default": false,
+
+      "info": "Turn off if the uploaded design already includes the logo and Gift Card text."
+
+    },
+
+    {
+
+      "type": "text",
+
+      "id": "card_label",
+
+      "label": "Card overlay text",
+
+      "default": "Carta regalo"
+
+    },
+
+    {
+
+      "type": "text",
+
+      "id": "default_image_url",
+
+      "label": "Default image URL",
+
+      "default": "https://cdn.shopify.com/s/files/1/0998/9482/1248/files/3c92af44-5e32-4993-ab51-3135ed365460.png?v=1789029443"
+
+    },
+
+    {
+
+      "type": "product",
+
+      "id": "product",
+
+      "label": "Gift card product"
+
+    },
+
+    {
+
+      "type": "text",
+
+      "id": "amount_label",
+
+      "label": "Amount selector label",
+
+      "default": "Scegli l'importo"
+
+    },
+
+    {
+
+      "type": "text",
+
+      "id": "button_label",
+
+      "label": "Add to cart button",
+
+      "default": "Aggiungi al carrello"
+
+    },
+
+    {
+
+      "type": "text",
+
+      "id": "product_missing_text",
+
+      "label": "Product missing message",
+
+      "default": "Collega un prodotto carta regalo nelle impostazioni della sezione per abilitare l'acquisto."
+
+    }
+
+  ],
+
+  "presets": [
+
+    {
+
+      "name": "Gift Card page"
+
+    }
+
+  ]
+
+}
+
+{% endschema %}
+

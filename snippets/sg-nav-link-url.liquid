@@ -1,0 +1,24 @@
+{%- doc -%}
+  Menu link URL — forces Contatti to the contact page template.
+
+  @param {object} link - Navigation link object
+{%- enddoc -%}
+
+{% liquid
+  assign link_title_down = link.title | strip | downcase
+  assign is_contact_link = false
+
+  if link_title_down == 'contatti' or link_title_down contains 'contatti' or link.handle == 'contatti' or link.handle contains 'contatti'
+    assign is_contact_link = true
+  endif
+%}
+
+{% if is_contact_link %}
+  {% if pages.contact != blank %}
+    {{ pages.contact.url }}
+  {% else %}
+    /pages/contact
+  {% endif %}
+{% else %}
+  {{ link.url }}
+{% endif %}

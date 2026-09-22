@@ -1,0 +1,20 @@
+{% doc %}
+  Macro-category tile — centered icon + label (minimal square card).
+
+  @param {string} handle - Collection handle
+  @param {string} title - Category title
+  @param {number} delay - Animation delay index
+{% enddoc %}
+
+{% capture card_url %}{% render 'sg-collection-nav-url', handle: handle %}{% endcapture %}
+<a
+  href="{{ card_url | strip }}"
+  class="macro-category-card sg-animate"
+  data-delay="{{ delay }}"
+  aria-label="{{ title | escape }}"
+>
+  <span class="macro-category-card__icon" aria-hidden="true">
+    {% render 'category-icons', category: handle, size: 48, class: 'macro-category-card__svg', label: title, decorative: true %}
+  </span>
+  <span class="macro-category-card__label">{{ title }}</span>
+</a>

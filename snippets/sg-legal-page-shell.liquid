@@ -1,0 +1,59 @@
+{% doc %}
+  Spiritual-style legal page shell — sidebar + main content.
+
+  @param {string} active_tab - privacy | cookie | terms | refund
+  @param {string} heading - Page title
+  @param {string} [last_updated] - Last updated line
+  @param {string} content_snippet - Snippet name to render in main body
+{% enddoc %}
+
+{% liquid
+  assign display_heading = heading | default: ''
+  if display_heading == blank
+    assign display_heading = 'spiritual_green.legal_privacy_policy' | t
+  endif
+  assign updated_line = last_updated | default: 'Ultimo aggiornamento: 23 gennaio 2026'
+  assign email = contact_email | default: 'info@spiritualgreen.it'
+%}
+
+<section
+  class="sg-legal-page sg-legal-page--spiritual sg-privacy-policy-page color-scheme-6"
+  style="--color-background: #ffffff; --color-background-rgb: 255, 255, 255; --color-foreground: #1a1a1a; --color-foreground-rgb: 26, 26, 26; --color-foreground-heading: #1a1a1a; background: #ffffff; color: #1a1a1a;"
+>
+  <div class="sg-legal-page__wrap">
+    <div class="sg-legal-page__layout">
+      {% render 'sg-legal-sidebar', active_tab: active_tab %}
+
+      <article class="sg-legal-page__main">
+        <header class="sg-legal-page__header">
+          <h1 class="sg-legal-page__title">{{ display_heading }}</h1>
+          {%- if updated_line != blank -%}
+            <p class="sg-legal-page__updated">{{ updated_line }}</p>
+          {%- endif -%}
+        </header>
+
+        <div class="sg-legal-page__content rte">
+          {% liquid
+            assign shell_intro = intro_heading | default: 'Introduzione'
+          %}
+          {% case content_snippet %}
+            {% when 'sg-legal-spiritual-content', 'sg-legal-seed-content' %}
+              {% render 'sg-legal-spiritual-content', intro_heading: shell_intro, contact_email: email %}
+            {% when 'sg-legal-cookie-content' %}
+              {% render 'sg-legal-cookie-content', contact_email: email %}
+            {% when 'sg-legal-terms-content' %}
+              {% render 'sg-legal-terms-content', contact_email: email %}
+            {% when 'sg-legal-refund-content' %}
+              {% render 'sg-legal-refund-content', contact_email: email %}
+            {% else %}
+              {% if body_html != blank %}
+                {%- render 'sg-sanitize-line-breaks', text: body_html, mode: 'html' -%}
+              {% else %}
+                {% render 'sg-legal-spiritual-content', intro_heading: 'Introduzione', contact_email: email %}
+              {% endif %}
+          {% endcase %}
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

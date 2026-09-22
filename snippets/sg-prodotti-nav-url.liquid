@@ -1,0 +1,22 @@
+{%- doc -%}
+  Canonical URL for a PRODOTTI category (collection preferred, page fallback).
+
+  @param {string} handle - Category handle (e.g. erboristeria)
+{%- enddoc -%}
+
+{% liquid
+  assign collection_item = collections[handle]
+  assign page_item = pages[handle]
+
+  if collection_item != blank
+    echo collection_item.url
+  elsif page_item != blank
+    echo page_item.url
+  elsif handle == 'erboristeria'
+    echo '/pages/erboristeria'
+  else
+    echo routes.collections_url
+    echo '/'
+    echo handle
+  endif
+%}

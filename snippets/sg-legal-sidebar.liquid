@@ -1,0 +1,63 @@
+{% doc %}
+  Spiritual-style legal sidebar — Spiritual Green tabs.
+
+  @param {string} [active_tab] - privacy | cookie | terms | refund
+{% enddoc %}
+
+{% liquid
+  assign current_tab = active_tab | default: ''
+
+  if current_tab == blank
+    if request.page_type == 'policy'
+      case policy.handle
+        when 'privacy-policy'
+          assign current_tab = 'privacy'
+        when 'terms-of-service'
+          assign current_tab = 'terms'
+        when 'refund-policy'
+          assign current_tab = 'refund'
+      endcase
+    elsif page.handle == 'cookie-policy' or request.path contains 'cookie-policy'
+      assign current_tab = 'cookie'
+    elsif request.path contains 'terms-of-service' or request.path contains 'termini-e-condizioni'
+      assign current_tab = 'terms'
+    elsif page.handle == 'politica-di-reso'
+      assign current_tab = 'refund'
+    endif
+  endif
+%}
+
+<aside class="sg-legal-page__sidebar" aria-label="{{ 'spiritual_green.legal_documents' | t }}">
+  <nav class="sg-legal-page__nav">
+    <ul class="sg-legal-page__nav-list" role="list">
+      <li class="sg-legal-page__nav-item{% if current_tab == 'privacy' %} sg-legal-page__nav-item--active{% endif %}">
+        {%- if current_tab == 'privacy' -%}
+          <span class="sg-legal-page__nav-current" aria-current="page">{{ 'spiritual_green.legal_privacy_cookie' | t }}</span>
+        {%- else -%}
+          <a class="sg-legal-page__nav-link" href="{% render 'sg-legal-nav-urls', type: 'privacy' %}">{{ 'spiritual_green.legal_privacy_cookie' | t }}</a>
+        {%- endif -%}
+      </li>
+      <li class="sg-legal-page__nav-item{% if current_tab == 'cookie' %} sg-legal-page__nav-item--active{% endif %}">
+        {%- if current_tab == 'cookie' -%}
+          <span class="sg-legal-page__nav-current" aria-current="page">{{ 'spiritual_green.legal_cookie_policy' | t }}</span>
+        {%- else -%}
+          <a class="sg-legal-page__nav-link" href="{% render 'sg-legal-nav-urls', type: 'cookie' %}">{{ 'spiritual_green.legal_cookie_policy' | t }}</a>
+        {%- endif -%}
+      </li>
+      <li class="sg-legal-page__nav-item{% if current_tab == 'terms' %} sg-legal-page__nav-item--active{% endif %}">
+        {%- if current_tab == 'terms' -%}
+          <span class="sg-legal-page__nav-current" aria-current="page">{{ 'spiritual_green.legal_terms' | t }}</span>
+        {%- else -%}
+          <a class="sg-legal-page__nav-link" href="{% render 'sg-legal-nav-urls', type: 'terms' %}">{{ 'spiritual_green.legal_terms' | t }}</a>
+        {%- endif -%}
+      </li>
+      <li class="sg-legal-page__nav-item{% if current_tab == 'refund' %} sg-legal-page__nav-item--active{% endif %}">
+        {%- if current_tab == 'refund' -%}
+          <span class="sg-legal-page__nav-current" aria-current="page">{{ 'spiritual_green.legal_refund' | t }}</span>
+        {%- else -%}
+          <a class="sg-legal-page__nav-link" href="{% render 'sg-legal-nav-urls', type: 'refund' %}">{{ 'spiritual_green.legal_refund' | t }}</a>
+        {%- endif -%}
+      </li>
+    </ul>
+  </nav>
+</aside>

@@ -1,0 +1,26 @@
+{%- doc -%}
+  Subcategory URL — prefers a dedicated collection, falls back to parent/tag filter.
+
+  @param {string} parent_handle - Parent macro-collection handle
+  @param {string} sub_handle - Subcategory handle (collection handle or product tag)
+{%- enddoc -%}
+
+{%- liquid
+  capture sg_normalized_parent_raw
+    render 'sg-normalize-macro-handle', handle: parent_handle
+  endcapture
+  assign resolved_parent = sg_normalized_parent_raw | strip
+  assign resolved_sub = sub_handle | default: '' | strip
+
+  if collections[resolved_sub] != blank
+    echo collections[resolved_sub].url
+  else
+    capture parent_url
+      render 'sg-collection-nav-url', handle: resolved_parent
+    endcapture
+    assign parent_url = parent_url | strip
+    echo parent_url
+    echo '/'
+    echo resolved_sub
+  endif
+-%}

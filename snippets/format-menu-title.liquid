@@ -1,0 +1,22 @@
+{%- doc -%}
+  Formats navigation titles as title case (e.g. SHOP → Shop).
+
+  @param {string} title - Raw menu link title from navigation
+{%- enddoc -%}
+
+{%- liquid
+  assign formatted_title = ''
+  assign title_words = title | downcase | split: ' '
+
+  for word in title_words
+    assign word_formatted = word | capitalize
+
+    if forloop.first
+      assign formatted_title = word_formatted
+    else
+      assign formatted_title = formatted_title | append: ' ' | append: word_formatted
+    endif
+  endfor
+-%}
+
+{{- formatted_title -}}

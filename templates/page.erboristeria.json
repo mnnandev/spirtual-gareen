@@ -1,0 +1,40 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "sg_shop_hero": {
+      "type": "sg-shop-hero",
+      "settings": {
+        "heading": "Erboristeria Tradizionale",
+        "subheading": "Piante officinali e olii essenziali",
+        "description": "<p>Prodotti naturali e consulenze specialistiche per il tuo benessere quotidiano. Scopri la nostra selezione di erbe, integratori e trattamenti personalizzati.</p>",
+        "background_asset": "sg-erboristeria-hero-bg.png",
+        "overlay_style": "erboristeria",
+        "show_cta": false,
+        "banner_height": 70,
+        "text_alignment": "left"
+      }
+    },
+    "products": {
+      "type": "custom-best-sellers",
+      "settings": {
+        "collection": "shopify://collections/all-products",
+        "max_products": 8,
+        "heading": "",
+        "description": "",
+        "shop_all_link": "shopify://collections/all-products"
+      }
+    }
+  },
+  "order": [
+    "sg_shop_hero",
+    "products"
+  ]
+}

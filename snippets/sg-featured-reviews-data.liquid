@@ -1,0 +1,63 @@
+{% comment %}
+  ============================================================
+  EDIT THESE 3 FEATURED HOMEPAGE REVIEWS HERE (fallback data)
+  ============================================================
+  Used only when the "SG Featured reviews" section has no blocks.
+  Prefer editing via Theme Editor or templates/index.json when possible.
+{% endcomment %}
+
+{%- if mode == 'cards' -%}
+  {%- comment -%} Review 1 {%- endcomment -%}
+  <article class="sg-featured-reviews__card" role="listitem">
+    <div class="sg-featured-reviews__stars" aria-hidden="true">
+      {% for i in (1..5) %}
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path d="M10 1.5l2.47 5.01 5.53.8-4 3.9.94 5.5L10 14.26 5.06 16.7l.94-5.5-4-3.9 5.53-.8L10 1.5z"/>
+        </svg>
+      {% endfor %}
+    </div>
+    <blockquote class="sg-featured-reviews__quote">
+      <p>Ottima per la routine quotidiana. Profumo delicato e ingredienti naturali, proprio quello che cercavo.</p>
+    </blockquote>
+    <footer class="sg-featured-reviews__footer">
+      <cite class="sg-featured-reviews__author">Giulia P.</cite>
+      <span class="sg-featured-reviews__source">Ordine verificato</span>
+    </footer>
+  </article>
+
+  {%- comment -%} Review 2 {%- endcomment -%}
+  <article class="sg-featured-reviews__card" role="listitem">
+    <div class="sg-featured-reviews__stars" aria-hidden="true">
+      {% for i in (1..5) %}
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path d="M10 1.5l2.47 5.01 5.53.8-4 3.9.94 5.5L10 14.26 5.06 16.7l.94-5.5-4-3.9 5.53-.8L10 1.5z"/>
+        </svg>
+      {% endfor %}
+    </div>
+    <blockquote class="sg-featured-reviews__quote">
+      <p>Crema gel leggerissima, si assorbe subito e non unge. Dopo una settimana la pelle è più morbida e uniforme.</p>
+    </blockquote>
+    <footer class="sg-featured-reviews__footer">
+      <cite class="sg-featured-reviews__author">Maria R.</cite>
+      <span class="sg-featured-reviews__source">Ordine verificato</span>
+    </footer>
+  </article>
+
+  {%- comment -%} Review 3 {%- endcomment -%}
+  <article class="sg-featured-reviews__card" role="listitem">
+    <div class="sg-featured-reviews__stars" aria-hidden="true">
+      {% for i in (1..5) %}
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path d="M10 1.5l2.47 5.01 5.53.8-4 3.9.94 5.5L10 14.26 5.06 16.7l.94-5.5-4-3.9 5.53-.8L10 1.5z"/>
+        </svg>
+      {% endfor %}
+    </div>
+    <blockquote class="sg-featured-reviews__quote">
+      <p>Confezione curata e consegna veloce. Effetto luminoso naturale, consigliatissimo per chi ama i cosmetici botanici.</p>
+    </blockquote>
+    <footer class="sg-featured-reviews__footer">
+      <cite class="sg-featured-reviews__author">Elena S.</cite>
+      <span class="sg-featured-reviews__source">Ordine verificato</span>
+    </footer>
+  </article>
+{%- endif -%}

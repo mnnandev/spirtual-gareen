@@ -1,0 +1,100 @@
+{%- doc -%}
+  Renders product grid items for a macro parent — parent collection + all subcategory collections (deduped).
+
+  @param {string} parent_handle - Normalized macro collection handle
+  @param {object} section - main-collection section
+  @param {collection} [collection] - Current parent collection
+  @param {number} [limit] - Optional max products to output
+{%- enddoc -%}
+
+{%- liquid
+  assign resolved_parent = parent_handle | default: '' | strip
+  assign sg_seen_ids = ','
+  assign sg_display_index = 0
+  assign sg_limit = limit | default: 250 | plus: 0
+
+  capture sg_price_filter_active_raw
+    render 'sg-collection-price-filter-active', collection: collection
+  endcapture
+  assign sg_price_filter_active_raw = sg_price_filter_active_raw | strip
+  assign sg_price_filter_active = false
+  if sg_price_filter_active_raw == 'true'
+    assign sg_price_filter_active = true
+  endif
+
+  capture sg_subcategory_handles_csv
+    render 'sg-collection-subcategory-meta', parent_handle: resolved_parent, output: 'handles'
+  endcapture
+  assign sg_sub_handles = sg_subcategory_handles_csv | strip | split: ','
+-%}
+
+{%- if collection != blank -%}
+  {%- for product in collection.products -%}
+    {%- if sg_price_filter_active -%}
+      {%- capture sg_in_range_raw -%}
+        {%- render 'sg-product-in-price-range', product: product, collection: collection -%}
+      {%- endcapture -%}
+      {%- assign sg_in_range = sg_in_range_raw | strip -%}
+      {%- unless sg_in_range == 'true' -%}
+        {%- continue -%}
+      {%- endunless -%}
+    {%- endif -%}
+
+    {%- assign sg_pid_marker = product.id | prepend: ',' | append: ',' -%}
+    {%- unless sg_seen_ids contains sg_pid_marker -%}
+      {%- assign sg_seen_ids = sg_seen_ids | append: product.id | append: ',' -%}
+      {%- assign sg_display_index = sg_display_index | plus: 1 -%}
+      {%- if sg_display_index <= sg_limit -%}
+        <li
+          id="{{ section.id }}-{{ product.id }}"
+          class="product-grid__item product-grid__item--{{ sg_display_index | minus: 1 }}"
+          data-product-id="{{ product.id }}"
+          ref="cards[]"
+        >
+          <product-card class="product-card sg-collection-product-card-wrap" data-product-id="{{ product.id }}">
+            <div class="product-card__content product-grid__card spacing-style border-style">
+              {% render 'sg-collection-product-card', product: product, settings: section.settings %}
+            </div>
+          </product-card>
+        </li>
+      {%- endif -%}
+    {%- endunless -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- for sg_sub_handle in sg_sub_handles -%}
+  {%- assign sg_sub_handle = sg_sub_handle | strip -%}
+  {%- if collections[sg_sub_handle] != blank -%}
+    {%- for product in collections[sg_sub_handle].products -%}
+      {%- if sg_price_filter_active -%}
+        {%- capture sg_in_range_raw -%}
+          {%- render 'sg-product-in-price-range', product: product, collection: collection -%}
+        {%- endcapture -%}
+        {%- assign sg_in_range = sg_in_range_raw | strip -%}
+        {%- unless sg_in_range == 'true' -%}
+          {%- continue -%}
+        {%- endunless -%}
+      {%- endif -%}
+
+      {%- assign sg_pid_marker = product.id | prepend: ',' | append: ',' -%}
+      {%- unless sg_seen_ids contains sg_pid_marker -%}
+        {%- assign sg_seen_ids = sg_seen_ids | append: product.id | append: ',' -%}
+        {%- assign sg_display_index = sg_display_index | plus: 1 -%}
+        {%- if sg_display_index <= sg_limit -%}
+          <li
+            id="{{ section.id }}-{{ product.id }}"
+            class="product-grid__item product-grid__item--{{ sg_display_index | minus: 1 }}"
+            data-product-id="{{ product.id }}"
+            ref="cards[]"
+          >
+            <product-card class="product-card sg-collection-product-card-wrap" data-product-id="{{ product.id }}">
+              <div class="product-card__content product-grid__card spacing-style border-style">
+                {% render 'sg-collection-product-card', product: product, settings: section.settings %}
+              </div>
+            </product-card>
+          </li>
+        {%- endif -%}
+      {%- endunless -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endfor -%}

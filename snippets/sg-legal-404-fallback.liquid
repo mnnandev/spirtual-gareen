@@ -1,0 +1,199 @@
+{%- doc -%}
+  Client-side fallback for virtual pages that 404 in Shopify Admin.
+
+  @param {string} [placement] - head | body
+{%- enddoc -%}
+
+{% liquid
+  assign placement = placement | default: 'body'
+%}
+
+{% if placement == 'head' %}
+  <style>
+    html.sg-legal-404-pending #MainContent {
+      opacity: 0;
+      pointer-events: none;
+      min-height: 60vh;
+    }
+
+    html.sg-legal-404-pending .section-resource-list,
+    html.sg-legal-404-pending .shopify-section:has(.product-list) {
+      display: none !important;
+    }
+  </style>
+  <script>
+    (function () {
+      var path = window.location.pathname.toLowerCase();
+      var virtualType = '';
+
+      if (
+        path.indexOf('refund-policy') !== -1 ||
+        path.indexOf('politica-di-reso') !== -1 ||
+        path.indexOf('diritto-di-recesso') !== -1
+      ) {
+        virtualType = 'refund';
+      } else if (path.indexOf('privacy-policy') !== -1 || path.indexOf('/pages/privacy') !== -1) {
+        virtualType = 'privacy';
+      } else if (path.indexOf('termini-e-condizioni') !== -1 || path.indexOf('terms-of-service') !== -1) {
+        virtualType = 'terms';
+      } else if (path.indexOf('cookie-policy') !== -1) {
+        virtualType = 'cookie';
+      } else if (path.indexOf('/pages/faq') !== -1) {
+        virtualType = 'faq';
+      } else if (path.indexOf('consulenza-online') !== -1) {
+        virtualType = 'consulenza';
+      } else if (
+        path.indexOf('/pages/gift-card') !== -1 ||
+        path.indexOf('/pages/buono-regalo') !== -1 ||
+        path.indexOf('/pages/carta-regalo') !== -1 ||
+        path.indexOf('/pages/giftcard') !== -1
+      ) {
+        virtualType = 'gift-card';
+      }
+
+      if (!virtualType) return;
+
+      window.__sgVirtual404Type = virtualType;
+      document.documentElement.classList.add('sg-legal-404-pending');
+    })();
+  </script>
+{% else %}
+  <script>
+    (function () {
+      var sgConsulenzaBookingAsset = {{ 'sg-consulenza-booking.js' | asset_url | json }};
+      var virtualType = window.__sgVirtual404Type;
+
+      if (!virtualType) {
+        var path = window.location.pathname.toLowerCase();
+
+        if (
+          path.indexOf('refund-policy') !== -1 ||
+          path.indexOf('politica-di-reso') !== -1 ||
+          path.indexOf('diritto-di-recesso') !== -1
+        ) {
+          virtualType = 'refund';
+        } else if (path.indexOf('privacy-policy') !== -1 || path.indexOf('/pages/privacy') !== -1) {
+          virtualType = 'privacy';
+        } else if (path.indexOf('termini-e-condizioni') !== -1 || path.indexOf('terms-of-service') !== -1) {
+          virtualType = 'terms';
+        } else if (path.indexOf('cookie-policy') !== -1) {
+          virtualType = 'cookie';
+        } else if (path.indexOf('/pages/faq') !== -1) {
+          virtualType = 'faq';
+        } else if (path.indexOf('consulenza-online') !== -1) {
+          virtualType = 'consulenza';
+        } else if (
+          path.indexOf('/pages/gift-card') !== -1 ||
+          path.indexOf('/pages/buono-regalo') !== -1 ||
+          path.indexOf('/pages/carta-regalo') !== -1 ||
+          path.indexOf('/pages/giftcard') !== -1
+        ) {
+          virtualType = 'gift-card';
+        }
+      }
+
+      if (!virtualType) return;
+
+      var sectionMap = {
+        terms: 'sg-legal-terms-virtual',
+        cookie: 'sg-legal-cookie-virtual',
+        refund: 'sg-legal-refund-virtual',
+        privacy: 'sg-legal-privacy-virtual',
+        faq: 'sg-faq-virtual',
+        consulenza: 'sg-consulenza-virtual',
+        'gift-card': 'sg-gift-card-virtual'
+      };
+      var titleMap = {
+        terms: {{ 'spiritual_green.legal_terms' | t | json }},
+        cookie: {{ 'spiritual_green.legal_cookie_policy' | t | json }},
+        refund: {{ 'spiritual_green.legal_refund' | t | json }},
+        privacy: {{ 'spiritual_green.legal_privacy_policy' | t | json }},
+        faq: {{ 'spiritual_green.faq' | t | json }},
+        consulenza: {{ 'spiritual_green.nav.consulenza' | t | json }},
+        'gift-card': {{ 'spiritual_green.nav.gift_card' | t | json }}
+      };
+      var sectionId = sectionMap[virtualType];
+      var main = document.getElementById('MainContent');
+
+      if (!main || !sectionId) return;
+
+      function activateInjectedAssets(root) {
+        root.querySelectorAll('link[rel="stylesheet"]').forEach(function (link) {
+          var href = link.getAttribute('href');
+          if (!href) return;
+          if (!document.querySelector('link[href="' + href + '"]')) {
+            var clone = document.createElement('link');
+            clone.rel = 'stylesheet';
+            clone.href = href;
+            document.head.appendChild(clone);
+          }
+          link.remove();
+        });
+
+        root.querySelectorAll('script').forEach(function (oldScript) {
+          var newScript = document.createElement('script');
+          Array.prototype.forEach.call(oldScript.attributes, function (attr) {
+            newScript.setAttribute(attr.name, attr.value);
+          });
+          if (oldScript.src) {
+            newScript.src = oldScript.src;
+          } else {
+            newScript.textContent = oldScript.textContent;
+          }
+          oldScript.parentNode.replaceChild(newScript, oldScript);
+        });
+      }
+
+      var rootId = 'sg-privacy-root';
+      var rootClass = 'sg-legal-virtual-page sg-legal-page-section';
+
+      if (virtualType === 'faq') {
+        rootId = 'sg-faq-root';
+        rootClass = 'sg-faq-virtual-page sg-faq-page-section';
+      } else if (virtualType === 'consulenza') {
+        rootId = 'sg-consulenza-root';
+        rootClass = 'sg-consulenza-virtual-page sg-consulenza-page-section template-consulenza';
+      } else if (virtualType === 'gift-card') {
+        rootId = 'sg-gift-card-root';
+        rootClass = 'sg-gift-card-virtual-page sg-gift-card-section template-gift-card';
+      }
+
+      fetch('/?section_id=' + sectionId)
+        .then(function (response) {
+          return response.text();
+        })
+        .then(function (html) {
+          var root = document.createElement('div');
+          root.id = rootId;
+          root.className = rootClass;
+          root.innerHTML = html;
+          main.innerHTML = '';
+          main.appendChild(root);
+          activateInjectedAssets(root);
+
+          if (virtualType === 'consulenza') {
+            var hasBooking = document.querySelector('script[src*="sg-consulenza-booking"]');
+            if (!hasBooking && sgConsulenzaBookingAsset) {
+              var bookingScript = document.createElement('script');
+              bookingScript.src = sgConsulenzaBookingAsset;
+              bookingScript.defer = true;
+              document.body.appendChild(bookingScript);
+            }
+          }
+
+          document.documentElement.classList.remove('sg-legal-404-pending');
+          document.body.classList.add('sg-legal-404-override', 'template-page');
+          if (virtualType === 'consulenza') {
+            document.body.classList.add('template-consulenza');
+          }
+          if (virtualType === 'gift-card') {
+            document.body.classList.add('template-gift-card');
+          }
+          document.title = (titleMap[virtualType] || 'Spiritual Green') + ' — Spiritual Green';
+        })
+        .catch(function () {
+          document.documentElement.classList.remove('sg-legal-404-pending');
+        });
+    })();
+  </script>
+{% endif %}

@@ -1,0 +1,55 @@
+{%- doc -%}
+  Add to cart action for product listing cards.
+
+  @param {product} product - Shopify product object
+{%- enddoc -%}
+
+{% liquid
+  assign variant = product.selected_or_first_available_variant
+  assign add_label = 'actions.add_to_cart' | t
+  assign options_label = 'spiritual_green.select_options' | t
+  assign sold_out_label = 'Esaurito'
+  assign loading_label = 'products.product.adding_to_cart' | t
+  assign success_label = 'spiritual_green.added_success' | t
+%}
+
+{% unless product == blank %}
+  <div class="sg-product-card-actions" data-sg-product-card-actions>
+    {% if product.available == false or variant.available == false %}
+      <button
+        type="button"
+        class="sg-product-card-actions__btn sg-product-card-actions__btn--sold-out"
+        disabled
+      >
+        {{ sold_out_label }}
+      </button>
+    {% elsif product.has_only_default_variant %}
+      <form
+        method="post"
+        action="{{ routes.cart_add_url }}"
+        class="sg-product-card-actions__form"
+        data-sg-card-add-form
+        data-product-id="{{ product.id }}"
+      >
+        <input type="hidden" name="id" value="{{ variant.id }}">
+        <input type="hidden" name="quantity" value="1">
+        <button
+          type="submit"
+          class="sg-product-card-actions__btn sg-product-card-actions__btn--add"
+          data-label-add="{{ add_label }}"
+          data-label-loading="{{ loading_label }}"
+          data-label-success="{{ success_label }}"
+        >
+          {{ add_label }}
+        </button>
+      </form>
+    {% else %}
+      <a
+        href="{{ product.url }}"
+        class="sg-product-card-actions__btn sg-product-card-actions__btn--options"
+      >
+        {{ options_label }}
+      </a>
+    {% endif %}
+  </div>
+{% endunless %}

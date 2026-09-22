@@ -1,0 +1,62 @@
+{% render 'sg-collection-product-card', product: closest.product, settings: block.settings %}
+
+{% schema %}
+{
+  "name": "SG Collection card",
+  "tag": null,
+  "settings": [
+    {
+      "type": "range",
+      "id": "description_limit",
+      "label": "Description length",
+      "min": 60,
+      "max": 280,
+      "step": 10,
+      "default": 110
+    },
+    {
+      "type": "checkbox",
+      "id": "show_new_badge",
+      "label": "Show New badge for tagged products",
+      "default": true,
+      "info": "Shows when product has tag: new, nuovo, or novita"
+    },
+    {
+      "type": "text",
+      "id": "new_label",
+      "label": "New badge label",
+      "default": "Novità"
+    },
+    {
+      "type": "text",
+      "id": "chip_text",
+      "label": "Code chip (optional)",
+      "info": "Leave blank to use variant SKU"
+    },
+    {
+      "type": "text",
+      "id": "bundle_badge_prefix",
+      "label": "Sale badge prefix",
+      "default": "Pacchetto + Risparmia"
+    },
+    {
+      "type": "text",
+      "id": "learn_label",
+      "label": "Learn more label",
+      "default": "Scopri di più"
+    },
+    {
+      "type": "text",
+      "id": "cart_label",
+      "label": "Add to cart label",
+      "default": "Aggiungi al carrello"
+    }
+  ],
+  "presets": [
+    {
+      "name": "SG Collection card",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

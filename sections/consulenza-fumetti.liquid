@@ -1,0 +1,166 @@
+{% liquid
+  assign fumetti_image = section.settings.image
+  assign fumetti_image_url = section.settings.image_url
+  assign fumetti_image_alt = section.settings.image_alt | default: 'Perché richiedere una consulenza illustrazione'
+%}
+
+<section
+  class="consulenza-fumetti"
+  id="consulenza-fumetti-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="consulenza-fumetti__inner">
+    <div class="consulenza-fumetti__layout">
+      <div class="consulenza-fumetti__media">
+        {% if fumetti_image != blank %}
+          {{
+            fumetti_image
+            | image_url: width: 900
+            | image_tag:
+              class: 'consulenza-fumetti__image',
+              loading: 'lazy',
+              widths: '400, 600, 800, 900',
+              sizes: '(min-width: 990px) 42vw, 100vw',
+              alt: fumetti_image_alt
+          }}
+        {% elsif fumetti_image_url != blank %}
+          <img
+            class="consulenza-fumetti__image"
+            src="{{ fumetti_image_url }}"
+            alt="{{ fumetti_image_alt | escape }}"
+            width="450"
+            height="450"
+            loading="lazy"
+          >
+        {% endif %}
+      </div>
+
+      <div class="consulenza-fumetti__content">
+        {% if section.settings.heading != blank %}
+          <h2 class="consulenza-fumetti__title">{{ section.settings.heading }}</h2>
+        {% endif %}
+
+        <div class="consulenza-fumetti__bubbles fumetti-grid">
+          {% for block in section.blocks %}
+            {% liquid
+              assign bubble_side = block.settings.side | default: 'left'
+            %}
+            <div
+              class="consulenza-fumetti__item fumetto fumetto-{{ bubble_side }}"
+              {{ block.shopify_attributes }}
+            >
+              {% if block.settings.bubble != blank %}
+                <div class="consulenza-fumetti__bubble fumetto-bubble">
+                  <p>{{ block.settings.bubble }}</p>
+                </div>
+              {% endif %}
+              {% if block.settings.answer != blank %}
+                <div class="consulenza-fumetti__answer fumetto-answer">
+                  <p>{{ block.settings.answer }}</p>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Consulenza Fumetti",
+  "tag": "section",
+  "class": "consulenza-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Perché richiedere una consulenza?"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Illustration image"
+    },
+    {
+      "type": "text",
+      "id": "image_url",
+      "label": "Illustration image URL override",
+      "info": "Used when no image is selected.",
+      "default": "https://cdn.shopify.com/s/files/1/0998/9482/1248/files/4966190.jpg?v=1781691612"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Illustration alt text",
+      "default": "Perché richiedere una consulenza illustrazione"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "fumetto",
+      "name": "Speech bubble",
+      "settings": [
+        {
+          "type": "select",
+          "id": "side",
+          "label": "Alignment",
+          "default": "left",
+          "options": [
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ]
+        },
+        {
+          "type": "textarea",
+          "id": "bubble",
+          "label": "Question (bubble)",
+          "default": "\"Non sai quale prodotto naturale fa per te?\""
+        },
+        {
+          "type": "textarea",
+          "id": "answer",
+          "label": "Answer (optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Consulenza Fumetti",
+      "blocks": [
+        {
+          "type": "fumetto",
+          "settings": {
+            "side": "left",
+            "bubble": "\"Non sai quale prodotto naturale fa per te?\""
+          }
+        },
+        {
+          "type": "fumetto",
+          "settings": {
+            "side": "left",
+            "bubble": "\"Cerchi un approccio naturale al tuo benessere?\""
+          }
+        },
+        {
+          "type": "fumetto",
+          "settings": {
+            "side": "left",
+            "bubble": "\"Hai domande su integratori o prodotti biologici?\""
+          }
+        },
+        {
+          "type": "fumetto",
+          "settings": {
+            "side": "left",
+            "bubble": "\"Vuoi iniziare uno stile di vita più sano e naturale?\""
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

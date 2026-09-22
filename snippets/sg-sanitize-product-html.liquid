@@ -1,0 +1,157 @@
+{%- doc -%}
+  Strip legacy PrestaShop/Iqit import markup that breaks PDP accordion DOM.
+
+  @param {string} text - Raw HTML content
+{%- enddoc -%}
+
+{%- liquid
+  assign working = text | default: '' | strip
+
+  if working == blank
+    echo ''
+  else
+    assign legacy_markers = 'iqit-accordion|product-infos-tabs|js-product-container|id="wrapper"|id="footer"|product-infos-accordion-mobile' | split: '|'
+    assign is_legacy = false
+
+    for marker in legacy_markers
+      if working contains marker
+        assign is_legacy = true
+        break
+      endif
+    endfor
+
+    if is_legacy == false and working contains 'rte-content'
+      if working contains '</h4>' or working contains '</section>' or working contains 'tab-pane'
+        assign is_legacy = true
+      endif
+    endif
+
+    if is_legacy
+      assign collected = ''
+      assign rte_delimiters = '<div class="rte-content">|<h4 class="rte-content">' | split: '|'
+
+      for delimiter in rte_delimiters
+        if working contains delimiter
+          assign segments = working | split: delimiter
+          for segment in segments
+            unless forloop.first
+              assign piece = segment | split: '</div>' | first | strip
+              if piece != blank and piece != '<br>' and piece != '<br/>' and piece != '<br />'
+                if collected != blank
+                  assign collected = collected | append: '<br><br>'
+                endif
+                assign collected = collected | append: piece
+              endif
+            endunless
+          endfor
+        endif
+      endfor
+
+      if collected != blank
+        assign working = collected
+      else
+        assign working = working | strip_html
+      endif
+    endif
+
+    if working contains 'wrapper' or working contains 'tab-pane' or working contains 'js-product-container'
+      assign working = working | strip_html
+    endif
+
+    assign working = working | replace: '<summary', '<span data-sg-neutralized'
+    assign working = working | replace: '</summary>', ''
+    assign working = working | replace: '<details', '<div data-sg-neutralized'
+    assign working = working | replace: '</details>', '</div>'
+    assign working = working | replace: '<footer', '<div data-sg-neutralized'
+    assign working = working | replace: '</footer>', '</div>'
+    assign working = working | replace: '<section', '<div data-sg-neutralized'
+    assign working = working | replace: '</section>', '</div>'
+    assign working = working | replace: '<form', '<div data-sg-neutralized'
+    assign working = working | replace: '</form>', '</div>'
+    assign working = working | replace: '<script', '<!--script'
+    assign working = working | replace: '</script>', 'script-->'
+
+    comment
+      Strip Avada/Fusion Builder shortcodes left over from WordPress imports.
+      Prefer content inside [fusion_text]...[/fusion_text]; otherwise drop attribute junk.
+    endcomment
+    if working contains '[fusion_' or working contains 'fusion_builder' or working contains 'builder_container' or working contains 'hundred_percent='
+      if working contains '[fusion_text'
+        assign fusion_chunks = ''
+        assign fusion_parts = working | split: '[fusion_text'
+        for fusion_part in fusion_parts
+          unless forloop.first
+            if fusion_part contains '[/fusion_text]'
+              assign fusion_inner = fusion_part | split: '[/fusion_text]' | first
+              if fusion_inner contains ']'
+                assign fusion_inner = fusion_inner | split: ']' | last
+              endif
+              assign fusion_inner = fusion_inner | strip
+              if fusion_inner != blank
+                if fusion_chunks != blank
+                  assign fusion_chunks = fusion_chunks | append: '<br><br>'
+                endif
+                assign fusion_chunks = fusion_chunks | append: fusion_inner
+              endif
+            endif
+          endunless
+        endfor
+        if fusion_chunks != blank
+          assign working = fusion_chunks
+        endif
+      endif
+
+      assign working = working | replace: '[/fusion_builder_container]', '' | replace: '[/fusion_builder_row]', '' | replace: '[/fusion_builder_column]', '' | replace: '[/fusion_text]', ''
+      assign working = working | replace: '[fusion_builder_container', '|||SG_FUSION|||' | replace: '[fusion_builder_row', '|||SG_FUSION|||' | replace: '[fusion_builder_column', '|||SG_FUSION|||' | replace: '[fusion_text', '|||SG_FUSION|||' | replace: '[fusion_', '|||SG_FUSION|||'
+      if working contains '|||SG_FUSION|||'
+        assign fusion_segments = working | split: '|||SG_FUSION|||'
+        assign working = ''
+        for fusion_segment in fusion_segments
+          if fusion_segment contains ']'
+            assign after_attrs = fusion_segment | split: ']' | last
+          else
+            assign after_attrs = fusion_segment
+          endif
+          assign after_attrs = after_attrs | strip
+          if after_attrs != blank
+            if working != blank
+              assign working = working | append: ' '
+            endif
+            assign working = working | append: after_attrs
+          endif
+        endfor
+      endif
+
+      assign working = working | replace: 'builder_container', '' | replace: 'hundred_percent=', '' | replace: 'fusion_builder_', '' | replace: 'fusion_builder', ''
+      assign working = working | replace: '[', '' | replace: ']', ''
+    endif
+
+    for pass in (1..8)
+      assign before = working
+      assign orphan_tags = '</h4>|</h3>|</h2>|</h1>|</section>|</div>|</footer>|</header>' | split: '|'
+
+      for orphan in orphan_tags
+        if working contains orphan
+          assign head = working | split: orphan | first | strip
+          if head == blank
+            assign tail_parts = working | split: orphan
+            assign working = ''
+            for tail_part in tail_parts offset: 1
+              if working != blank
+                assign working = working | append: orphan
+              endif
+              assign working = working | append: tail_part
+            endfor
+            assign working = working | strip
+          endif
+        endif
+      endfor
+
+      if working == before
+        break
+      endif
+    endfor
+
+    echo working
+  endif
+-%}

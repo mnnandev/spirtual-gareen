@@ -1,0 +1,43 @@
+<div id="sg-privacy-root">
+  {% liquid
+    assign privacy_fallback = 'spiritual_green.legal_privacy_policy' | t
+    assign policy_heading = policy.title | default: privacy_fallback
+    assign policy_updated = 'Ultimo aggiornamento: 23 gennaio 2026'
+    assign policy_tab = 'privacy'
+    assign policy_snippet = 'sg-legal-spiritual-content'
+    assign policy_body = blank
+
+    case policy.handle
+      when 'refund-policy'
+        assign policy_tab = 'refund'
+        assign policy_snippet = 'sg-legal-refund-content'
+        assign policy_heading = policy.title | default: 'Politica di Reso'
+      when 'privacy-policy'
+        assign policy_tab = 'privacy'
+        assign policy_snippet = 'sg-legal-spiritual-content'
+        assign policy_heading = policy.title | default: privacy_fallback
+      when 'terms-of-service'
+        assign policy_tab = 'terms'
+        assign policy_snippet = 'sg-legal-terms-content'
+        assign policy_heading = 'Termini e Condizioni del Sito Web Spiritual Green'
+      when 'shipping-policy'
+        assign policy_heading = policy.title | default: 'Spedizioni'
+      when 'subscription-policy'
+        assign policy_heading = policy.title | default: 'Abbonamenti'
+    endcase
+
+    if policy.body != blank and policy.handle != 'privacy-policy' and policy.handle != 'refund-policy' and policy.handle != 'terms-of-service'
+      assign policy_body = policy.body
+      assign policy_snippet = blank
+    endif
+  %}
+
+  {% render 'sg-legal-page-shell',
+    active_tab: policy_tab,
+    heading: policy_heading,
+    last_updated: policy_updated,
+    contact_email: 'info@spiritualgreen.it',
+    content_snippet: policy_snippet,
+    body_html: policy_body
+  %}
+</div>

@@ -1,0 +1,56 @@
+{%- doc -%}
+  Localized label for collection/search sort options.
+
+  @param {string} sort_value - option.value from results.sort_options
+  @param {string} [fallback] - option.name when no mapping exists
+{%- enddoc -%}
+
+{%- liquid
+  assign sort_label = fallback | default: sort_value
+  assign name_check = fallback | default: '' | downcase | strip
+
+  case sort_value
+    when 'manual'
+      assign sort_label = 'collections.sorting.featured' | t
+    when 'best-selling'
+      assign sort_label = 'collections.sorting.best_selling' | t
+    when 'title-ascending'
+      assign sort_label = 'collections.sorting.az' | t
+    when 'title-descending'
+      assign sort_label = 'collections.sorting.za' | t
+    when 'price-ascending'
+      assign sort_label = 'collections.sorting.price_ascending' | t
+    when 'price-descending'
+      assign sort_label = 'collections.sorting.price_descending' | t
+    when 'created-ascending'
+      assign sort_label = 'collections.sorting.date_ascending' | t
+    when 'created-descending'
+      assign sort_label = 'collections.sorting.date_descending' | t
+    when 'relevance'
+      assign sort_label = 'collections.sorting.relevance' | t
+  endcase
+
+  # Fallback by English option name — covers values that differ from the standard sort keys
+  case name_check
+    when 'most relevant', 'relevance'
+      assign sort_label = 'collections.sorting.relevance' | t
+    when 'featured'
+      assign sort_label = 'collections.sorting.featured' | t
+    when 'best selling'
+      assign sort_label = 'collections.sorting.best_selling' | t
+    when 'alphabetically, a-z'
+      assign sort_label = 'collections.sorting.az' | t
+    when 'alphabetically, z-a'
+      assign sort_label = 'collections.sorting.za' | t
+    when 'price, low to high'
+      assign sort_label = 'collections.sorting.price_ascending' | t
+    when 'price, high to low'
+      assign sort_label = 'collections.sorting.price_descending' | t
+    when 'date, old to new'
+      assign sort_label = 'collections.sorting.date_ascending' | t
+    when 'date, new to old'
+      assign sort_label = 'collections.sorting.date_descending' | t
+  endcase
+-%}
+
+{{- sort_label -}}

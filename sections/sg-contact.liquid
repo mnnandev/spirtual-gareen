@@ -1,0 +1,227 @@
+{% liquid
+  assign form_id = 'SgContactForm-' | append: section.id
+  assign breadcrumb_label = section.settings.breadcrumb_label | default: 'Contatti'
+%}
+
+<section
+  id="SgContactPage-{{ section.id }}"
+  class="sg-contact-page"
+  data-section-id="{{ section.id }}"
+>
+  <div class="sg-contact-page__wrap">
+    <nav class="sg-contact-page__breadcrumb" aria-label="{{ 'spiritual_green.breadcrumb' | t }}">
+      <a href="{{ routes.root_url }}" class="sg-contact-page__breadcrumb-home" aria-label="{{ 'spiritual_green.home' | t }}">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M2.5 6.5 8 2l5.5 4.5V13a1 1 0 0 1-1 1h-3.5v-4H7v4H3.5a1 1 0 0 1-1-1V6.5Z" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <span class="sg-contact-page__breadcrumb-sep" aria-hidden="true">›</span>
+      <span class="sg-contact-page__breadcrumb-current">{{ breadcrumb_label }}</span>
+    </nav>
+
+    <div class="sg-contact-page__card">
+      <header class="sg-contact-page__header">
+        <h1 class="sg-contact-page__title">{{ section.settings.heading }}</h1>
+        <p class="sg-contact-page__intro">{{ section.settings.intro }}</p>
+      </header>
+
+      {%- form 'contact', id: form_id, class: 'sg-contact-page__form' -%}
+        <input type="hidden" name="contact[id]" value="{{ form_id }}">
+
+        {%- if form.errors and form.id == form_id -%}
+          <div class="sg-contact-page__alert sg-contact-page__alert--error" tabindex="-1" autofocus>
+            {{- 'icon-error.svg' | inline_asset_content -}}
+            <span>{{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}</span>
+          </div>
+        {%- endif -%}
+
+        {%- if form.posted_successfully? and form.id == form_id -%}
+          <div class="sg-contact-page__alert sg-contact-page__alert--success" tabindex="-1" autofocus>
+            {{- 'icon-checkmark.svg' | inline_asset_content -}}
+            <span>{{ section.settings.success_message }}</span>
+          </div>
+        {%- endif -%}
+
+        <div class="sg-contact-page__grid">
+          <div class="sg-contact-page__field">
+            <label class="sg-contact-page__label" for="ContactForm-email-{{ section.id }}">
+              {{ section.settings.label_email }} <span aria-hidden="true">*</span>
+            </label>
+            <input
+              type="email"
+              id="ContactForm-email-{{ section.id }}"
+              class="sg-contact-page__input"
+              name="contact[email]"
+              autocomplete="email"
+              required
+              value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+            >
+          </div>
+
+          <div class="sg-contact-page__field">
+            <label class="sg-contact-page__label" for="ContactForm-name-{{ section.id }}">
+              {{ section.settings.label_name }} <span aria-hidden="true">*</span>
+            </label>
+            <input
+              type="text"
+              id="ContactForm-name-{{ section.id }}"
+              class="sg-contact-page__input"
+              name="contact[name]"
+              autocomplete="name"
+              required
+              value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+            >
+          </div>
+
+          <div class="sg-contact-page__field">
+            <label class="sg-contact-page__label" for="ContactForm-phone-{{ section.id }}">
+              {{ section.settings.label_phone }} <span aria-hidden="true">*</span>
+            </label>
+            <input
+              type="tel"
+              id="ContactForm-phone-{{ section.id }}"
+              class="sg-contact-page__input"
+              name="contact[phone]"
+              autocomplete="tel"
+              required
+              value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+            >
+          </div>
+
+          <div class="sg-contact-page__field">
+            <label class="sg-contact-page__label" for="ContactForm-city-{{ section.id }}">
+              {{ section.settings.label_city }} <span aria-hidden="true">*</span>
+            </label>
+            <input
+              type="text"
+              id="ContactForm-city-{{ section.id }}"
+              class="sg-contact-page__input"
+              name="contact[city]"
+              autocomplete="address-level2"
+              required
+            >
+          </div>
+        </div>
+
+        <div class="sg-contact-page__field sg-contact-page__field--full">
+          <label class="sg-contact-page__label" for="ContactForm-body-{{ section.id }}">
+            {{ section.settings.label_message }}
+          </label>
+          <textarea
+            id="ContactForm-body-{{ section.id }}"
+            class="sg-contact-page__input sg-contact-page__textarea"
+            name="contact[body]"
+            rows="6"
+          >{{- form.body -}}</textarea>
+        </div>
+
+        <div class="sg-contact-page__consent">
+          <p class="sg-contact-page__label sg-contact-page__label--consent">
+            {{ section.settings.label_terms }} <span aria-hidden="true">*</span>
+          </p>
+          <label class="sg-contact-page__checkbox-row">
+            <input
+              type="checkbox"
+              class="sg-contact-page__checkbox"
+              name="contact[gdpr_consent]"
+              value="yes"
+              required
+            >
+            <span class="sg-contact-page__consent-text">{{ section.settings.consent_text }}</span>
+          </label>
+        </div>
+
+        <button type="submit" class="sg-contact-page__submit">
+          {{ section.settings.submit_label }}
+        </button>
+      {%- endform -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "SG Contact",
+  "tag": "section",
+  "class": "sg-contact-page-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "breadcrumb_label",
+      "label": "Breadcrumb",
+      "default": "Contatti"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "RIMANIAMO IN CONTATTO"
+    },
+    {
+      "type": "text",
+      "id": "intro",
+      "label": "Intro",
+      "default": "Hai bisogno di info? Compila il form sottostante, ti risponderemo il prima possibile!"
+    },
+    {
+      "type": "text",
+      "id": "label_email",
+      "label": "Email label",
+      "default": "E-mail"
+    },
+    {
+      "type": "text",
+      "id": "label_name",
+      "label": "Name label",
+      "default": "Nome e Cognome"
+    },
+    {
+      "type": "text",
+      "id": "label_phone",
+      "label": "Phone label",
+      "default": "Numero"
+    },
+    {
+      "type": "text",
+      "id": "label_city",
+      "label": "City label",
+      "default": "Citta"
+    },
+    {
+      "type": "text",
+      "id": "label_message",
+      "label": "Message label",
+      "default": "Il tuo messaggio.."
+    },
+    {
+      "type": "text",
+      "id": "label_terms",
+      "label": "Terms label",
+      "default": "Termini e condizioni"
+    },
+    {
+      "type": "text",
+      "id": "consent_text",
+      "label": "Consent text",
+      "default": "Ho letto linformativa privacy e acconsento al trattamento dei miei dati personali (GDPR). Richieste: info@spiritualgreen.it"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Submit label",
+      "default": "INVIA"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "Grazie! Il tuo messaggio e stato inviato."
+    }
+  ],
+  "presets": [
+    {
+      "name": "SG Contact"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,255 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin language editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "custom_hero_home": {
+      "type": "sg-home-split-hero",
+      "blocks": {
+        "slide_pea": {
+          "type": "slide",
+          "settings": {
+            "label": "PEA Complex 1200",
+            "product": "pea-1200-complex-stick",
+            "product_handle": "pea-1200-complex-stick",
+            "link": "shopify://products/pea-1200-complex-stick",
+            "show_best_sellers_badge": true
+          }
+        },
+        "slide_instagram": {
+          "type": "instagram",
+          "settings": {
+            "label": "Instagram — Alice",
+            "instagram_url": "https://www.instagram.com/spiritualgreenerboristerie/"
+          }
+        },
+        "slide_magnesio": {
+          "type": "slide",
+          "settings": {
+            "label": "Magnesio Regio Donna",
+            "product": "magnesio-regio-donna",
+            "product_handle": "magnesio-regio-donna",
+            "link": "shopify://products/magnesio-regio-donna",
+            "show_best_sellers_badge": true
+          }
+        },
+        "slide_kit_intestino": {
+          "type": "slide",
+          "settings": {
+            "label": "Kit Intestino Infiammato",
+            "product": "kit-intestino-infiammato",
+            "product_handle": "kit-intestino-infiammato",
+            "link": "shopify://products/kit-intestino-infiammato",
+            "show_best_sellers_badge": true
+          }
+        },
+        "slide_gift": {
+          "type": "slide",
+          "settings": {
+            "label": "Carta regalo",
+            "link": "shopify://pages/gift-card",
+            "use_gift_card_product": true,
+            "pin_below_carousel": true,
+            "show_best_sellers_badge": false,
+            "image_url_fallback": "https://cdn.shopify.com/s/files/1/0998/9482/1248/files/3c92af44-5e32-4993-ab51-3135ed365460.png?v=1789029443"
+          }
+        }
+      },
+      "block_order": [
+        "slide_pea",
+        "slide_magnesio",
+        "slide_kit_intestino",
+        "slide_instagram",
+        "slide_gift"
+      ],
+      "settings": {
+        "promo_background": "#E8913A",
+        "promo_image_url": "https://cdn.shopify.com/s/files/1/0998/9482/1248/files/IMG_0334.jpg?v=1789817158",
+        "use_theme_welcome_asset": false,
+        "welcome_caption": "",
+        "promo_kicker": "Sconti estivi",
+        "promo_percent": "-20%",
+        "promo_subheading": "*su tutto il sito",
+        "promo_heading": "Sconti estivi! *tutto fino al 20%",
+        "promo_link": "/collections/offerte",
+        "enable_autoplay": true,
+        "autoplay_seconds": 5
+      }
+    },
+    "category_circles_home": {
+      "type": "category-circles",
+      "blocks": {
+        "cat_sonno": {
+          "type": "category",
+          "settings": {
+            "title": "Sonno, Mente ed Energia",
+            "handle": "sonno-mente-energia"
+          }
+        },
+        "cat_difese": {
+          "type": "category",
+          "settings": {
+            "title": "Difese, Protezione e Vie Respiratorie",
+            "handle": "difese-protezione-respiratorie"
+          }
+        },
+        "cat_intestino": {
+          "type": "category",
+          "settings": {
+            "title": "Intestino, Digestione e Metabolismo",
+            "handle": "intestino-digestione-metabolismo"
+          }
+        },
+        "cat_movimento": {
+          "type": "category",
+          "settings": {
+            "title": "Movimento, Dolori e Recupero",
+            "handle": "movimento-dolori-recupero"
+          }
+        },
+        "cat_ormonale": {
+          "type": "category",
+          "settings": {
+            "title": "Benessere Ormonale e Intimo",
+            "handle": "benessere-ormonale-intimo"
+          }
+        },
+        "cat_bellezza": {
+          "type": "category",
+          "settings": {
+            "title": "Bellezza e Cura della Persona",
+            "handle": "bellezza-cura-persona"
+          }
+        },
+        "cat_zen": {
+          "type": "category",
+          "settings": {
+            "title": "Mondo Zen",
+            "handle": "mondo-zen"
+          }
+        }
+      },
+      "block_order": [
+        "cat_sonno",
+        "cat_difese",
+        "cat_intestino",
+        "cat_movimento",
+        "cat_ormonale",
+        "cat_bellezza",
+        "cat_zen"
+      ],
+      "settings": {
+        "heading": "Trova il prodotto giusto per te",
+        "subheading": "Trova ciò di cui hai bisogno"
+      }
+    },
+    "sg_pea_dissolve_home": {
+      "type": "sg-pea-dissolve",
+      "blocks": {
+        "benefit_1": {
+          "type": "benefit",
+          "settings": {
+            "icon": "🛡️",
+            "text": "Modula la risposta infiammatoria"
+          }
+        },
+        "benefit_2": {
+          "type": "benefit",
+          "settings": {
+            "icon": "🧠",
+            "text": "Supporta nervi, muscoli e articolazioni"
+          }
+        },
+        "benefit_3": {
+          "type": "benefit",
+          "settings": {
+            "icon": "🌿",
+            "text": "Favorisce l'equilibrio della barriera intestinale"
+          }
+        }
+      },
+      "block_order": [
+        "benefit_1",
+        "benefit_2",
+        "benefit_3"
+      ],
+      "settings": {
+        "enabled": true,
+        "product_handles": "pea-1200-complex-stick,pea-1200-complex,pea-complex-1200,pea-1200,pea-complex",
+        "match_title_contains": "PEA Complex 1200",
+        "product_image": "",
+        "product_image_url": "https://cdn.shopify.com/s/files/1/0998/9482/1248/files/pea.png?v=1788757471",
+        "heading": "PEA Complex 1200",
+        "description": "<p>La PEA micronizzata sostiene la fisiologica risposta dell'organismo all'infiammazione e al dolore. Aiuta il benessere del sistema nervoso, di muscoli e articolazioni e supporta l'equilibrio della barriera intestinale, anche in presenza di intestino infiammato.</p>"
+      }
+    },
+    "product_grid_home": {
+      "type": "sg-home-products-tabs",
+      "settings": {
+        "heading": "Prodotti in evidenza",
+        "view_all_label": "Vedi Tutti",
+        "max_products": 10,
+        "tab_new_label": "Novità",
+        "tab_bestseller_label": "Più Venduti",
+        "tab_offers_label": "Offerte",
+        "tab_estate_label": "Estate",
+        "collection_new": "novita",
+        "link_new": "shopify://collections/novita",
+        "collection_bestseller": "piu-venduti",
+        "link_bestseller": "shopify://collections/piu-venduti",
+        "collection_offers": "offerte",
+        "link_offers": "shopify://collections/offerte",
+        "collection_estate": "estate",
+        "link_estate": "shopify://collections/estate"
+      }
+    },
+    "scrolling_text_home": {
+      "type": "sg-cert-badges-carousel",
+      "blocks": {
+        "badge_organic": {
+          "type": "badge",
+          "settings": {
+            "label": "100% biologico",
+            "icon": "organic"
+          }
+        },
+        "badge_organico": {
+          "type": "badge",
+          "settings": {
+            "label": "100% organico",
+            "icon": "natural"
+          }
+        },
+        "badge_chemicals": {
+          "type": "badge",
+          "settings": {
+            "label": "Senza sostanze chimiche",
+            "icon": "chemicals-free"
+          }
+        }
+      },
+      "block_order": [
+        "badge_organic",
+        "badge_organico",
+        "badge_chemicals"
+      ],
+      "settings": {
+        "autoplay": true,
+        "scroll_duration": 18
+      }
+    }
+  },
+  "order": [
+    "custom_hero_home",
+    "category_circles_home",
+    "product_grid_home",
+    "sg_pea_dissolve_home",
+    "scrolling_text_home"
+  ]
+}

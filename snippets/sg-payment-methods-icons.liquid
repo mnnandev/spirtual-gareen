@@ -1,0 +1,26 @@
+{%- doc -%}
+  Shared payment method icon list items.
+
+  @param {boolean} [hide_labels] - Hide visually-hidden labels on clone slides (a11y)
+{%- enddoc -%}
+
+<li class="sg-payment-methods__item" title="Apple Pay" role="listitem">
+  {% unless hide_labels %}<span class="visually-hidden">Apple Pay</span>{% endunless %}
+  {{ 'apple_pay' | payment_type_svg_tag: class: 'sg-payment-methods__icon' }}
+</li>
+<li class="sg-payment-methods__item" title="Google Pay" role="listitem">
+  {% unless hide_labels %}<span class="visually-hidden">Google Pay</span>{% endunless %}
+  {{ 'google_pay' | payment_type_svg_tag: class: 'sg-payment-methods__icon' }}
+</li>
+<li class="sg-payment-methods__item" title="PayPal" role="listitem">
+  {% unless hide_labels %}<span class="visually-hidden">PayPal</span>{% endunless %}
+  {{ 'paypal' | payment_type_svg_tag: class: 'sg-payment-methods__icon' }}
+</li>
+<li class="sg-payment-methods__item" title="Visa" role="listitem">
+  {% unless hide_labels %}<span class="visually-hidden">Visa</span>{% endunless %}
+  {{ 'visa' | payment_type_svg_tag: class: 'sg-payment-methods__icon' }}
+</li>
+<li class="sg-payment-methods__item" title="Mastercard" role="listitem">
+  {% unless hide_labels %}<span class="visually-hidden">Mastercard</span>{% endunless %}
+  {{ 'master' | payment_type_svg_tag: class: 'sg-payment-methods__icon' }}
+</li>

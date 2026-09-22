@@ -1,0 +1,110 @@
+{%- liquid
+  assign current_product = product
+  if closest.product != blank
+    assign current_product = closest.product
+  endif
+
+  assign benefici_mf = current_product.metafields.custom.benefici
+  assign empty_message = empty_message | default: 'Benefici disponibili a breve.'
+  assign has_benefits = false
+  assign html = current_product.description | default: ''
+
+  capture html_clean
+    render 'sg-sanitize-product-html', text: html
+  endcapture
+  assign html_clean = html_clean | strip
+
+  if benefici_mf != blank and benefici_mf.value != blank
+    if benefici_mf.type contains 'list.'
+      if benefici_mf.value.size > 0
+        assign has_benefits = true
+      endif
+    else
+      assign has_benefits = true
+    endif
+  endif
+
+  assign extracted_benefits = ''
+  unless has_benefits
+    capture extracted_benefits
+      render 'sg-pdp-parse-benefici-items', html: html_clean
+    endcapture
+    assign extracted_benefits = extracted_benefits | strip
+    if extracted_benefits == blank and html_clean != html
+      capture extracted_benefits
+        render 'sg-pdp-parse-benefici-items', html: html
+      endcapture
+      assign extracted_benefits = extracted_benefits | strip
+    endif
+    if extracted_benefits != blank
+      assign has_benefits = true
+    endif
+  endunless
+-%}
+
+<div class="product-benefici sg-pdp-panel">
+  {%- if has_benefits -%}
+    {%- if benefici_mf != blank and benefici_mf.value != blank -%}
+      {%- case benefici_mf.type -%}
+        {%- when 'list.single_line_text_field', 'list.multi_line_text_field' -%}
+          <ul class="benefici-list sg-pdp-panel__list sg-pdp-panel__list--checks">
+            {%- for benefit in benefici_mf.value -%}
+              {%- capture clean_benefit -%}
+                {%- render 'sg-sanitize-line-breaks', text: benefit, mode: 'plain' -%}
+              {%- endcapture -%}
+              <li class="benefici-item sg-pdp-panel__item">
+                <span class="benefici-icon sg-pdp-panel__check" aria-hidden="true">✓</span>
+                <span class="sg-pdp-panel__text">{{ clean_benefit | strip }}</span>
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- when 'rich_text_field' -%}
+          <div class="benefici-content sg-product-pdp-content sg-pdp-panel__body rte">
+            {%- capture benefici_rich_text -%}
+              {{ benefici_mf | metafield_tag }}
+            {%- endcapture -%}
+            {%- render 'sg-format-product-html', text: benefici_rich_text -%}
+          </div>
+        {%- else -%}
+          {%- if benefici_mf.value.first -%}
+            <ul class="benefici-list sg-pdp-panel__list sg-pdp-panel__list--checks">
+              {%- for benefit in benefici_mf.value -%}
+                {%- capture clean_benefit -%}
+                  {%- render 'sg-sanitize-line-breaks', text: benefit, mode: 'plain' -%}
+                {%- endcapture -%}
+                <li class="benefici-item sg-pdp-panel__item">
+                  <span class="benefici-icon sg-pdp-panel__check" aria-hidden="true">✓</span>
+                  <span class="sg-pdp-panel__text">{{ clean_benefit | strip }}</span>
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- else -%}
+            <div class="benefici-content sg-product-pdp-content sg-pdp-panel__body rte">
+              {%- capture benefici_rich_text -%}
+                {{ benefici_mf | metafield_tag }}
+              {%- endcapture -%}
+              {%- render 'sg-format-product-html', text: benefici_rich_text -%}
+            </div>
+          {%- endif -%}
+      {%- endcase -%}
+    {%- else -%}
+      {%- assign benefit_lines = extracted_benefits | split: '|||' -%}
+      <ul class="benefici-list sg-pdp-panel__list sg-pdp-panel__list--checks">
+        {%- for benefit in benefit_lines -%}
+          {%- assign benefit_trim = benefit | strip -%}
+          {%- if benefit_trim != blank -%}
+            {%- capture clean_benefit -%}
+              {%- render 'sg-sanitize-line-breaks', text: benefit_trim, mode: 'plain' -%}
+            {%- endcapture -%}
+            <li class="benefici-item sg-pdp-panel__item">
+              <span class="benefici-icon sg-pdp-panel__check" aria-hidden="true">✓</span>
+              <span class="sg-pdp-panel__text">{{ clean_benefit | strip }}</span>
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  {%- else -%}
+    <p class="benefici-empty sg-pdp-panel__empty">{{ empty_message }}</p>
+  {%- endif -%}
+</div>

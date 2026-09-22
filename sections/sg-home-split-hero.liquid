@@ -1,0 +1,355 @@
+{%- doc -%}
+  Homepage split hero — Zanetti-style 70/30 panels.
+  Large promo tile + small carousel (image links / Instagram embed).
+{%- enddoc -%}
+
+{%- liquid
+  assign orange = section.settings.promo_background | default: '#e8913a'
+  assign autoplay = section.settings.autoplay_seconds | default: 5 | times: 1000
+  if section.settings.enable_autoplay == false
+    assign autoplay = 0
+  endif
+-%}
+
+{{ 'sg-home-split-hero.css' | asset_url | stylesheet_tag }}
+
+<section
+  class="sg-split-hero"
+  id="SgSplitHero-{{ section.id }}"
+  data-sg-split-hero
+  data-autoplay="{{ autoplay }}"
+  style="--sg-split-orange: {{ orange }};"
+>
+  <div class="sg-split-hero__wrap">
+    <div class="sg-split-hero__grid">
+      <div class="sg-split-hero__cell sg-split-hero__cell--promo">
+        {% render 'sg-home-promo-panel',
+          background: orange,
+          image: section.settings.promo_image,
+          image_url: section.settings.promo_image_url,
+          use_theme_welcome_asset: section.settings.use_theme_welcome_asset,
+          welcome_caption: section.settings.welcome_caption,
+          kicker: section.settings.promo_kicker,
+          percent: section.settings.promo_percent,
+          subheading: section.settings.promo_subheading,
+          heading: section.settings.promo_heading,
+          link: section.settings.promo_link
+        %}
+      </div>
+
+      {%- comment -%}
+        Homepage product quadrant (carousel): Best Sellers badge is ONLY controlled
+        per slide via show_best_sellers_badge — not sg-bestseller-flag / product tags.
+      {%- endcomment -%}
+      <div class="sg-split-hero__cell sg-split-hero__cell--carousel">
+        <div class="sg-split-hero__carousel-stack">
+          {%- liquid
+            assign sg_carousel_count = 0
+            for block in section.blocks
+              unless block.settings.pin_below_carousel
+                assign sg_carousel_count = sg_carousel_count | plus: 1
+              endunless
+            endfor
+          -%}
+          <div class="sg-split-hero__panel sg-split-hero__carousel">
+            <div class="sg-split-hero__viewport">
+              <div class="sg-split-hero__track" data-sg-split-track>
+                {%- assign sg_carousel_index = 0 -%}
+                {%- for block in section.blocks -%}
+                  {%- unless block.settings.pin_below_carousel -%}
+                    {%- liquid
+                      assign sg_slide_is_first = false
+                      if sg_carousel_index == 0
+                        assign sg_slide_is_first = true
+                      endif
+                    -%}
+                    {% render 'sg-split-hero-slide',
+                      block: block,
+                      is_active: sg_slide_is_first,
+                      eager_media: sg_slide_is_first
+                    %}
+                    {%- assign sg_carousel_index = sg_carousel_index | plus: 1 -%}
+                  {%- endunless -%}
+                {%- endfor -%}
+              </div>
+            </div>
+
+            {%- if sg_carousel_count > 1 -%}
+              <button type="button" class="sg-split-hero__nav sg-split-hero__nav--prev" data-sg-split-prev aria-label="Slide precedente">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M15 18l-6-6 6-6"/>
+                </svg>
+              </button>
+              <button type="button" class="sg-split-hero__nav sg-split-hero__nav--next" data-sg-split-next aria-label="Slide successiva">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M9 18l6-6-6-6"/>
+                </svg>
+              </button>
+              <div class="sg-split-hero__dots" role="tablist" aria-label="Slide">
+                {%- assign sg_dot_index = 0 -%}
+                {%- for block in section.blocks -%}
+                  {%- unless block.settings.pin_below_carousel -%}
+                    <button
+                      type="button"
+                      class="sg-split-hero__dot{% if sg_dot_index == 0 %} is-active{% endif %}"
+                      data-sg-split-dot
+                      data-index="{{ sg_dot_index }}"
+                      aria-label="Vai alla slide {{ sg_dot_index | plus: 1 }}"
+                      {% if sg_dot_index == 0 %}aria-current="true"{% endif %}
+                    ></button>
+                    {%- assign sg_dot_index = sg_dot_index | plus: 1 -%}
+                  {%- endunless -%}
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
+          </div>
+
+          {%- for block in section.blocks -%}
+            {%- if block.settings.pin_below_carousel -%}
+              <div class="sg-split-hero__gift-panel" {{ block.shopify_attributes }}>
+                {% render 'sg-split-hero-slide', block: block, pinned: true %}
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'sg-home-split-hero.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Home split hero",
+  "tag": "section",
+  "class": "section-sg-split-hero",
+  "enabled_on": {
+    "templates": ["index"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Large promo panel"
+    },
+    {
+      "type": "color",
+      "id": "promo_background",
+      "label": "Background (brand orange)",
+      "default": "#E8913A"
+    },
+    {
+      "type": "image_picker",
+      "id": "promo_image",
+      "label": "Alice welcome photo",
+      "info": "Final Alice / Spiritual Green welcome photo. Until set, placeholder or URL below is used."
+    },
+    {
+      "type": "text",
+      "id": "promo_image_url",
+      "label": "Alice welcome photo URL (fallback)",
+      "default": "https://cdn.shopify.com/s/files/1/0998/9482/1248/files/IMG_0334.jpg?v=1789817158",
+      "info": "CDN URL used when image picker is empty. Overrides bundled theme asset when set."
+    },
+    {
+      "type": "checkbox",
+      "id": "use_theme_welcome_asset",
+      "label": "Use bundled Alice welcome photo",
+      "default": false,
+      "info": "Shows assets/sg-alice-welcome.webp (JPEG fallback) when no image picker or URL is set."
+    },
+    {
+      "type": "text",
+      "id": "welcome_caption",
+      "label": "Welcome caption over photo",
+      "default": "Benvenuti da Spiritual Green — Alice"
+    },
+    {
+      "type": "text",
+      "id": "promo_kicker",
+      "label": "Promo eyebrow (text mode only)",
+      "default": "Sconti estivi"
+    },
+    {
+      "type": "text",
+      "id": "promo_percent",
+      "label": "Big discount text",
+      "default": "-20%"
+    },
+    {
+      "type": "text",
+      "id": "promo_subheading",
+      "label": "Promo subline",
+      "default": "*su tutto il sito"
+    },
+    {
+      "type": "textarea",
+      "id": "promo_heading",
+      "label": "Fallback promo text",
+      "default": "Sconti estivi! *tutto fino al 20%",
+      "info": "Used only if eyebrow/discount/subline are empty."
+    },
+    {
+      "type": "url",
+      "id": "promo_link",
+      "label": "Promo link"
+    },
+    {
+      "type": "header",
+      "content": "Side carousel"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_autoplay",
+      "label": "Enable autoplay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_seconds",
+      "label": "Autoplay interval (seconds)",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "default": 5
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Image slide",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label / fallback text",
+          "default": "Spiritual Green"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Slide image",
+          "info": "Upload the designer graphic here. If empty and a product is selected, the product image is used."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Custom link",
+          "info": "Optional. Leave empty if you pick a product, collection, or page below."
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product (image + link)",
+          "info": "Sets the click-through URL. Also fills the image if no slide image is uploaded."
+        },
+        {
+          "type": "text",
+          "id": "product_handle",
+          "label": "Product handle (fallback)",
+          "info": "Optional. Used if the product picker is empty — e.g. kit-intestino-infiammato."
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection link"
+        },
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Page link"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_best_sellers_badge",
+          "label": "Show Best Sellers badge",
+          "default": false,
+          "info": "Homepage carousel only. Does not use the global Più venduto product flag."
+        },
+        {
+          "type": "checkbox",
+          "id": "use_gift_card_product",
+          "label": "Resolve gift card product (image + link)",
+          "default": false,
+          "info": "When slide image is empty, uses the store gift card product image and URL if available."
+        },
+        {
+          "type": "checkbox",
+          "id": "pin_below_carousel",
+          "label": "Pin below carousel (always visible)",
+          "default": false,
+          "info": "Use for Carta regalo — shows a fixed clickable graphic under the product slider."
+        },
+        {
+          "type": "text",
+          "id": "image_url_fallback",
+          "label": "Slide image URL (fallback)",
+          "info": "Optional CDN URL when image picker and product image are empty (e.g. gift card artwork)."
+        }
+      ]
+    },
+    {
+      "type": "instagram",
+      "name": "Instagram video",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Instagram — Alice"
+        },
+        {
+          "type": "text",
+          "id": "instagram_url",
+          "label": "Instagram post / reel URL",
+          "info": "Example: https://www.instagram.com/reel/XXXX/ — plays inline on click via Instagram embed"
+        },
+        {
+          "type": "image_picker",
+          "id": "poster",
+          "label": "Poster image before play"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home split hero",
+      "blocks": [
+        {
+          "type": "slide",
+          "settings": {
+            "label": "PEA Complex 1200"
+          }
+        },
+        {
+          "type": "instagram",
+          "settings": {
+            "label": "Instagram — Alice"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "label": "Magnesio Regio Donna"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "label": "Kit intestino infiammato",
+            "product_handle": "kit-intestino-infiammato",
+            "show_best_sellers_badge": true
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "label": "Gift Card"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

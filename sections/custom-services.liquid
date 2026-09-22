@@ -1,0 +1,355 @@
+{% liquid
+  assign section_title = section.settings.title
+%}
+
+<section
+  id="CustomServices-{{ section.id }}"
+  class="custom-services"
+  data-section-id="{{ section.id }}"
+>
+  <div class="custom-services__inner">
+    {% if section_title != blank %}
+      <h2 class="custom-services__title">{{ section_title }}</h2>
+    {% endif %}
+
+    {% if section.blocks.size > 0 %}
+      <ul class="custom-services__grid" role="list">
+        {% for block in section.blocks %}
+          <li
+            class="custom-services__item sg-animate"
+            data-delay="{{ forloop.index }}"
+            {{ block.shopify_attributes }}
+          >
+            <div class="custom-services__icon custom-services__icon--{{ block.settings.icon }}" aria-hidden="true">
+              {% case block.settings.icon %}
+                {% when 'shipping' %}
+                  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="14" width="28" height="18" rx="3" fill="#b8e0c8"/>
+                    <path d="M32 20h8l4 6v6h-12V20z" fill="#9fd4b0"/>
+                    <circle cx="14" cy="36" r="4" fill="#7aab8a"/>
+                    <circle cx="36" cy="36" r="4" fill="#7aab8a"/>
+                  </svg>
+                {% when 'store' %}
+                  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 20 12 10h24l4 10v18H8V20z" fill="#b8d4f0"/>
+                    <rect x="18" y="26" width="12" height="12" rx="1" fill="#8fc0e8"/>
+                    <path d="M8 20h32v4H8v-4z" fill="#a8cce8"/>
+                  </svg>
+                {% when 'tag' %}
+                  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 10h14l14 14-14 14L10 24V10z" fill="#f5c4d4"/>
+                    <circle cx="17" cy="17" r="3" fill="#e8a0b8"/>
+                  </svg>
+                {% when 'gift' %}
+                  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="8" y="22" width="32" height="18" rx="2" fill="#f5e6a8"/>
+                    <rect x="6" y="16" width="36" height="8" rx="2" fill="#edd878"/>
+                    <path d="M24 16V40M16 16c0-4 3.5-8 8-8s8 4 8 8" stroke="#e8c84a" stroke-width="2"/>
+                  </svg>
+                {% else %}
+                  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="24" cy="24" r="16" fill="#e8e8e8"/>
+                  </svg>
+              {% endcase %}
+            </div>
+
+            {% if block.settings.heading != blank %}
+              <h3 class="custom-services__heading">{{ block.settings.heading }}</h3>
+            {% endif %}
+
+            {% if block.settings.text != blank %}
+              <p class="custom-services__text">{{ block.settings.text }}</p>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .custom-services {
+    --cs-green: #97C48A;
+    --cs-white: #ffffff;
+    --cs-font: system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: var(--cs-green);
+    padding: 60px 40px;
+    width: 100%;
+  }
+
+  .custom-services__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  .custom-services__title {
+    display: none;
+  }
+
+  .custom-services__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    justify-items: center;
+  }
+
+  .custom-services__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 0;
+    width: 100%;
+    max-width: 260px;
+    padding: 20px 16px;
+    border-radius: 16px;
+    transition: background 0.3s ease;
+    cursor: default;
+  }
+
+  .custom-services__item:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .custom-services__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    line-height: 1;
+    font-size: 28px;
+  }
+
+  .custom-services__icon svg {
+    display: none;
+  }
+
+  .custom-services__icon--shipping::before {
+    content: '🚚';
+    font-size: 28px;
+  }
+
+  .custom-services__icon--store::before {
+    content: '🏪';
+    font-size: 28px;
+  }
+
+  .custom-services__icon--tag::before {
+    content: '🎁';
+    font-size: 28px;
+  }
+
+  .custom-services__icon--gift::before {
+    content: '🛍️';
+    font-size: 28px;
+  }
+
+  .custom-services__heading {
+    margin: 0;
+    font-family: var(--cs-font);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cs-white);
+  }
+
+  .custom-services__text {
+    margin: 6px 0 0;
+    font-family: var(--cs-font);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--cs-white);
+    opacity: 0.7;
+    max-width: 220px;
+  }
+
+  @media screen and (max-width: 989px) {
+    .custom-services {
+      padding: 48px 24px;
+    }
+
+    .custom-services__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+  }
+
+  @media screen and (max-width: 549px) {
+    .custom-services {
+      padding: 40px 20px;
+    }
+
+    .custom-services__grid {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .custom-services__item {
+      max-width: 320px;
+    }
+
+    .custom-services__text {
+      max-width: 280px;
+    }
+  }
+
+  .custom-services .sg-animate {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+  }
+
+  .custom-services .sg-animate.sg-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .custom-services .sg-animate[data-delay='1'] {
+    transition-delay: 0.1s;
+  }
+
+  .custom-services .sg-animate[data-delay='2'] {
+    transition-delay: 0.2s;
+  }
+
+  .custom-services .sg-animate[data-delay='3'] {
+    transition-delay: 0.3s;
+  }
+
+  .custom-services .sg-animate[data-delay='4'] {
+    transition-delay: 0.4s;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  function initServicesAnimate(root = document) {
+    const items = root.querySelectorAll('.custom-services .sg-animate');
+    if (!items.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      items.forEach((item) => item.classList.add('sg-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('sg-visible');
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    items.forEach((item) => {
+      if (!item.classList.contains('sg-visible')) {
+        observer.observe(item);
+      }
+    });
+  }
+
+  initServicesAnimate();
+
+  document.addEventListener('shopify:section:load', (event) => {
+    if (event.target instanceof HTMLElement) {
+      initServicesAnimate(event.target);
+    }
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Custom services",
+  "tag": "section",
+  "class": "custom-services-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section title",
+      "default": "I NOSTRI SERVIZI"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "service",
+      "name": "Service",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "shipping", "label": "Shipping" },
+            { "value": "store", "label": "Store" },
+            { "value": "tag", "label": "Tag / offer" },
+            { "value": "gift", "label": "Gift" }
+          ],
+          "default": "shipping"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Service title"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Description",
+          "default": "Short description"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [
+    {
+      "name": "Custom services",
+      "category": "Custom",
+      "blocks": [
+        {
+          "type": "service",
+          "settings": {
+            "icon": "shipping",
+            "heading": "SPEDIZIONE GRATUITA",
+            "text": "Sopra i 49€ di spesa"
+          }
+        },
+        {
+          "type": "service",
+          "settings": {
+            "icon": "store",
+            "heading": "RITIRO IN NEGOZIO",
+            "text": "Paga online e ritira in negozio"
+          }
+        },
+        {
+          "type": "service",
+          "settings": {
+            "icon": "tag",
+            "heading": "CAMPIONI OMAGGIO",
+            "text": "Sempre, con i tuoi acquisti"
+          }
+        },
+        {
+          "type": "service",
+          "settings": {
+            "icon": "gift",
+            "heading": "CONFEZIONI REGALO",
+            "text": "Per regali fatti col cuore"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

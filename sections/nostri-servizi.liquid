@@ -1,0 +1,491 @@
+{% liquid
+  assign s1_parts = section.settings.service_1_title | split: ' '
+  assign s1_lead = s1_parts[0]
+  assign s1_accent = ''
+  if s1_parts.size > 1
+    assign s1_accent_parts = s1_parts | slice: 1, s1_parts.size
+    assign s1_accent = s1_accent_parts | join: ' '
+  endif
+
+  assign s2_parts = section.settings.service_2_title | split: ' '
+  assign s2_lead = s2_parts[0]
+  assign s2_accent = ''
+  if s2_parts.size > 1
+    assign s2_accent_parts = s2_parts | slice: 1, s2_parts.size
+    assign s2_accent = s2_accent_parts | join: ' '
+  endif
+
+  assign s3_parts = section.settings.service_3_title | split: ' '
+  assign s3_lead = s3_parts[0]
+  assign s3_accent = ''
+  if s3_parts.size > 1
+    assign s3_accent_parts = s3_parts | slice: 1, s3_parts.size
+    assign s3_accent = s3_accent_parts | join: ' '
+  endif
+
+  assign s4_parts = section.settings.service_4_title | split: ' '
+  assign s4_lead = s4_parts[0]
+  assign s4_accent = ''
+  if s4_parts.size > 1
+    assign s4_accent_parts = s4_parts | slice: 1, s4_parts.size
+    assign s4_accent = s4_accent_parts | join: ' '
+  endif
+%}
+
+<section
+  class="nostri-servizi"
+  id="nostri-servizi-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="nostri-servizi__container">
+    <div class="nostri-servizi__header">
+      {% if section.settings.title != blank %}
+        <h2 class="nostri-servizi__title">{{ section.settings.title }}</h2>
+      {% endif %}
+      {% if section.settings.subtitle != blank %}
+        <p class="nostri-servizi__subtitle">{{ section.settings.subtitle }}</p>
+      {% endif %}
+    </div>
+
+    <div class="nostri-servizi__grid">
+      <div class="nostri-servizi__card sg-animate" data-delay="1">
+        <div class="nostri-servizi__media" aria-hidden="true"></div>
+        <div class="nostri-servizi__card-body">
+          <div class="nostri-servizi__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="10" cy="8" r="3.5"/>
+              <path d="M5 20v-1.5a4 4 0 0 1 4-4h2"/>
+              <circle cx="17.5" cy="17.5" r="3"/>
+              <path d="m21 21-2.2-2.2"/>
+            </svg>
+          </div>
+          <h3 class="nostri-servizi__card-title">
+            <span class="nostri-servizi__title-lead">{{ s1_lead }}</span>{% if s1_accent != blank %}
+            <span class="nostri-servizi__title-accent"> {{ s1_accent }}</span>{% endif %}
+          </h3>
+          <p class="nostri-servizi__card-desc">{{ section.settings.service_1_desc }}</p>
+        </div>
+      </div>
+
+      <div class="nostri-servizi__card sg-animate" data-delay="2">
+        <div class="nostri-servizi__media" aria-hidden="true"></div>
+        <div class="nostri-servizi__card-body">
+          <div class="nostri-servizi__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+              <path d="M12 14V8"/>
+              <path d="M9.5 11.5c1-.7 2.2-1 2.5-1s1.5.3 2.5 1"/>
+            </svg>
+          </div>
+          <h3 class="nostri-servizi__card-title">
+            <span class="nostri-servizi__title-lead">{{ s2_lead }}</span>{% if s2_accent != blank %}
+            <span class="nostri-servizi__title-accent"> {{ s2_accent }}</span>{% endif %}
+          </h3>
+          <p class="nostri-servizi__card-desc">{{ section.settings.service_2_desc }}</p>
+        </div>
+      </div>
+
+      <div class="nostri-servizi__card sg-animate" data-delay="3">
+        <div class="nostri-servizi__media" aria-hidden="true"></div>
+        <div class="nostri-servizi__card-body">
+          <div class="nostri-servizi__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/>
+              <path d="M15 18h2"/>
+              <path d="M19 18h2a1 1 0 0 0 1-1v-5h-4v6"/>
+              <path d="M15 6h4l3 4v5"/>
+              <circle cx="7" cy="18" r="2"/>
+              <circle cx="17" cy="18" r="2"/>
+            </svg>
+          </div>
+          <h3 class="nostri-servizi__card-title">
+            <span class="nostri-servizi__title-lead">{{ s3_lead }}</span>{% if s3_accent != blank %}
+            <span class="nostri-servizi__title-accent"> {{ s3_accent }}</span>{% endif %}
+          </h3>
+          <p class="nostri-servizi__card-desc">{{ section.settings.service_3_desc }}</p>
+        </div>
+      </div>
+
+      <div class="nostri-servizi__card sg-animate" data-delay="4">
+        <div class="nostri-servizi__media" aria-hidden="true"></div>
+        <div class="nostri-servizi__card-body">
+          <div class="nostri-servizi__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="6" width="14" height="12" rx="2"/>
+              <path d="m16 10 4-2v8l-4-2"/>
+              <path d="M7 10h4"/>
+              <path d="M7 14h2"/>
+            </svg>
+          </div>
+          <h3 class="nostri-servizi__card-title">
+            <span class="nostri-servizi__title-lead">{{ s4_lead }}</span>{% if s4_accent != blank %}
+            <span class="nostri-servizi__title-accent"> {{ s4_accent }}</span>{% endif %}
+          </h3>
+          <p class="nostri-servizi__card-desc">{{ section.settings.service_4_desc }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .nostri-servizi {
+    background-color: #ffffff;
+    padding: 80px 0;
+    box-sizing: border-box;
+  }
+
+  .nostri-servizi__container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 3vw, 2.5rem);
+    box-sizing: border-box;
+  }
+
+  .nostri-servizi__header {
+    text-align: center;
+    margin-bottom: 44px;
+    padding-top: 4px;
+  }
+
+  .nostri-servizi__title {
+    margin: 0 0 10px;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.75rem, 2.5vw, 2rem);
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+  }
+
+  .nostri-servizi__subtitle {
+    margin: 0;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    color: #666666;
+    line-height: 1.6;
+  }
+
+  .nostri-servizi__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .nostri-servizi__card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    padding: clamp(1.75rem, 2.8vw, 2.25rem) clamp(1.25rem, 2vw, 1.75rem);
+    overflow: hidden;
+    text-align: center;
+    color: #1a1a1a;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(30, 60, 30, 0.08);
+    transition:
+      transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    box-sizing: border-box;
+    transform: translateY(0);
+  }
+
+  .nostri-servizi__card:hover,
+  .nostri-servizi__card.sg-animate.sg-visible:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 32px rgba(30, 60, 30, 0.12);
+  }
+
+  .nostri-servizi__media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background: linear-gradient(180deg, #F7FAF6 0%, #EFF5ED 38%, #D9EAD4 72%, #C8E2C0 100%);
+    pointer-events: none;
+  }
+
+  .nostri-servizi__card-body {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .nostri-servizi__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #1a1a1a;
+  }
+
+  .nostri-servizi__icon svg {
+    display: block;
+    width: clamp(44px, 5vw, 52px);
+    height: clamp(44px, 5vw, 52px);
+  }
+
+  .nostri-servizi__card-title {
+    margin: 0;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: clamp(1.05rem, 1.55vw, 1.35rem);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  .nostri-servizi__title-lead {
+    color: #1a1a1a;
+  }
+
+  .nostri-servizi__title-accent {
+    color: #1a1a1a;
+  }
+
+  .nostri-servizi__card-desc {
+    margin: 0;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: clamp(12px, 1.1vw, 14px);
+    font-weight: 400;
+    line-height: 1.55;
+    color: #333333;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+    max-width: 30ch;
+  }
+
+  .nostri-servizi .sg-animate {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .nostri-servizi .sg-animate.sg-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nostri-servizi__card,
+    .nostri-servizi .sg-animate {
+      transition: none;
+    }
+
+    .nostri-servizi__card:hover {
+      transform: none;
+    }
+
+    .nostri-servizi .sg-animate {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .nostri-servizi .sg-animate[data-delay='1'] { transition-delay: 0.05s; }
+  .nostri-servizi .sg-animate[data-delay='2'] { transition-delay: 0.1s; }
+  .nostri-servizi .sg-animate[data-delay='3'] { transition-delay: 0.15s; }
+  .nostri-servizi .sg-animate[data-delay='4'] { transition-delay: 0.2s; }
+
+  @media screen and (max-width: 1024px) {
+    .nostri-servizi {
+      padding: 64px 0;
+    }
+
+    .nostri-servizi__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .nostri-servizi {
+      padding: 48px 0;
+    }
+
+    .nostri-servizi__header {
+      margin-bottom: 32px;
+      padding-inline: 1.25rem;
+    }
+
+    .nostri-servizi__grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding-inline: 1.25rem;
+    }
+
+    .nostri-servizi__card {
+      min-height: 280px;
+      padding: 24px 20px;
+    }
+
+    .nostri-servizi__card-title {
+      font-size: 1.15rem;
+    }
+
+    .nostri-servizi__card-desc {
+      font-size: 13px;
+      max-width: none;
+    }
+
+    .nostri-servizi__icon svg {
+      width: 44px;
+      height: 44px;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .nostri-servizi__title {
+      font-size: clamp(1.5rem, 5vw, 1.75rem);
+    }
+
+    .nostri-servizi__card {
+      min-height: 260px;
+      padding: 22px 18px;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  function initNostriServiziAnimate(root = document) {
+    const items = root.querySelectorAll('.nostri-servizi .sg-animate');
+    if (!items.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      items.forEach((item) => item.classList.add('sg-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('sg-visible');
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -30px 0px' }
+    );
+
+    items.forEach((item) => {
+      if (!item.classList.contains('sg-visible')) {
+        observer.observe(item);
+      }
+    });
+  }
+
+  initNostriServiziAnimate();
+
+  document.addEventListener('shopify:section:load', (event) => {
+    if (event.target instanceof HTMLElement) {
+      initNostriServiziAnimate(event.target);
+    }
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "I Nostri Servizi",
+  "tag": "section",
+  "class": "nostri-servizi-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "I Nostri Servizi"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Section Subtitle",
+      "default": "Quello che possiamo fare per il tuo benessere"
+    },
+    {
+      "type": "header",
+      "content": "Service 1"
+    },
+    {
+      "type": "text",
+      "id": "service_1_title",
+      "label": "Service 1 Title",
+      "default": "Consulenza Specialistica"
+    },
+    {
+      "type": "textarea",
+      "id": "service_1_desc",
+      "label": "Service 1 Description",
+      "default": "Consulenti esperti ti guidano nella scelta dei prodotti più adatti alle tue esigenze personali"
+    },
+    {
+      "type": "header",
+      "content": "Service 2"
+    },
+    {
+      "type": "text",
+      "id": "service_2_title",
+      "label": "Service 2 Title",
+      "default": "Prodotti Selezionati"
+    },
+    {
+      "type": "textarea",
+      "id": "service_2_desc",
+      "label": "Service 2 Description",
+      "default": "Solo prodotti naturali di alta qualità, selezionati con cura per il tuo benessere quotidiano"
+    },
+    {
+      "type": "header",
+      "content": "Service 3"
+    },
+    {
+      "type": "text",
+      "id": "service_3_title",
+      "label": "Service 3 Title",
+      "default": "Spedizione Rapida"
+    },
+    {
+      "type": "textarea",
+      "id": "service_3_desc",
+      "label": "Service 3 Description",
+      "default": "Consegna veloce e sicura direttamente a casa tua, con spedizione gratuita sopra i 49€"
+    },
+    {
+      "type": "header",
+      "content": "Service 4"
+    },
+    {
+      "type": "text",
+      "id": "service_4_title",
+      "label": "Service 4 Title",
+      "default": "Consulenza Online"
+    },
+    {
+      "type": "textarea",
+      "id": "service_4_desc",
+      "label": "Service 4 Description",
+      "default": "Prenota una consulenza online con i nostri esperti tramite il nostro calendario dedicato"
+    }
+  ],
+  "presets": [
+    {
+      "name": "I Nostri Servizi",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

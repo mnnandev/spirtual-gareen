@@ -1,0 +1,37 @@
+{%- doc -%}
+  Shop dropdown — 7 macro-categories (text-only, minimal).
+{%- enddoc -%}
+
+{% liquid
+  assign sg_category_handles = 'sonno-mente-energia,difese-protezione-respiratorie,intestino-digestione-metabolismo,movimento-dolori-recupero,benessere-ormonale-intimo,bellezza-cura-persona,mondo-zen' | split: ','
+  assign sg_category_titles = 'Sonno, Mente ed Energia|Difese, Protezione e Vie Respiratorie|Intestino, Digestione e Metabolismo|Movimento, Dolori e Recupero|Benessere Ormonale e Intimo|Bellezza e Cura della Persona|Mondo Zen' | split: '|'
+%}
+
+{% capture shop_all_url %}{% render 'sg-main-nav-url', key: 'shop' %}{% endcapture %}
+
+<div class="sg-prodotti-mega-menu sg-shop-categories-mega-menu">
+  <ul class="sg-mega-menu__list list-unstyled" role="list">
+    {% for handle in sg_category_handles %}
+      {% assign title = sg_category_titles[forloop.index0] %}
+      {% capture item_url %}{% render 'sg-collection-nav-url', handle: handle %}{% endcapture %}
+      <li class="sg-mega-menu__item-wrap">
+        <a
+          href="{{ item_url | strip }}"
+          class="sg-mega-menu__item sg-prodotti-mega-menu__item sg-shop-categories-mega-menu__item"
+        >
+          <span class="sg-mega-menu__icon" aria-hidden="true">
+            {% render 'category-icons', category: handle, size: 20, label: title, decorative: true %}
+          </span>
+          <span class="sg-mega-menu__info">
+            <span class="sg-mega-menu__title">{{ title }}</span>
+          </span>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <a href="{{ shop_all_url | strip }}" class="sg-mega-menu__shop-all">
+    {{ 'spiritual_green.mega_menu_shop_all' | t }}
+    <span class="sg-mega-menu__arrow" aria-hidden="true">→</span>
+  </a>
+</div>

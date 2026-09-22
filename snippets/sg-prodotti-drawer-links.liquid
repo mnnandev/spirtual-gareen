@@ -1,0 +1,28 @@
+{%- doc -%}
+  Mobile drawer child links for PRODOTTI (same URLs as sg-prodotti-submenu).
+
+  @param {object} parent_link - Parent menu link (for IDs)
+  @param {boolean} [render_link_image] - Unused; kept for render call compatibility
+{%- enddoc -%}
+
+{% liquid
+  assign prodotti_handles = 'erboristeria,alimentazione,cosmetica,integratori,per-la-casa,etnico' | split: ','
+  assign prodotti_titles = 'Erboristeria Tradizionale|Alimentazione Biologica|Cosmetica Naturale|Integratori Alimentari|Per la Casa|Etnico' | split: '|'
+%}
+
+{% for handle in prodotti_handles %}
+  {% assign link_title = prodotti_titles[forloop.index0] %}
+  {% capture link_url %}{% render 'sg-prodotti-nav-url', handle: handle %}{% endcapture %}
+  <li
+    class="menu-drawer__list-item"
+    style="--menu-drawer-animation-index: {{ forloop.index }};"
+  >
+    <a
+      id="HeaderDrawer-{{ parent_link.handle }}-{{ handle }}"
+      href="{{ link_url | strip }}"
+      class="menu-drawer__menu-item menu-drawer__menu-item--child menu-drawer__animated-element focus-inset"
+    >
+      <span class="menu-drawer__menu-item-text wrap-text">{{ link_title | escape }}</span>
+    </a>
+  </li>
+{% endfor %}

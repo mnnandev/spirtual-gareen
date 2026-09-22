@@ -1,0 +1,32 @@
+{%- doc -%}
+  Collection URL with alias mapping and fallbacks when a collection is not in Shopify yet.
+
+  @param {string} handle - Collection handle
+{%- enddoc -%}
+
+{%- liquid
+  capture resolved_handle_raw
+    render 'sg-resolve-macro-collection-handle', handle: handle
+  endcapture
+  assign resolved_handle = resolved_handle_raw | strip
+  assign target = collections[resolved_handle]
+-%}
+
+{%- if target != blank and target.url != blank -%}
+  {{- target.url -}}
+{%- else -%}
+  {%- capture search_query -%}
+    {%- render 'sg-shop-category-meta', handle: handle, output: 'search_query' -%}
+  {%- endcapture -%}
+  {%- assign search_query = search_query | strip -%}
+
+  {%- if search_query != blank -%}
+    {{- routes.search_url -}}?q={{ search_query | url_encode }}&type=product
+  {%- elsif collections['all-products'] != blank -%}
+    {{- collections['all-products'].url -}}
+  {%- elsif collections.all != blank -%}
+    {{- collections.all.url -}}
+  {%- else -%}
+    {{- routes.all_products_collection_url -}}
+  {%- endif -%}
+{%- endif -%}

@@ -1,0 +1,164 @@
+{%- doc -%}
+  Single circular category tile with subcategory panel.
+
+  @param {object} block - Section block (optional)
+  @param {string} title - Category title
+  @param {string} handle - Collection handle
+  @param {string} section_id - Section ID for unique panel IDs
+  @param {number} index - Item index
+  @param {string} [active_parent_handle] - Canonical handle of active macro-category
+  @param {string} [current_sub_handle] - Active subcategory handle for panel links
+{%- enddoc -%}
+
+{%- liquid
+  assign item_title = title
+  assign item_handle = handle
+  assign item_active_parent_handle = active_parent_handle | default: '' | strip
+  assign item_current_sub_handle = current_sub_handle | default: '' | strip
+  assign item_block_image = blank
+
+  if block != blank
+    assign item_title = block.settings.title | default: item_title
+    if block.settings.collection != blank
+      assign item_handle = block.settings.collection.handle
+    elsif block.settings.handle != blank
+      assign item_handle = block.settings.handle
+    endif
+    assign item_block_image = block.settings.image
+  endif
+
+  capture item_normalized_handle_raw
+    render 'sg-normalize-macro-handle', handle: item_handle
+  endcapture
+  assign item_normalized_handle = item_normalized_handle_raw | strip
+
+  assign item_is_active_parent = false
+  if item_active_parent_handle != blank and item_normalized_handle == item_active_parent_handle
+    assign item_is_active_parent = true
+  endif
+
+  capture circle_image_url_raw
+    render 'sg-shop-category-meta', handle: item_handle, output: 'circle_image_url'
+  endcapture
+  assign circle_image_url = circle_image_url_raw | strip
+  assign item_uses_photo = false
+  if item_block_image != blank or circle_image_url != blank
+    assign item_uses_photo = true
+  endif
+
+  capture parent_url
+    render 'sg-collection-nav-url', handle: item_handle
+  endcapture
+  assign parent_url = parent_url | strip
+
+  capture sub_handles_csv
+    render 'sg-collection-subcategory-meta', parent_handle: item_handle, output: 'handles'
+  endcapture
+  capture sub_titles_csv
+    render 'sg-collection-subcategory-meta', parent_handle: item_handle, output: 'titles'
+  endcapture
+
+  assign sub_handles = sub_handles_csv | strip | split: ','
+  assign sub_titles = sub_titles_csv | strip | split: '|'
+  assign has_subcategories = false
+  if sub_handles_csv != blank and sub_handles.size > 0
+    assign has_subcategories = true
+  endif
+
+  assign panel_id = 'category-panel-' | append: section_id | append: '-' | append: index
+  assign icon_size = 48
+-%}
+
+<li
+  class="category-circles__item{% if has_subcategories %} category-circles__item--has-panel{% endif %}{% if item_is_active_parent %} is-active-parent{% endif %}"
+  data-category-item
+  {{ block.shopify_attributes }}
+>
+  <div class="category-circles__circle-wrap">
+    {%- comment -%}
+      Always use a real link for the circle. A stacked toggle button used to replace
+      the link on mobile (display swap), so taps opened a panel instead of navigating.
+    {%- endcomment -%}
+    <a
+      href="{{ parent_url }}"
+      class="category-circles__circle category-circles__circle-link{% if item_uses_photo %} category-circles__circle--photo{% endif %}{% if item_is_active_parent and item_current_sub_handle == blank %} is-active{% endif %}"
+      aria-label="{{ item_title | escape }}"
+      {% if item_is_active_parent and item_current_sub_handle == blank %}
+        aria-current="page"
+      {% endif %}
+    >
+      {% render 'sg-category-circle-image',
+        handle: item_handle,
+        image: item_block_image,
+        title: item_title,
+        size: icon_size
+      %}
+    </a>
+
+    {% if item_title != blank %}
+      {%- liquid
+        assign label_len = item_title | size
+        assign label_class = 'category-circles__label'
+        if label_len > 36
+          assign label_class = label_class | append: ' category-circles__label--long'
+        elsif label_len > 30
+          assign label_class = label_class | append: ' category-circles__label--medium'
+        endif
+      -%}
+      <a
+        href="{{ parent_url }}"
+        class="{{ label_class }}"
+        data-label-length="{{ label_len }}"
+        {% if item_is_active_parent and item_current_sub_handle == blank %}
+          aria-current="page"
+        {% endif %}
+      >
+        {{ item_title }}
+      </a>
+    {% endif %}
+  </div>
+
+  {% if has_subcategories %}
+    <div
+      id="{{ panel_id }}"
+      class="category-circles__panel category-circles__panel--mega"
+      data-category-panel
+      hidden
+    >
+      <ul class="category-circles__panel-list" role="list">
+        <li>
+          <a
+            href="{{ parent_url }}"
+            class="category-circles__panel-link category-circles__panel-link--all{% if item_is_active_parent and item_current_sub_handle == blank %} is-active{% endif %}"
+            {% if item_is_active_parent and item_current_sub_handle == blank %}
+              aria-current="page"
+            {% endif %}
+          >
+            {{ 'spiritual_green.nav.all_products_in_category' | t }}
+          </a>
+        </li>
+        {% for sub_handle in sub_handles %}
+          {% assign sub_handle = sub_handle | strip %}
+          {% assign sub_title = sub_titles[forloop.index0] %}
+          {% assign sub_is_active = false %}
+          {% if item_is_active_parent and item_current_sub_handle != blank and item_current_sub_handle == sub_handle %}
+            {% assign sub_is_active = true %}
+          {% endif %}
+          {% if sub_handle != blank and sub_title != blank %}
+            <li>
+              <a
+                href="{% render 'sg-subcategory-nav-url', parent_handle: item_handle, sub_handle: sub_handle %}"
+                class="category-circles__panel-link{% if sub_is_active %} is-active{% endif %}"
+                {% if sub_is_active %}
+                  aria-current="page"
+                {% endif %}
+              >
+                {{ sub_title }}
+              </a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+</li>

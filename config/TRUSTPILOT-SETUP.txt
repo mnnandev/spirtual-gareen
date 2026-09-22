@@ -1,0 +1,28 @@
+# Trustpilot + featured reviews setup
+
+## Theme settings (required for widgets)
+Theme Editor → Theme settings → **Trustpilot**:
+- **Business Unit ID** — from Trustpilot Business → company profile
+- **Default locale** — `it-IT`
+- **Trustpilot profile URL** — e.g. `https://it.trustpilot.com/review/your-domain.it`
+
+Without the Business Unit ID, the live Trustpilot carousel is skipped; three featured review cards still show.
+
+## Site-wide (footer group)
+**SG Dicono di noi** — `sections/footer-group.json` → `sg_dicono_di_noi_global`
+- Heading + 3 featured cards on every page that uses the main theme footer
+- Optional Trustpilot carousel when Business Unit ID is set
+
+### Update the 3 featured reviews
+- Theme Editor → Footer → SG Dicono di noi → edit review blocks
+- Or fallback copy in `snippets/sg-featured-reviews-data.liquid`
+
+## Product pages
+**SG Trustpilot product reviews** (optional section) uses the official TrustBox embed:
+- Bootstrap script in `layout/theme.liquid`
+- Widget with `data-sku` from all product variant SKUs
+- Docs: https://help.trustpilot.com/s/article/Add-a-product-review-TrustBox-widget
+
+Product Reviews add-on is required on the Trustpilot plan. SKUs in Shopify must match SKUs in Trustpilot.
+
+Fake placeholder review sections (`custom-product-reviews*`) were removed from `templates/product.json`.

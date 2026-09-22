@@ -1,0 +1,24 @@
+{%- doc -%}
+  Format a Shopify price filter value (minor units / cents) for plain number inputs.
+
+  @param {number} cents - Price in minor units (e.g. 10000 = €100)
+{%- enddoc -%}
+
+{%- liquid
+  assign cents_num = cents | default: 0 | plus: 0
+  assign whole = cents_num | divided_by: 100
+  assign frac = cents_num | modulo: 100
+
+  if frac == 0
+    echo whole
+  else
+    capture frac_str
+      if frac < 10
+        echo '0'
+      endif
+      echo frac
+    endcapture
+    assign formatted = whole | append: '.' | append: frac_str
+    echo formatted
+  endif
+-%}

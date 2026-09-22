@@ -1,0 +1,230 @@
+<!doctype html>
+{% liquid
+  assign sg_legal_404_override = ''
+  assign sg_render_consulenza = false
+  assign sg_render_gift_card = false
+
+  if template.name == '404'
+    capture sg_legal_404_override
+      render 'sg-legal-virtual-type'
+    endcapture
+    assign sg_legal_404_override = sg_legal_404_override | strip
+
+    if sg_legal_404_override == blank and request.path contains 'consulenza-online'
+      assign sg_legal_404_override = 'consulenza'
+    endif
+
+    if sg_legal_404_override == blank and request.path contains 'gift-card'
+      assign sg_legal_404_override = 'gift-card'
+    endif
+  endif
+
+  if sg_legal_404_override == 'consulenza'
+    assign sg_render_consulenza = true
+  elsif sg_legal_404_override == 'gift-card'
+    assign sg_render_gift_card = true
+  elsif page.handle == 'consulenza-online' and template.suffix != 'consulenza'
+    assign sg_render_consulenza = true
+  elsif page.handle == 'gift-card' and template.suffix != 'gift-card'
+    assign sg_render_gift_card = true
+  endif
+
+  if template.name == '404' and request.path contains 'gift-card'
+    assign sg_render_gift_card = true
+    assign sg_legal_404_override = 'gift-card'
+  endif
+
+  assign sg_gift_card_product = blank
+  if template.name == 'product' and product != blank and product.gift_card? and template.suffix != 'gift-card'
+    assign sg_render_gift_card = true
+    assign sg_gift_card_product = product
+  endif
+
+  capture sg_consulenza_calendly_url
+    render 'sg-consulenza-calendly-url'
+  endcapture
+  assign sg_consulenza_calendly_url = sg_consulenza_calendly_url | strip
+%}
+<html
+  class="{% if request.design_mode %}shopify-design-mode {% endif %}{% if template.name == 'cart' %}template-cart{% endif %}"
+  lang="{% render 'sg-display-lang', output: 'html_lang' %}"
+>
+  <head>
+    {%- if settings.favicon != blank -%}
+      <link
+        rel="icon"
+        type="image/png"
+        href="{{ settings.favicon | image_url: width: 32, height: 32 }}"
+      >
+    {%- endif -%}
+
+    {% # theme-check-disable RemoteAsset %}
+    {% comment %} This a way to wait for main content to load when navigating to a new page so that the view transitions can work consistently {% endcomment %}
+    {% if settings.transition_to_main_product or settings.page_transition_enabled %}
+      <link
+        rel="expect"
+        href="#MainContent"
+        blocking="render"
+        id="view-transition-render-blocker"
+      >
+    {% endif %}
+
+    {%- render 'meta-tags' -%}
+    {%- render 'stylesheets' -%}
+    {%- render 'fonts' -%}
+    {%- render 'sg-brand-fonts' -%}
+    {%- render 'scripts' -%}
+    {%- render 'theme-styles-variables' -%}
+    {%- render 'sg-typography' -%}
+    {%- render 'color-schemes' -%}
+
+    {% if request.design_mode %}
+      {%- render 'theme-editor' -%}
+    {% endif %}
+
+    {{ content_for_header }}
+    {% # theme-check-enable RemoteAsset %}
+
+    {%- render 'sg-trustpilot-bootstrap' -%}
+
+    {% if template.name == '404' and sg_legal_404_override == blank %}
+      {% render 'sg-legal-404-fallback', placement: 'head' %}
+    {% endif %}
+  </head>
+
+  <body class="page-width-{{ settings.page_width }} card-hover-effect-{{ settings.card_hover_effect }}{% if template.name == 'index' %} template-index{% endif %}{% if template.name == 'cart' %} template-cart{% endif %}{% if template.name == 'collection' %} template-collection{% endif %}{% if template.name == 'policy' %} template-policy{% endif %}{% if template.name == 'page' %} template-page{% endif %}{% if template.name == 'page' and template.suffix == 'consulenza' %} template-consulenza{% endif %}{% if template.name == 'page' and template.suffix == 'gift-card' %} template-gift-card{% endif %}{% if sg_render_consulenza %} template-consulenza{% endif %}{% if sg_render_gift_card %} template-gift-card{% endif %}{% if template.name == '404' %} template-404{% endif %}{% if sg_legal_404_override != blank %} sg-legal-404-override template-page{% endif %}{% if sg_legal_404_override == 'consulenza' or sg_render_consulenza %} template-consulenza{% endif %}{% if sg_legal_404_override == 'gift-card' or sg_render_gift_card %} template-gift-card{% endif %}">
+    {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
+    <div id="header-group">
+      {% sections 'header-group' %}
+    </div>
+
+    <script>
+      // Inline header height and menu style calculations to prevent layout shift
+      // Note: Updates in calculateHeaderGroupHeight(), updateTransparentHeaderOffset() and setHeaderMenuStyle() utilities.js should be kept in sync with this function
+      (function setHeaderHeighCustomProperties() {
+        /*
+         * Header calculation functions for maintaining CSS variables
+         * Mimic calculateHeaderGroupHeight() in utilities.js
+         */
+        const header = document.querySelector('header-component');
+        const headerGroup = document.querySelector('#header-group');
+        const hasHeaderSection = headerGroup?.querySelector('.header-section');
+
+        if (!header || !headerGroup) return;
+
+        const headerTopRow = header.querySelector('.header__row--top');
+        const headerHeight = header.offsetHeight;
+
+        // Calculate the total height of the header group
+        let headerGroupHeight = 0;
+        const children = headerGroup.children;
+        for (let i = 0; i < children.length; i++) {
+          const element = children[i];
+          if (element === header || !(element instanceof HTMLElement)) continue;
+          headerGroupHeight += element.offsetHeight;
+        }
+
+        // Check for transparent header special case
+        if (header.hasAttribute('transparent') && header.parentElement?.nextElementSibling) {
+          headerGroupHeight += headerHeight;
+        }
+
+        // Set CSS variables
+        document.body.style.setProperty('--header-height', `${headerHeight}px`);
+        document.body.style.setProperty('--header-group-height', `${headerGroupHeight}px`);
+        // Pin-header offset (fixed #header-group) — refined later by spiritual-green-header.js
+        document.documentElement.style.setProperty(
+          '--sg-header-offset',
+          `${Math.round(headerGroup.getBoundingClientRect().height || headerGroupHeight || headerHeight)}px`
+        );
+
+        if (headerTopRow) {
+          window.requestAnimationFrame(function () {
+            document.body.style.setProperty('--top-row-height', `${headerTopRow.offsetHeight}px`);
+          });
+        }
+
+        /**
+         * Updates CSS custom properties for transparent header offset calculation
+         * Mimic updateTransparentHeaderOffset() in utilities.js
+         */
+
+        if (!hasHeaderSection || !header?.hasAttribute('transparent')) {
+          document.body.style.setProperty('--transparent-header-offset-boolean', '0');
+          return;
+        }
+
+        const hasImmediateSection = hasHeaderSection.nextElementSibling?.classList.contains('shopify-section');
+
+        const shouldApplyOffset = !hasImmediateSection ? '1' : '0';
+        document.body.style.setProperty('--transparent-header-offset-boolean', shouldApplyOffset);
+      })();
+
+      (function setHeaderMenuStyle() {
+        const headerComponent = document.querySelector('#header-component');
+        if (headerComponent) {
+          const isTouchDevice = 'ontouchstart' in window && navigator.maxTouchPoints > 0;
+          const isDesktop = window.matchMedia('(min-width: 750px)').matches;
+          const overflowList = headerComponent?.querySelector('overflow-list');
+          const overflowDisabled = overflowList && overflowList.hasAttribute('disabled');
+          const hasReachedMinimum =
+            overflowList && overflowList.hasAttribute('minimum-reached') && !overflowDisabled && !isDesktop;
+          headerComponent.dataset.menuStyle = isTouchDevice || hasReachedMinimum ? 'drawer' : 'menu';
+        }
+      })();
+    </script>
+
+    <main
+      id="MainContent"
+      class="content-for-layout{% if sg_legal_404_override != blank %} sg-legal-404-override-main{% endif %}"
+      role="main"
+      data-page-transition-enabled="{{ settings.page_transition_enabled }}"
+      data-product-transition="{{ settings.transition_to_main_product }}"
+      data-template="{{ template }}"
+    >
+      {% if sg_render_consulenza %}
+        <div id="sg-consulenza-root" class="sg-consulenza-virtual-page sg-consulenza-page-section template-consulenza">
+          {% render 'sg-consulenza-page-default', calendly_url: sg_consulenza_calendly_url %}
+        </div>
+        {% if sg_consulenza_calendly_url != blank %}
+          <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+          <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+        {% endif %}
+        <script src="{{ 'sg-consulenza-booking.js' | asset_url }}" defer></script>
+      {% elsif sg_render_gift_card %}
+        <div id="sg-gift-card-root" class="sg-gift-card-virtual-page sg-gift-card-section template-gift-card">
+          {% render 'sg-gift-card-page-default', product_override: sg_gift_card_product %}
+        </div>
+      {% elsif sg_legal_404_override != blank and sg_legal_404_override != 'consulenza' and sg_legal_404_override != 'gift-card' %}
+        {% if sg_legal_404_override == 'faq' %}
+          <div id="sg-faq-root" class="sg-faq-virtual-page sg-faq-page-section">
+            {% render 'sg-faq-page-body' %}
+          </div>
+        {% else %}
+          <div id="sg-privacy-root" class="sg-legal-virtual-page sg-legal-page-section">
+            {% render 'sg-legal-virtual-render', legal_type: sg_legal_404_override %}
+          </div>
+        {% endif %}
+      {% else %}
+        {{ content_for_layout }}
+      {% endif %}
+    </main>
+
+    {% if template.name == '404' and sg_legal_404_override == blank %}
+      {% render 'sg-legal-404-fallback', placement: 'body' %}
+    {% endif %}
+
+    <footer>
+      {% sections 'footer-group' %}
+    </footer>
+
+    {% render 'sg-newsletter-popup' %}
+
+    {% render 'search-modal' %}
+
+    {% if settings.quick_add or settings.mobile_quick_add %}
+      {% render 'quick-add-modal' %}
+    {% endif %}
+
+  </body>
+</html>

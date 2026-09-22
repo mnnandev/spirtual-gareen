@@ -1,0 +1,460 @@
+{% if section.settings.show_section %}
+  <section
+    id="CustomBrandsBar-{{ section.id }}"
+    class="custom-brands-bar"
+    data-section-id="{{ section.id }}"
+    data-brands-bar
+  >
+    <div class="custom-brands-bar__container">
+      <div class="custom-brands-bar__glass">
+        <div class="custom-brands-bar__viewport" data-brands-viewport>
+          <div class="custom-brands-bar__track" data-brands-track>
+            <div class="custom-brands-bar__slide" data-brands-slide role="list">
+              <a
+                class="custom-brands-bar__logo-link"
+                href="https://www.guam.it/"
+                target="_blank"
+                rel="noopener noreferrer"
+                role="listitem"
+              >
+                <img
+                  class="custom-brands-bar__logo"
+                  src="https://cdn.shopify.com/s/files/1/0998/9482/1248/files/GUAM.webp?v=1780472185"
+                  alt="GUAM"
+                  width="140"
+                  height="52"
+                  loading="lazy"
+                >
+              </a>
+              <a class="custom-brands-bar__logo-link" href="#" role="listitem">
+                <img
+                  class="custom-brands-bar__logo"
+                  src="https://cdn.shopify.com/s/files/1/0998/9482/1248/files/PROMO-PHARMA.webp?v=1780472185"
+                  alt="Promo Pharma"
+                  width="200"
+                  height="52"
+                  loading="lazy"
+                >
+              </a>
+              <a
+                class="custom-brands-bar__logo-link"
+                href="https://www.whysport.it/"
+                target="_blank"
+                rel="noopener noreferrer"
+                role="listitem"
+              >
+                <img
+                  class="custom-brands-bar__logo"
+                  src="https://cdn.shopify.com/s/files/1/0998/9482/1248/files/WHY-SPORT.webp?v=1780472185"
+                  alt="Why Sport"
+                  width="180"
+                  height="52"
+                  loading="lazy"
+                >
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endif %}
+
+{% style %}
+  #shopify-section-{{ section.id }}.custom-brands-bar-section {
+    position: relative;
+    z-index: 25;
+    margin-top: -52px;
+    margin-bottom: -52px;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    background: transparent !important;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }}.custom-brands-bar-section {
+      margin-top: -44px;
+      margin-bottom: -44px;
+    }
+  }
+{% endstyle %}
+
+{% stylesheet %}
+  .custom-brands-bar {
+    background: transparent;
+    padding: 0;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .custom-brands-bar__container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .custom-brands-bar__glass {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    box-shadow:
+      0 4px 24px rgba(28, 58, 19, 0.1),
+      0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    padding: 20px 48px;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
+    pointer-events: auto;
+  }
+
+  .custom-brands-bar__viewport {
+    overflow: hidden;
+    max-width: 100%;
+    min-height: 52px;
+  }
+
+  .custom-brands-bar__track {
+    display: flex;
+    align-items: center;
+    will-change: transform;
+    transition: transform 1.1s ease-in-out;
+  }
+
+  .custom-brands-bar__track.is-resetting {
+    transition: none;
+  }
+
+  .custom-brands-bar__slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 80px;
+    min-height: 52px;
+    box-sizing: border-box;
+  }
+
+  .custom-brands-bar__logo-link {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    line-height: 0;
+    text-decoration: none;
+  }
+
+  .custom-brands-bar__logo {
+    display: block;
+    height: 52px;
+    width: auto;
+    min-width: 72px;
+    max-width: 220px;
+    object-fit: contain;
+    opacity: 1 !important;
+    filter: contrast(1.2) brightness(0.92) !important;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .custom-brands-bar__logo-link:hover .custom-brands-bar__logo {
+    opacity: 1 !important;
+    transform: scale(1.04);
+  }
+
+  @media screen and (max-width: 768px) {
+    .custom-brands-bar__glass {
+      padding: 16px 24px;
+    }
+
+    .custom-brands-bar__viewport {
+      margin: 0 auto;
+    }
+
+    .custom-brands-bar__slide {
+      gap: 0;
+      justify-content: center;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  const logos = [
+    {
+      src: 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/GUAM.webp?v=1780472185',
+      alt: 'GUAM',
+      href: 'https://www.guam.it/',
+    },
+    {
+      src: 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/PROMO-PHARMA.webp?v=1780472185',
+      alt: 'Promo Pharma',
+      href: '#',
+    },
+    {
+      src: 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/WHY-SPORT.webp?v=1780472185',
+      alt: 'Why Sport',
+      href: 'https://www.whysport.it/',
+    },
+    {
+      src: 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/INNBAMBOO.webp?v=1780472185',
+      alt: 'Innbamboo',
+      href: 'https://innbamboo.com/',
+    },
+    {
+      src: 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/ERBOLARIO.webp?v=1780472185',
+      alt: "L'Erbolario",
+      href: 'https://www.erbolario.com/',
+    },
+    {
+      src: 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/OCCITANE.webp?v=1780472185',
+      alt: "L'Occitane",
+      href: 'https://it.loccitane.com/',
+    },
+    {
+      src: 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/LOCHERBER.webp?v=1780472186',
+      alt: 'Locherber',
+      href: 'https://locherbermilano.com/eu/it/',
+    },
+  ];
+
+  const SLIDE_MS = 1100;
+  const ROTATE_MS = 6500;
+  const MOBILE_MQ = window.matchMedia('(max-width: 768px)');
+
+  /** @type {Map<HTMLElement, { intervalId: number, resizeHandler: () => void, isAnimating: boolean }>} */
+  const instances = new Map();
+
+  /**
+   * @param {number} perPage
+   * @returns {typeof logos[]}
+   */
+  function buildGroups(perPage) {
+    const groups = [];
+    for (let start = 0; start < logos.length; start += perPage) {
+      const group = [];
+      for (let i = 0; i < perPage; i++) {
+        group.push(logos[(start + i) % logos.length]);
+      }
+      groups.push(group);
+    }
+    return groups;
+  }
+
+  /**
+   * @param {typeof logos[0]} logo
+   * @returns {HTMLAnchorElement}
+   */
+  function createLogoLink(logo) {
+    const link = document.createElement('a');
+    link.className = 'custom-brands-bar__logo-link';
+    link.href = logo.href;
+    link.setAttribute('role', 'listitem');
+
+    if (logo.href && logo.href !== '#') {
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+    }
+
+    const img = document.createElement('img');
+    img.className = 'custom-brands-bar__logo';
+    img.src = logo.src;
+    img.alt = logo.alt;
+    img.height = 40;
+    img.loading = 'lazy';
+
+    link.appendChild(img);
+    return link;
+  }
+
+  /**
+   * @param {typeof logos[]} group
+   * @returns {HTMLDivElement}
+   */
+  function createSlide(group) {
+    const slide = document.createElement('div');
+    slide.className = 'custom-brands-bar__slide';
+    slide.setAttribute('data-brands-slide', '');
+    slide.setAttribute('role', 'list');
+    group.forEach((logo) => slide.appendChild(createLogoLink(logo)));
+    return slide;
+  }
+
+  /**
+   * @param {HTMLElement} viewport
+   * @param {HTMLElement} track
+   * @param {typeof logos[]} groups
+   * @param {number} activeIndex
+   */
+  function buildTrack(viewport, track, groups, activeIndex = 0) {
+    track.replaceChildren(...groups.map((group) => createSlide(group)));
+
+    if (groups.length > 1) {
+      track.appendChild(createSlide(groups[0]));
+    }
+
+    track.classList.remove('is-resetting');
+    track.style.transform = 'translateX(0)';
+
+    const slides = track.querySelectorAll('[data-brands-slide]');
+    let slideWidth = 0;
+
+    slides.forEach((slide) => {
+      if (slide instanceof HTMLElement) {
+        slideWidth = Math.max(slideWidth, slide.offsetWidth);
+      }
+    });
+
+    if (slideWidth > 0) {
+      slides.forEach((slide) => {
+        if (slide instanceof HTMLElement) {
+          slide.style.width = `${slideWidth}px`;
+        }
+      });
+      viewport.style.width = `${slideWidth}px`;
+    } else {
+      viewport.style.width = '';
+    }
+
+    const index = Math.min(activeIndex, Math.max(groups.length - 1, 0));
+    track.style.transform = `translateX(-${index * slideWidth}px)`;
+    return { slideWidth, index, groupCount: groups.length };
+  }
+
+  /**
+   * @param {HTMLElement} track
+   * @param {number} index
+   * @param {number} slideWidth
+   */
+  function goToSlide(track, index, slideWidth) {
+    track.classList.remove('is-resetting');
+    track.style.transform = `translateX(-${index * slideWidth}px)`;
+  }
+
+  /**
+   * @param {HTMLElement} section
+   */
+  function initBrandsBar(section) {
+    if (!(section instanceof HTMLElement)) return;
+
+    const viewport = section.querySelector('[data-brands-viewport]');
+    const track = section.querySelector('[data-brands-track]');
+    if (!(viewport instanceof HTMLElement) || !(track instanceof HTMLElement)) return;
+
+    destroyBrandsBar(section);
+
+    let perPage = MOBILE_MQ.matches ? 1 : 3;
+    let groups = buildGroups(perPage);
+    let { slideWidth, index: currentIndex, groupCount } = buildTrack(viewport, track, groups, 0);
+    let isAnimating = false;
+
+    const tick = () => {
+      if (isAnimating || slideWidth <= 0 || groupCount <= 1) return;
+
+      isAnimating = true;
+      const atLastGroup = currentIndex === groupCount - 1;
+      const nextIndex = currentIndex + 1;
+      goToSlide(track, nextIndex, slideWidth);
+
+      window.setTimeout(() => {
+        if (atLastGroup) {
+          track.classList.add('is-resetting');
+          currentIndex = 0;
+          goToSlide(track, 0, slideWidth);
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              track.classList.remove('is-resetting');
+            });
+          });
+        } else {
+          currentIndex = nextIndex;
+        }
+        isAnimating = false;
+      }, SLIDE_MS);
+    };
+
+    const intervalId = window.setInterval(tick, ROTATE_MS);
+
+    const resizeHandler = () => {
+      const nextPerPage = MOBILE_MQ.matches ? 1 : 3;
+      if (nextPerPage !== perPage) {
+        perPage = nextPerPage;
+        groups = buildGroups(perPage);
+        currentIndex = 0;
+      }
+      const built = buildTrack(viewport, track, groups, currentIndex);
+      slideWidth = built.slideWidth;
+      currentIndex = built.index;
+      groupCount = built.groupCount;
+    };
+
+    MOBILE_MQ.addEventListener('change', resizeHandler);
+    window.addEventListener('resize', resizeHandler);
+    instances.set(section, { intervalId, resizeHandler, isAnimating: false });
+    section.dataset.brandsResizeBound = 'true';
+  }
+
+  /**
+   * @param {HTMLElement} section
+   */
+  function destroyBrandsBar(section) {
+    const existing = instances.get(section);
+    if (!existing) return;
+
+    window.clearInterval(existing.intervalId);
+    MOBILE_MQ.removeEventListener('change', existing.resizeHandler);
+    window.removeEventListener('resize', existing.resizeHandler);
+    instances.delete(section);
+  }
+
+  function initAllBrandsBars(root = document) {
+    root.querySelectorAll('[data-brands-bar]').forEach((section) => {
+      if (section instanceof HTMLElement) {
+        initBrandsBar(section);
+      }
+    });
+  }
+
+  initAllBrandsBars();
+
+  document.addEventListener('shopify:section:load', (event) => {
+    if (event.target instanceof HTMLElement) {
+      initAllBrandsBars(event.target);
+    }
+  });
+
+  document.addEventListener('shopify:section:unload', (event) => {
+    if (event.target instanceof HTMLElement) {
+      event.target.querySelectorAll('[data-brands-bar]').forEach((section) => {
+        if (section instanceof HTMLElement) {
+          destroyBrandsBar(section);
+        }
+      });
+    }
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Custom brands bar",
+  "tag": "section",
+  "class": "custom-brands-bar-section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_section",
+      "label": "Show section",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom brands bar",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

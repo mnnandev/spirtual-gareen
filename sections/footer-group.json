@@ -1,0 +1,89 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "footer",
+  "name": "Footer",
+  "sections": {
+    "sg_dicono_di_noi_global": {
+      "type": "sg-trustpilot-store-reviews",
+      "blocks": {
+        "review_1": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "author": "Giulia P.",
+            "source": "Ordine verificato",
+            "text": "Ottima per la routine quotidiana. Profumo delicato e ingredienti naturali, proprio quello che cercavo."
+          }
+        },
+        "review_2": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "author": "Maria R.",
+            "source": "Ordine verificato",
+            "text": "Crema gel leggerissima, si assorbe subito e non unge. Dopo una settimana la pelle è più morbida e uniforme."
+          }
+        },
+        "review_3": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "author": "Elena S.",
+            "source": "Ordine verificato",
+            "text": "Confezione curata e consegna veloce. Effetto luminoso naturale, consigliatissimo per chi ama i cosmetici botanici."
+          }
+        }
+      },
+      "block_order": [
+        "review_1",
+        "review_2",
+        "review_3"
+      ],
+      "settings": {
+        "heading": "Dicono di noi",
+        "subheading": "Recensioni verificate sugli ordini Spiritual Green",
+        "anchor_id": "recensioni",
+        "show_featured_cards": true,
+        "show_trustpilot_widget": true,
+        "template_id": "53aa8912dec7e10d38f59f36",
+        "theme": "light",
+        "style_height": "260px",
+        "stars": "4,5",
+        "padding_top": 48,
+        "padding_bottom": 40
+      }
+    },
+    "sg_payment_methods_global": {
+      "type": "sg-payment-methods",
+      "settings": {
+        "heading": "Accettiamo pagamenti con",
+        "enable_slider": true,
+        "scroll_duration": 22,
+        "padding_top": 40,
+        "padding_bottom": 56
+      }
+    },
+    "custom_footer_home": {
+      "type": "custom-footer",
+      "settings": {
+        "facebook_url": "https://www.facebook.com/SpiritualGreenErboristerie",
+        "instagram_url": "https://www.instagram.com/spiritualgreenerboristerie/",
+        "email_url": "mailto:info@spiritualgreen.it",
+        "phone_url": "tel:+393939999136"
+      }
+    }
+  },
+  "order": [
+    "sg_dicono_di_noi_global",
+    "sg_payment_methods_global",
+    "custom_footer_home"
+  ]
+}

@@ -1,0 +1,120 @@
+{% doc %}
+  Product card for the homepage tabbed carousel.
+
+  Structure (aligned regions for mobile/desktop grids):
+  1. 1:1 product image (+ discount badge)
+  2. Title (clamped)
+  3. Format (reserved row)
+  4. Description (clamped, reserved height)
+  5. Price row
+  6. Availability note (own row when OOS)
+  7. ATC / sold-out button (pinned to bottom)
+
+  @param {product} product - Shopify product object
+{% enddoc %}
+
+{% liquid
+  assign variant = product.selected_or_first_available_variant
+  assign card_available = true
+  if product.available == false or variant.available == false
+    assign card_available = false
+  endif
+
+  capture card_title
+    render 'sg-product-card-fields', product: product, output: 'title'
+  endcapture
+  assign card_title = card_title | strip
+
+  capture card_format
+    render 'sg-product-card-fields', product: product, output: 'format'
+  endcapture
+  assign card_format = card_format | strip
+
+  capture card_description
+    render 'sg-product-card-fields', product: product, output: 'description', limit: 110
+  endcapture
+  assign card_description = card_description | strip
+
+  comment
+    Keep availability copy out of the short description — it belongs on its own row.
+  endcomment
+  assign desc_down = card_description | downcase
+  if desc_down contains 'prodotto al momento non disponibile' or desc_down contains 'non disponibile'
+    assign card_description = card_description | replace: 'PRODOTTO AL MOMENTO NON DISPONIBILE', '' | replace: 'Prodotto al momento non disponibile', '' | replace: 'prodotto al momento non disponibile', '' | replace: 'NON DISPONIBILE', '' | replace: 'Non disponibile', '' | strip
+    assign card_description = card_description | replace: '  ', ' ' | strip
+  endif
+%}
+
+<div
+  class="sg-home-product-card{% unless card_available %} sg-home-product-card--unavailable{% endunless %}"
+  data-home-product-slide
+>
+  <a
+    class="sg-home-product-card__link"
+    href="{{ product.url }}"
+    aria-label="{{ product.title | escape }}"
+  >
+    <div class="sg-home-product-card__media">
+      {% render 'sg-discount-badge', product: product, variant: variant %}
+      {% render 'sg-image-bestseller-badge', product: product %}
+
+      {% if product.featured_media %}
+        {% assign card_image_alt = product.featured_media.alt | default: product.title %}
+        {{
+          product.featured_media
+          | image_url: width: 800
+          | image_tag:
+            class: 'sg-home-product-card__image',
+            loading: 'lazy',
+            widths: '300, 400, 600, 800',
+            sizes: '(min-width: 1200px) 220px, (min-width: 768px) 28vw, 70vw',
+            alt: card_image_alt
+        }}
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag: 'sg-home-product-card__image sg-home-product-card__image--placeholder' }}
+      {% endif %}
+    </div>
+
+    <div class="sg-home-product-card__body">
+      {%- capture clean_title -%}
+        {%- render 'sg-sanitize-line-breaks', text: card_title, mode: 'title' -%}
+      {%- endcapture -%}
+      {%- assign heading_title_html = clean_title | strip | escape -%}
+      {% render 'sg-product-card-heading',
+        title_html: heading_title_html,
+        format: card_format,
+        title_class: 'sg-home-product-card__title',
+        format_class: 'sg-home-product-card__format'
+      %}
+
+      <p class="sg-home-product-card__description{% if card_description == blank %} sg-home-product-card__description--empty{% endif %}">
+        {%- if card_description != blank -%}
+          {{ card_description | escape }}
+        {%- endif -%}
+      </p>
+
+      <div class="sg-home-product-card__meta">
+        <div class="sg-home-product-card__price-row">
+          {% render 'sg-product-card-price-row',
+            price: variant.price,
+            compare_at_price: variant.compare_at_price,
+            compare_class: 'sg-home-product-card__price-compare',
+            sale_class: 'sg-home-product-card__price sg-home-product-card__price--sale',
+            regular_class: 'sg-home-product-card__price',
+            show_discount: false
+          %}
+        </div>
+
+        {% unless card_available %}
+          <p class="sg-home-product-card__availability" role="status">
+            Prodotto al momento non disponibile
+          </p>
+        {% endunless %}
+      </div>
+    </div>
+  </a>
+
+  <div class="sg-home-product-card__footer">
+    {% render 'sg-product-card-add-to-cart', product: product %}
+  </div>
+</div>

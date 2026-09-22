@@ -1,0 +1,24 @@
+{%- doc -%}
+  Returns "true" or "false" — whether a price range filter is applied.
+
+  @param {collection} collection
+{%- enddoc -%}
+
+{%- liquid
+  assign sg_price_filter_active = false
+
+  for filter in collection.filters
+    if filter.type == 'price_range'
+      if filter.min_value.value != null or filter.max_value.value != null
+        assign sg_price_filter_active = true
+      endif
+      break
+    endif
+  endfor
+
+  if sg_price_filter_active
+    echo 'true'
+  else
+    echo 'false'
+  endif
+-%}

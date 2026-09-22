@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1600" viewBox="0 0 2400 1600" role="img" aria-label="Offerte placeholder">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd89b"/>
+      <stop offset="100%" stop-color="#f5a623"/>
+    </linearGradient>
+  </defs>
+  <rect width="2400" height="1600" fill="url(#bg)"/>
+</svg>

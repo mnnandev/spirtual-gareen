@@ -1,0 +1,44 @@
+{%- doc -%}
+  Shared sale price row for listing product cards.
+  Order: original (strikethrough) → discounted (bold) → discount %
+
+  @param {number} price - Current price in cents
+  @param {number} [compare_at_price] - Compare-at price in cents
+  @param {number} [discount_pct] - Optional discount percentage override
+  @param {string} compare_class - Class for strikethrough original price
+  @param {string} sale_class - Class for discounted price
+  @param {string} [regular_class] - Class for regular (non-sale) price
+  @param {string} [discount_class] - Class for discount badge
+  @param {boolean} [show_discount] - Show discount % badge when on sale
+{%- enddoc -%}
+
+{%- liquid
+  assign sale_price = price | default: 0
+  assign compare_price = compare_at_price | default: 0
+  assign on_sale = false
+
+  if compare_price > sale_price and compare_price > 0
+    assign on_sale = true
+  endif
+
+  assign pct = discount_pct | default: 0
+  if on_sale and pct == 0
+    assign discount_amount = compare_price | minus: sale_price
+    assign pct = discount_amount | times: 100.0 | divided_by: compare_price | round
+  endif
+
+  assign show_discount_badge = false
+  if show_discount and on_sale and pct > 0
+    assign show_discount_badge = true
+  endif
+-%}
+
+{%- if on_sale -%}
+  <s class="{{ compare_class }}">{{ compare_price | money }}</s>
+  <span class="{{ sale_class }}">{{ sale_price | money }}</span>
+  {%- if show_discount_badge -%}
+    <span class="{{ discount_class }}">{{ pct }}%</span>
+  {%- endif -%}
+{%- else -%}
+  <span class="{{ regular_class | default: sale_class }}">{{ sale_price | money }}</span>
+{%- endif -%}

@@ -1,0 +1,141 @@
+{%- doc -%}
+  Spiritual-style product card for collection / search pages.
+
+  Structure (site-wide):
+  1. 1:1 product image
+  2. Title (no SKU)
+  3. Format (e.g. 30 Stick pack)
+  4. Description (plain text, no Descrizione heading)
+  5. Price + CTAs
+
+  @param {object} product - Product object
+  @param {object} settings - Card settings (section or block)
+{%- enddoc -%}
+
+{% liquid
+  assign variant = product.selected_or_first_available_variant
+  assign char_limit = settings.description_limit | default: 110
+
+  capture card_title
+    render 'sg-product-card-fields', product: product, output: 'title'
+  endcapture
+  assign card_title = card_title | strip
+
+  capture card_format
+    render 'sg-product-card-fields', product: product, output: 'format'
+  endcapture
+  assign card_format = card_format | strip
+
+  capture card_description
+    render 'sg-product-card-fields', product: product, output: 'description', limit: char_limit
+  endcapture
+  assign card_description = card_description | strip
+
+  assign show_new = false
+  if settings.show_new_badge
+    for tag in product.tags
+      assign tag_down = tag | downcase
+      if tag_down == 'new' or tag_down == 'nuovo' or tag_down == 'novita'
+        assign show_new = true
+        break
+      endif
+    endfor
+  endif
+
+  assign compare_at = product.compare_at_price_max
+  assign on_sale = false
+  if compare_at > product.price and compare_at != blank
+    assign on_sale = true
+  endif
+
+  assign image = product.featured_media.preview_image
+  if image == blank and product.media.size > 0
+    assign image = product.media.first.preview_image
+  endif
+
+  assign learn_label = 'spiritual_green.learn_more' | t
+  assign new_label = settings.new_label | default: 'Novità'
+  if new_label == 'Novità' or new_label == 'New' or new_label == 'New arrivals'
+    assign new_label = 'spiritual_green.nav.novita' | t
+  endif
+%}
+
+<div class="sg-collection-card{% if on_sale %} sg-collection-card--bundle{% endif %}">
+  <div class="sg-collection-card__media">
+    {% if show_new %}
+      <span class="sg-collection-card__badge sg-collection-card__badge--new">{{ new_label }}</span>
+    {% endif %}
+    {% render 'sg-discount-badge', product: product %}
+    {% render 'sg-image-bestseller-badge', product: product %}
+
+    {% if image != blank %}
+      {% assign image_alt = image.alt | default: product.title %}
+      <a href="{{ product.url }}" class="sg-collection-card__image-link" tabindex="-1" aria-hidden="true">
+        {{
+          image
+          | image_url: width: 900
+          | image_tag:
+            class: 'sg-collection-card__image',
+            loading: 'lazy',
+            widths: '400, 600, 900',
+            sizes: '(min-width: 750px) 28vw, 100vw',
+            alt: image_alt
+        }}
+      </a>
+    {% else %}
+      <div class="sg-collection-card__image-placeholder"></div>
+    {% endif %}
+  </div>
+
+  <div class="sg-collection-card__body">
+    <div class="sg-product-card-copy{% if on_sale %} sg-product-card-copy--bundle{% endif %}">
+      {%- capture clean_title -%}
+        {%- render 'sg-sanitize-line-breaks', text: card_title, mode: 'title' -%}
+      {%- endcapture -%}
+      {%- capture title_link_html -%}
+        <a href="{{ product.url }}">{{ clean_title | strip }}</a>
+      {%- endcapture -%}
+      {% render 'sg-product-card-heading',
+        title_html: title_link_html,
+        format: card_format,
+        title_class: 'sg-collection-card__title',
+        format_class: 'sg-collection-card__format'
+      %}
+
+      <p class="sg-collection-card__description{% if card_description == blank %} sg-collection-card__description--empty{% endif %}">
+        {%- if card_description != blank -%}
+          {{ card_description | escape }}
+        {%- endif -%}
+      </p>
+
+      <div class="sg-collection-card__price-row">
+        {% if on_sale %}
+          {% render 'sg-product-card-price-row',
+            price: product.price,
+            compare_at_price: compare_at,
+            compare_class: 'sg-collection-card__compare',
+            sale_class: 'sg-collection-card__price sg-collection-card__price--sale',
+            regular_class: 'sg-collection-card__price',
+            show_discount: false
+          %}
+        {% else %}
+          {% render 'sg-product-card-price-row',
+            price: product.price,
+            compare_at_price: variant.compare_at_price,
+            compare_class: 'sg-collection-card__compare',
+            sale_class: 'sg-collection-card__price sg-collection-card__price--sale',
+            regular_class: 'sg-collection-card__price',
+            show_discount: false
+          %}
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="sg-product-card-ctas sg-collection-card__actions">
+      {% render 'sg-product-card-add-to-cart', product: product %}
+      <a href="{{ product.url }}" class="sg-product-card-actions__btn sg-product-card-actions__btn--learn">
+        {{ learn_label }}
+      </a>
+    </div>
+  </div>
+</div>

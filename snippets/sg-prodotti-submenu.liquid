@@ -1,0 +1,40 @@
+{%- doc -%}
+  PRODOTTI dropdown — glass panel, category links only (no images).
+
+  @param {object} [parent_link] - Parent nav link (unused; categories are fixed)
+{%- enddoc -%}
+
+{% liquid
+  assign prodotti_handles = 'erboristeria,alimentazione,cosmetica,integratori,per-la-casa,etnico' | split: ','
+  assign prodotti_titles = 'Erboristeria Tradizionale|Alimentazione Biologica|Cosmetica Naturale|Integratori Alimentari|Per la Casa|Etnico' | split: '|'
+
+  if collections['all-products'] != blank
+    assign shop_all_url = collections['all-products'].url
+  else
+    assign shop_all_url = routes.all_products_collection_url
+  endif
+%}
+
+<div class="sg-prodotti-mega-menu">
+  <ul class="sg-mega-menu__list list-unstyled" role="list">
+    {% for handle in prodotti_handles %}
+      {% assign title = prodotti_titles[forloop.index0] %}
+      {% capture item_url %}{% render 'sg-prodotti-nav-url', handle: handle %}{% endcapture %}
+      <li class="sg-mega-menu__item-wrap">
+        <a
+          href="{{ item_url | strip }}"
+          class="sg-mega-menu__item sg-prodotti-mega-menu__item"
+        >
+          <span class="sg-mega-menu__info">
+            <span class="sg-mega-menu__title">{{ title }}</span>
+          </span>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <a href="{{ shop_all_url }}" class="sg-mega-menu__shop-all">
+    Vedi tutti i prodotti
+    <span class="sg-mega-menu__arrow" aria-hidden="true">→</span>
+  </a>
+</div>

@@ -1,0 +1,411 @@
+{% liquid
+  assign bg_image = blank
+  assign product_image = blank
+
+  if section.settings.background_image != blank
+    assign bg_image = section.settings.background_image | image_url: width: 1920
+  endif
+
+  if section.settings.product_image != blank
+    assign product_image = section.settings.product_image | image_url: width: 800
+  endif
+%}
+
+<section
+  id="CustomInfoBanner-{{ section.id }}"
+  class="custom-info-banner"
+  data-section-id="{{ section.id }}"
+>
+  {% if bg_image != blank %}
+    <img
+      class="custom-info-banner__bg"
+      src="{{ bg_image }}"
+      alt=""
+      width="1920"
+      height="1080"
+      loading="lazy"
+      aria-hidden="true"
+    >
+  {% endif %}
+
+  <div class="custom-info-banner__glass sg-animate">
+    <div class="custom-info-banner__col custom-info-banner__col--left">
+      <p class="custom-info-banner__label">• LA NOSTRA FRAGRANZA</p>
+      <h2 class="custom-info-banner__heading">Una fragranza che trasforma la tua casa</h2>
+
+      <div class="custom-info-banner__stats">
+        <div class="custom-info-banner__stat">
+          <span class="custom-info-banner__pill">RICARICA MAEL</span>
+          <p class="custom-info-banner__stat-text">Mandarino e Cannella</p>
+        </div>
+        <div class="custom-info-banner__stat">
+          <span class="custom-info-banner__icon-circle" aria-hidden="true">↑</span>
+          <p class="custom-info-banner__stat-value">300ml</p>
+          <p class="custom-info-banner__stat-text">Formula Naturale</p>
+        </div>
+      </div>
+
+      <p class="custom-info-banner__footnote">°Note: Mandarino · Bergamotto · Cannella · Cedro</p>
+    </div>
+
+    <div class="custom-info-banner__col custom-info-banner__col--center">
+      {% if product_image != blank %}
+        <img
+          class="custom-info-banner__product"
+          src="{{ product_image }}"
+          alt="Ricarica Mael Mandarino e Cannella"
+          width="400"
+          height="560"
+          loading="lazy"
+        >
+      {% endif %}
+    </div>
+
+    <div class="custom-info-banner__col custom-info-banner__col--right">
+      <div class="custom-info-banner__note-card">
+        <p class="custom-info-banner__note-title">NOTE DI TESTA</p>
+        <span class="custom-info-banner__note-line" aria-hidden="true"></span>
+        <p class="custom-info-banner__note-desc">
+          Mandarino, Bergamotto e Arancio per una apertura fresca e agrumata
+        </p>
+      </div>
+
+      <div class="custom-info-banner__note-card custom-info-banner__note-card--spaced">
+        <p class="custom-info-banner__note-title">NOTE DI FONDO</p>
+        <span class="custom-info-banner__note-line" aria-hidden="true"></span>
+        <p class="custom-info-banner__note-desc">
+          Legno di Cedro e Vaniglia per un caldo abbraccio finale
+        </p>
+      </div>
+
+      <a class="custom-info-banner__cta" href="/products/ricarica-mael-mandarino-e-cannella">
+        <span>Scopri il Prodotto</span>
+        <span class="custom-info-banner__cta-icon" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .custom-info-banner {
+    --cib-font: system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --cib-green: #97C48A;
+    position: relative;
+    width: 100%;
+    max-width: none;
+    min-height: 500px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .custom-info-banner__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .custom-info-banner__glass {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr 1fr;
+    gap: 48px;
+    align-items: center;
+    max-width: 1100px;
+    margin: 60px auto;
+    padding: 48px;
+    background: rgba(151, 196, 138, 0.45);
+    backdrop-filter: blur(38px);
+    -webkit-backdrop-filter: blur(38px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    box-sizing: border-box;
+  }
+
+  .custom-info-banner__col {
+    min-width: 0;
+  }
+
+  .custom-info-banner__label {
+    margin: 0 0 16px;
+    font-family: var(--cib-font);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.3;
+  }
+
+  .custom-info-banner__heading {
+    margin: 0 0 24px;
+    font-family: var(--cib-font);
+    font-size: clamp(1.4rem, 2.2vw, 2rem);
+    font-weight: 350;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+  }
+
+  .custom-info-banner__stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 20px 24px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+  }
+
+  .custom-info-banner__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .custom-info-banner__pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--cib-green);
+    font-family: var(--cib-font);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1.3;
+  }
+
+  .custom-info-banner__icon-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .custom-info-banner__stat-value {
+    margin: 0;
+    font-family: var(--cib-font);
+    font-size: 15px;
+    font-weight: 500;
+    color: #ffffff;
+    line-height: 1.2;
+  }
+
+  .custom-info-banner__stat-text {
+    margin: 0;
+    font-family: var(--cib-font);
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.35;
+  }
+
+  .custom-info-banner__footnote {
+    margin: 16px 0 0;
+    font-family: var(--cib-font);
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .custom-info-banner__product {
+    display: block;
+    max-height: 400px;
+    width: auto;
+    max-width: 100%;
+    margin: 0 auto;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+  }
+
+  .custom-info-banner__col--center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .custom-info-banner__note-card--spaced {
+    margin-top: 24px;
+  }
+
+  .custom-info-banner__note-title {
+    margin: 0;
+    font-family: var(--cib-font);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.3;
+  }
+
+  .custom-info-banner__note-line {
+    display: block;
+    margin: 8px 0;
+    border-top: 1px dashed rgba(255, 255, 255, 0.3);
+  }
+
+  .custom-info-banner__note-desc {
+    margin: 0;
+    font-family: var(--cib-font);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .custom-info-banner__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    padding: 12px 24px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #ffffff !important;
+    font-family: var(--cib-font);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.2;
+    text-decoration: none !important;
+    transition: background 0.3s ease;
+  }
+
+  .custom-info-banner__cta:hover {
+    background: rgba(255, 255, 255, 0.28);
+  }
+
+  .custom-info-banner__cta-icon {
+    display: flex;
+    align-items: center;
+    line-height: 0;
+    transition: transform 0.3s ease;
+  }
+
+  .custom-info-banner__cta:hover .custom-info-banner__cta-icon {
+    transform: translateX(3px);
+  }
+
+  .custom-info-banner .sg-animate {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+  }
+
+  .custom-info-banner .sg-animate.sg-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media screen and (max-width: 768px) {
+    .custom-info-banner {
+      min-height: auto;
+    }
+
+    .custom-info-banner__glass {
+      grid-template-columns: 1fr;
+      gap: 28px;
+      margin: 20px;
+      padding: 32px 20px;
+    }
+
+    .custom-info-banner__col--center {
+      order: -1;
+    }
+
+    .custom-info-banner__product {
+      max-height: 280px;
+    }
+
+    .custom-info-banner__stats {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  function initInfoBannerAnimate(root = document) {
+    const items = root.querySelectorAll('.custom-info-banner .sg-animate');
+    if (!items.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      items.forEach((item) => item.classList.add('sg-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('sg-visible');
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    items.forEach((item) => {
+      if (!item.classList.contains('sg-visible')) {
+        observer.observe(item);
+      }
+    });
+  }
+
+  initInfoBannerAnimate();
+
+  document.addEventListener('shopify:section:load', (event) => {
+    if (event.target instanceof HTMLElement) {
+      initInfoBannerAnimate(event.target);
+    }
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Info Banner",
+  "tag": "section",
+  "class": "custom-info-banner-section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "image_picker",
+      "id": "product_image",
+      "label": "Product image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Info Banner",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

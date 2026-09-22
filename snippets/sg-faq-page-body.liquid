@@ -1,0 +1,120 @@
+{%- doc -%}
+  Spiritual Green FAQ page body (breadcrumb + accordion).
+
+  @param {string} [heading] - Page title override
+  @param {string} [intro] - Intro paragraph override
+{%- enddoc -%}
+
+{% liquid
+  assign faq_heading = heading | default: 'Domande frequenti'
+  assign faq_intro = intro | default: 'Trova risposte rapide su ordini, spedizioni, resi e consulenza. Per altre richieste scrivici a info@spiritualgreen.it.'
+  assign contact_url = '/pages/contact'
+  if pages.contact != blank
+    assign contact_url = pages.contact.url
+  endif
+%}
+
+<div class="sg-faq-page__wrap">
+  <nav class="sg-faq-page__breadcrumb" aria-label="{{ 'spiritual_green.breadcrumb' | t }}">
+    <a href="{{ routes.root_url }}" class="sg-faq-page__breadcrumb-home" aria-label="{{ 'spiritual_green.home' | t }}">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M2.5 6.5 8 2l5.5 4.5V13a1 1 0 0 1-1 1h-3.5v-4H7v4H3.5a1 1 0 0 1-1-1V6.5Z" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <span class="sg-faq-page__breadcrumb-sep" aria-hidden="true">›</span>
+    <span class="sg-faq-page__breadcrumb-current">{{ 'spiritual_green.faq' | t }}</span>
+  </nav>
+
+  <div class="sg-faq-page__card">
+    <header class="sg-faq-page__header">
+      <h1 class="sg-faq-page__title">{{ faq_heading }}</h1>
+      <p class="sg-faq-page__intro">{{ faq_intro }}</p>
+    </header>
+
+    <div class="sg-faq-page__list">
+      <details class="sg-faq-page__item">
+        <summary class="sg-faq-page__question">Come posso effettuare un ordine?</summary>
+        <div class="sg-faq-page__answer">
+          <p>
+            Scegli i prodotti dal nostro negozio, aggiungili al carrello e completa il pagamento inserendo i dati di
+            spedizione e pagamento. Riceverai un'e-mail di conferma non appena l'ordine sarà registrato.
+          </p>
+        </div>
+      </details>
+
+      <details class="sg-faq-page__item">
+        <summary class="sg-faq-page__question">Quali metodi di pagamento accettate?</summary>
+        <div class="sg-faq-page__answer">
+          <p>
+            Accettiamo le principali carte di credito e debito, oltre ai metodi di pagamento rapido disponibili alla
+            cassa (ad esempio PayPal, se attivo sul tuo dispositivo).
+          </p>
+        </div>
+      </details>
+
+      <details class="sg-faq-page__item">
+        <summary class="sg-faq-page__question">Quanto costa la spedizione?</summary>
+        <div class="sg-faq-page__answer">
+          <p>
+            Le spese di spedizione vengono calcolate al momento del pagamento in base al peso e alla destinazione. La spedizione è
+            gratuita per ordini superiori a 49€.
+          </p>
+        </div>
+      </details>
+
+      <details class="sg-faq-page__item">
+        <summary class="sg-faq-page__question">Quando riceverò il mio ordine?</summary>
+        <div class="sg-faq-page__answer">
+          <p>
+            Gli ordini vengono evasi nei giorni lavorativi. I tempi di consegna dipendono dal corriere e dalla zona di
+            destinazione; di solito l'ordine arriva entro pochi giorni lavorativi dall'evasione.
+          </p>
+        </div>
+      </details>
+
+      <details class="sg-faq-page__item">
+        <summary class="sg-faq-page__question">Posso restituire un prodotto?</summary>
+        <div class="sg-faq-page__answer">
+          <p>
+            Sì, puoi esercitare il diritto di recesso nei termini previsti dalla legge. Per avviare un reso contattaci a
+            <a href="mailto:info@spiritualgreen.it">info@spiritualgreen.it</a> indicando numero d'ordine e motivo della
+            richiesta. Maggiori dettagli nella nostra Politica di Reso.
+          </p>
+        </div>
+      </details>
+
+      <details class="sg-faq-page__item">
+        <summary class="sg-faq-page__question">Offrite consulenza online con i vostri esperti?</summary>
+        <div class="sg-faq-page__answer">
+          <p>
+            Sì. Spiritual Green offre consulenza online con i nostri esperti erboristi per orientarti nella scelta dei
+            prodotti più adatti alle tue esigenze. Puoi richiederla dalla pagina
+            <a href="{{ contact_url }}">Contatti</a> o durante la navigazione sul sito.
+          </p>
+        </div>
+      </details>
+
+      <details class="sg-faq-page__item">
+        <summary class="sg-faq-page__question">Gli integratori e i rimedi naturali sono adatti a tutti?</summary>
+        <div class="sg-faq-page__answer">
+          <p>
+            Ogni persona ha esigenze diverse. Prima di assumere integratori o prodotti erboristici, leggi sempre
+            attentamente etichetta e istruzioni. In caso di gravidanza, allattamento, terapie in corso o patologie,
+            consulta il medico o il farmacista. Per un consiglio personalizzato contatta i nostri esperti.
+          </p>
+        </div>
+      </details>
+
+      <details class="sg-faq-page__item">
+        <summary class="sg-faq-page__question">Come posso contattarvi?</summary>
+        <div class="sg-faq-page__answer">
+          <p>
+            Puoi scriverci a <a href="mailto:info@spiritualgreen.it">info@spiritualgreen.it</a> oppure compilare il
+            modulo nella pagina <a href="{{ contact_url }}">Contatti</a>. Ti risponderemo il prima possibile nei giorni
+            lavorativi.
+          </p>
+        </div>
+      </details>
+    </div>
+  </div>
+</div>

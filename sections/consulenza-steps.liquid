@@ -1,0 +1,89 @@
+<section
+  class="consulenza-steps"
+  id="consulenza-steps-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="consulenza-steps__inner">
+    {% if section.settings.heading != blank %}
+      <h2 class="consulenza-steps__title">{{ section.settings.heading }}</h2>
+    {% endif %}
+
+    <div class="consulenza-steps__grid steps-grid">
+      {% for block in section.blocks %}
+        <div class="consulenza-steps__item step-item" {{ block.shopify_attributes }}>
+          <div class="consulenza-steps__number step-number">{{ forloop.index }}</div>
+          {% if block.settings.title != blank %}
+            <h3 class="consulenza-steps__step-title step-title">{{ block.settings.title }}</h3>
+          {% endif %}
+          {% if block.settings.description != blank %}
+            <p class="consulenza-steps__step-desc step-desc">{{ block.settings.description }}</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Consulenza Steps",
+  "tag": "section",
+  "class": "consulenza-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Come funziona?"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Prenota online"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Scegli data e orario dal calendario di Alice."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Consulenza Steps",
+      "blocks": [
+        {
+          "type": "step",
+          "settings": {
+            "title": "Prenota online",
+            "description": "Scegli data e orario dal calendario di Alice."
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Ricevi conferma",
+            "description": "Ti invieremo un'email con tutti i dettagli della consulenza."
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Inizia il percorso",
+            "description": "Parla con Alice e ricevi consigli personalizzati per il tuo benessere."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

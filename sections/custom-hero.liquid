@@ -1,0 +1,1061 @@
+{% liquid
+  assign hero_image_alt = 'Spiritual Green'
+  assign carousel_interval = section.settings.carousel_interval | default: 3
+
+  assign slide_1_url = blank
+  if section.settings.image != blank
+    assign slide_1_url = section.settings.image | image_url: width: 2400
+    assign hero_image_alt = section.settings.image.alt | default: hero_image_alt
+  elsif section.settings.image_1_url != blank
+    assign slide_1_url = section.settings.image_1_url
+  else
+    assign slide_1_url = 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/INTEGRATORI-BACKGROUND-2.webp?v=1780477497'
+  endif
+
+  assign slide_2_url = section.settings.image_2_url
+  if slide_2_url == blank
+    assign slide_2_url = 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/VISITE-BACKGROUND-2_1.webp?v=1780750087'
+  endif
+
+  assign slide_3_url = section.settings.image_3_url
+  if slide_3_url == blank
+    assign slide_3_url = 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/ALOE-HEADER.webp?v=1780750156'
+  endif
+
+  assign slide_4_url = section.settings.image_4_url
+  if slide_4_url == blank
+    assign slide_4_url = 'https://cdn.shopify.com/s/files/1/0998/9482/1248/files/ALIMENTAZIONE-BACKGROUND-2_1.webp?v=1780750231'
+  endif
+
+  assign slide_urls = slide_1_url | append: '||' | append: slide_2_url | append: '||' | append: slide_3_url | append: '||' | append: slide_4_url
+
+  assign slide_urls_array = slide_urls | split: '||'
+  assign slide_count = 0
+  for slide_url in slide_urls_array
+    if slide_url != blank
+      assign slide_count = slide_count | plus: 1
+    endif
+  endfor
+%}
+
+<section
+  id="CustomHero-{{ section.id }}"
+  class="custom-hero custom-hero--spiritual custom-hero--full-width"
+  data-section-id="{{ section.id }}"
+>
+  <div class="custom-hero__backdrop" aria-hidden="true">
+    {% if slide_count > 0 %}
+      <div
+        class="custom-hero__slides{% if slide_count > 1 %} custom-hero__slides--carousel{% endif %}"
+        data-hero-carousel
+        data-interval="{{ carousel_interval }}"
+        style="--hero-ken-duration: {{ carousel_interval }}s;"
+      >
+        {% assign slide_index = 0 %}
+        {% for slide_url in slide_urls_array %}
+          {% if slide_url != blank %}
+            <div class="custom-hero__slide{% if slide_index == 0 %} is-active{% endif %}">
+              <div class="custom-hero__slide-motion">
+                <img
+                  class="custom-hero__slide-media"
+                  src="{{ slide_url }}"
+                  alt="{{ hero_image_alt | escape }}"
+                  width="2400"
+                  height="1600"
+                  {% if slide_index == 0 %}
+                    loading="eager"
+                    fetchpriority="high"
+                  {% else %}
+                    loading="lazy"
+                  {% endif %}
+                  decoding="async"
+                >
+              </div>
+            </div>
+            {% assign slide_index = slide_index | plus: 1 %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div class="custom-hero__wash"></div>
+  </div>
+
+  <div class="custom-hero__inner">
+    <div class="custom-hero__content-stack custom-hero__content--animate sg-visible" data-hero-content>
+      {% assign content_index = 0 %}
+      {% for slide_url in slide_urls_array %}
+        {% if slide_url != blank %}
+          {% liquid
+            case content_index
+              when 0
+                assign panel_eyebrow = section.settings.slide_1_eyebrow
+                assign panel_heading = section.settings.slide_1_heading
+                assign panel_button_label = section.settings.slide_1_button_label
+                assign panel_button_link = section.settings.slide_1_button_link
+              when 1
+                assign panel_eyebrow = section.settings.slide_2_eyebrow
+                assign panel_heading = section.settings.slide_2_heading
+                assign panel_button_label = section.settings.slide_2_button_label
+                assign panel_button_link = section.settings.slide_2_button_link
+              when 2
+                assign panel_eyebrow = section.settings.slide_3_eyebrow
+                assign panel_heading = section.settings.slide_3_heading
+                assign panel_button_label = section.settings.slide_3_button_label
+                assign panel_button_link = section.settings.slide_3_button_link
+              when 3
+                assign panel_eyebrow = section.settings.slide_4_eyebrow
+                assign panel_heading = section.settings.slide_4_heading
+                assign panel_button_label = section.settings.slide_4_button_label
+                assign panel_button_link = section.settings.slide_4_button_link
+            endcase
+          %}
+
+          <div
+            class="custom-hero__content-panel{% if content_index == 0 %} is-active{% endif %}"
+            data-slide-content="{{ content_index }}"
+          >
+            {% if panel_eyebrow != blank %}
+              <p class="custom-hero__eyebrow">{{ panel_eyebrow }}</p>
+            {% endif %}
+
+            {% if panel_heading != blank %}
+              <h1 class="custom-hero__heading">{{ panel_heading | newline_to_br }}</h1>
+            {% endif %}
+
+            {% if panel_button_label != blank %}
+              <div class="custom-hero__actions">
+                <a
+                  {% if panel_button_link != blank %}
+                    href="{{ panel_button_link }}"
+                  {% else %}
+                    role="link"
+                    aria-disabled="true"
+                  {% endif %}
+                  class="custom-hero__btn custom-hero__btn--outline"
+                >
+                  {{ panel_button_label }}
+                </a>
+              </div>
+            {% endif %}
+          </div>
+
+          {% assign content_index = content_index | plus: 1 %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if slide_count > 1 %}
+    <div class="custom-hero__dots" role="tablist" aria-label="Diapositive">
+      {% assign dot_index = 0 %}
+      {% for slide_url in slide_urls_array %}
+        {% if slide_url != blank %}
+          <button
+            type="button"
+            class="custom-hero__dot{% if dot_index == 0 %} is-active{% endif %}"
+            role="tab"
+            aria-selected="{% if dot_index == 0 %}true{% else %}false{% endif %}"
+            aria-label="Diapositiva {{ dot_index | plus: 1 }}"
+            data-slide="{{ dot_index }}"
+          ></button>
+          {% assign dot_index = dot_index | plus: 1 %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+
+{% stylesheet %}
+  .custom-hero--spiritual {
+    --custom-hero-green: #97C48A;
+    --custom-hero-green-hover: #7FAF72;
+    --custom-hero-heading-color: #1a1a1a;
+    --custom-hero-font: 'DM Sans', system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    position: relative;
+    width: 100%;
+    min-height: min(92vh, 820px);
+    background: #F7FAF6;
+    overflow: hidden;
+  }
+
+  .custom-hero--spiritual.custom-hero--full-width {
+    width: 100%;
+    max-width: none;
+  }
+
+  .custom-hero--spiritual .custom-hero__backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .custom-hero--spiritual .custom-hero__slides {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .custom-hero--spiritual .custom-hero__slide {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    transform: translate3d(100%, 0, 0);
+    transition: transform 0.5s ease;
+    will-change: transform;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .custom-hero--spiritual .custom-hero__slide.is-active {
+    transform: translate3d(0, 0, 0);
+    z-index: 2;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .custom-hero--spiritual .custom-hero__slide.is-leaving {
+    transform: translate3d(-100%, 0, 0);
+    z-index: 1;
+    visibility: visible;
+  }
+
+  .custom-hero--spiritual .custom-hero__slide.is-entering-from {
+    transition: none;
+    transform: translate3d(100%, 0, 0);
+    visibility: visible;
+  }
+
+  .custom-hero--spiritual .custom-hero__slide-motion {
+    width: 100%;
+    height: 100%;
+    transform: none;
+    transform-origin: center center;
+  }
+
+  .custom-hero--spiritual .custom-hero__slide.is-active .custom-hero__slide-motion {
+    animation: none;
+  }
+
+  .custom-hero--spiritual .custom-hero__slide.is-entering {
+    animation: none;
+  }
+
+  .custom-hero--spiritual .custom-hero__slide-media {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    object-position: 72% center;
+    display: block;
+  }
+
+  @keyframes sg-hero-ken-burns {
+    from {
+      transform: scale(1);
+    }
+
+    to {
+      transform: scale(1.06);
+    }
+  }
+
+  @keyframes sg-hero-fade-brighten {
+    from {
+      filter: brightness(1.06);
+    }
+
+    to {
+      filter: brightness(1);
+    }
+  }
+
+  .custom-hero--spiritual .custom-hero__dots {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(1.25rem, 3vh, 2rem);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transform: translateX(-50%);
+    pointer-events: auto;
+  }
+
+  .custom-hero--spiritual .custom-hero__dot {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+  }
+
+  .custom-hero--spiritual .custom-hero__dot::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(127, 175, 114, 0.28);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .custom-hero--spiritual .custom-hero__dot.is-active::before {
+    background: #97C48A;
+    transform: scale(1.2);
+  }
+
+  .custom-hero--spiritual .custom-hero__dot:focus-visible {
+    outline: 2px solid #97C48A;
+    outline-offset: 2px;
+  }
+
+  .custom-hero--spiritual .custom-hero__wash {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      #F7FAF6 0%,
+      #F7FAF6 24%,
+      rgba(248, 250, 248, 0.96) 36%,
+      rgba(248, 250, 248, 0.82) 48%,
+      rgba(248, 250, 248, 0.45) 62%,
+      rgba(248, 250, 248, 0.12) 78%,
+      transparent 92%
+    );
+    pointer-events: none;
+  }
+
+  .custom-hero--spiritual .custom-hero__inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 1440px;
+    min-height: min(92vh, 820px);
+    margin: 0 auto;
+    padding:
+      calc(var(--header-height, 72px) + clamp(2.5rem, 6vh, 4rem))
+      clamp(1.5rem, 4.5vw, 3.5rem)
+      clamp(2.5rem, 5vh, 3.5rem);
+    box-sizing: border-box;
+    pointer-events: none;
+  }
+
+  .custom-hero--spiritual .custom-hero__content-stack,
+  .custom-hero--spiritual .custom-hero__btn {
+    pointer-events: auto;
+  }
+
+  .custom-hero--spiritual .custom-hero__content-stack {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    width: 100%;
+    max-width: min(520px, 92vw);
+  }
+
+  .custom-hero--spiritual .custom-hero__content-panel {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(12px);
+    transition:
+      opacity 0.5s ease,
+      transform 0.5s ease,
+      visibility 0.5s;
+    pointer-events: none;
+  }
+
+  .custom-hero--spiritual .custom-hero__content-panel.is-active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+    z-index: 2;
+  }
+
+  .custom-hero--spiritual .custom-hero__content-panel.is-leaving {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-14px);
+    z-index: 1;
+  }
+
+  .custom-hero--spiritual .custom-hero__eyebrow {
+    margin: 0 0 12px;
+    font-family: var(--custom-hero-font);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: #1a1a1a;
+  }
+
+  .custom-hero--spiritual .custom-hero__heading {
+    margin: 0 !important;
+    font-family: var(--sg-font-heading, 'Playfair Display', Georgia, 'Times New Roman', serif) !important;
+    font-weight: 500 !important;
+    font-size: 3.2rem !important;
+    line-height: 1.2 !important;
+    letter-spacing: normal !important;
+    text-transform: none !important;
+    color: #1a1a1a !important;
+    text-shadow: none !important;
+  }
+
+  .custom-hero--spiritual .custom-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 34px;
+  }
+
+  .custom-hero--spiritual .custom-hero__btn {
+    font-family: var(--custom-hero-font);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-sizing: border-box;
+  }
+
+  .custom-hero--spiritual .custom-hero__btn--outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 12px 30px;
+    border-radius: 999px;
+    border: 1px solid #1a1a1a;
+    background: transparent;
+    color: #1a1a1a !important;
+  }
+
+  .custom-hero--spiritual .custom-hero__btn--outline:hover {
+    background: #1a1a1a;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+  }
+
+  .custom-hero--spiritual .custom-hero__btn[aria-disabled='true'] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .custom-hero--spiritual .custom-hero__content--animate {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .custom-hero--spiritual .custom-hero__content--animate:not(.sg-visible) {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: sg-hero-fade-up 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
+  }
+
+  @keyframes sg-hero-fade-up {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media screen and (max-width: 900px) {
+    .custom-hero--spiritual {
+      min-height: clamp(460px, 70vh, 600px);
+    }
+
+    .custom-hero--spiritual .custom-hero__inner {
+      align-items: flex-start;
+      justify-content: flex-start;
+      min-height: clamp(460px, 70vh, 600px);
+      padding:
+        calc(var(--header-height, 64px) + 1.5rem)
+        clamp(1rem, 4vw, 1.5rem)
+        2.25rem;
+    }
+
+    .custom-hero--spiritual .custom-hero__slide-media {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: none !important;
+      min-height: 100%;
+      object-fit: cover;
+      object-position: 72% 92%;
+    }
+
+    .custom-hero--spiritual .custom-hero__slide-motion {
+      transform-origin: 72% 92%;
+    }
+
+    .custom-hero--spiritual .custom-hero__wash {
+      background: linear-gradient(
+        180deg,
+        #F7FAF6 0%,
+        rgba(248, 250, 248, 0.96) 14%,
+        rgba(248, 250, 248, 0.72) 30%,
+        rgba(248, 250, 248, 0.32) 48%,
+        transparent 64%
+      );
+    }
+
+    .custom-hero--spiritual .custom-hero__heading {
+      font-size: clamp(2.1rem, 7vw, 2.8rem) !important;
+      line-height: 1.2 !important;
+      font-weight: 500 !important;
+      text-transform: none !important;
+      letter-spacing: normal !important;
+    }
+
+    .custom-hero--spiritual .custom-hero__actions {
+      margin-top: 22px;
+      margin-bottom: 0;
+    }
+
+    .custom-hero--spiritual .custom-hero__dots {
+      bottom: 1.1rem;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .custom-hero--spiritual {
+      position: relative;
+      min-height: clamp(420px, 60vh, 520px);
+      overflow: hidden;
+      background: #F7FAF6;
+    }
+
+  .custom-hero--spiritual .custom-hero__backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+    .custom-hero--spiritual .custom-hero__wash {
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.88) 0%,
+        rgba(255, 255, 255, 0.72) 14%,
+        rgba(255, 255, 255, 0.48) 30%,
+        rgba(255, 255, 255, 0.22) 48%,
+        rgba(255, 255, 255, 0.08) 62%,
+        transparent 76%
+      );
+    }
+
+    .custom-hero--spiritual .custom-hero__slide-media {
+      object-fit: cover;
+      object-position: 68% 94%;
+    }
+
+    .custom-hero--spiritual .custom-hero__slide-motion {
+      transform-origin: 68% 94%;
+    }
+
+    .custom-hero--spiritual .custom-hero__inner {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      width: 100%;
+      min-height: clamp(420px, 60vh, 520px);
+      margin: 0;
+      padding:
+        calc(var(--header-height, 60px) + 1.25rem)
+        clamp(12px, 4vw, 20px)
+        calc(3.75rem + env(safe-area-inset-bottom, 0px));
+      background: transparent;
+      box-sizing: border-box;
+    }
+
+    .custom-hero--spiritual .custom-hero__content-stack {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      padding: 50px 14px;
+      border-radius: 10px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    .custom-hero--spiritual .custom-hero__content-panel {
+      text-align: center;
+    }
+
+    .custom-hero--spiritual .custom-hero__eyebrow,
+    .custom-hero--spiritual .custom-hero__heading {
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .custom-hero--spiritual .custom-hero__content-stack::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.58) 0%,
+        rgba(255, 255, 255, 0.48) 55%,
+        rgba(255, 255, 255, 0.36) 100%
+      );
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .custom-hero--spiritual .custom-hero__heading {
+      font-size: clamp(2.1rem, 8vw, 2.8rem) !important;
+      line-height: 1.2 !important;
+      font-weight: 500 !important;
+      letter-spacing: normal !important;
+      text-transform: none !important;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      hyphens: auto;
+      max-width: 100%;
+      text-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.95),
+        0 2px 14px rgba(248, 250, 248, 0.92) !important;
+    }
+
+    .custom-hero--spiritual .custom-hero__eyebrow {
+      margin-bottom: 10px;
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      max-width: 100%;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .custom-hero--spiritual .custom-hero__btn--outline {
+      min-height: 48px;
+      min-width: min(100%, 300px);
+      padding: 12px 24px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #1a1a1a;
+      color: #ffffff !important;
+      border-color: #1a1a1a;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    .custom-hero--spiritual .custom-hero__btn--outline:hover {
+      background: #000000;
+      color: #ffffff !important;
+      border-color: #000000;
+    }
+
+    .custom-hero--spiritual .custom-hero__actions {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin-top: 20px;
+      margin-bottom: 4px;
+      position: relative;
+      z-index: 3;
+    }
+
+    .custom-hero--spiritual .custom-hero__dots {
+      position: absolute;
+      left: 50%;
+      bottom: 1rem;
+      z-index: 5;
+      transform: translateX(-50%);
+      justify-content: center;
+      gap: 6px;
+      padding: 0;
+      background: transparent;
+    }
+
+    .custom-hero--spiritual .custom-hero__dot {
+      width: 24px;
+      height: 24px;
+    }
+
+    .custom-hero--spiritual .custom-hero__dot::before {
+      width: 8px;
+      height: 8px;
+      background: rgba(127, 175, 114, 0.38);
+    }
+
+    .custom-hero--spiritual .custom-hero__dot.is-active::before {
+      background: #97C48A;
+    }
+
+    .custom-hero--spiritual .custom-hero__slide.is-active .custom-hero__slide-motion {
+      animation: none;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .custom-hero--spiritual {
+      min-height: clamp(400px, 58vh, 500px);
+    }
+
+    .custom-hero--spiritual .custom-hero__inner {
+      min-height: clamp(400px, 58vh, 500px);
+      padding-inline: 12px;
+      padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    .custom-hero--spiritual .custom-hero__content-stack {
+      padding: 50px 12px;
+    }
+
+    .custom-hero--spiritual .custom-hero__heading {
+      font-size: clamp(2rem, 7.5vw, 2.5rem) !important;
+      letter-spacing: normal !important;
+    }
+
+    .custom-hero--spiritual .custom-hero__actions {
+      margin-top: 18px;
+    }
+
+    .custom-hero--spiritual .custom-hero__btn--outline {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+
+  @media screen and (max-width: 399px) {
+    .custom-hero--spiritual .custom-hero__inner {
+      padding-inline: 10px;
+    }
+
+    .custom-hero--spiritual .custom-hero__content-stack {
+      padding: 50px 10px;
+    }
+
+    .custom-hero--spiritual .custom-hero__heading {
+      font-size: clamp(1.9rem, 7vw, 2.3rem) !important;
+    }
+
+    .custom-hero--spiritual .custom-hero__eyebrow {
+      font-size: 13px;
+      letter-spacing: 0.02em;
+    }
+  }
+
+  @keyframes sg-hero-ken-burns-mobile {
+    from {
+      transform: scale(1);
+    }
+
+    to {
+      transform: scale(1.04);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .custom-hero--spiritual .custom-hero__content--animate {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+
+    .custom-hero--spiritual .custom-hero__content-panel {
+      transition: none;
+    }
+
+    .custom-hero--spiritual .custom-hero__slide {
+      transition: none;
+    }
+
+    .custom-hero--spiritual .custom-hero__slide-motion {
+      animation: none !important;
+    }
+  }
+{% endstylesheet %}
+
+<script>
+  function initHeroCarousel(root = document) {
+    root.querySelectorAll('[data-hero-carousel]').forEach((carousel) => {
+      if (carousel.dataset.initialized === 'true') return;
+      carousel.dataset.initialized = 'true';
+
+      const section = carousel.closest('.custom-hero');
+      const slides = carousel.querySelectorAll('.custom-hero__slide');
+      const dots = section ? section.querySelectorAll('.custom-hero__dot') : [];
+      const contentPanels = section ? section.querySelectorAll('[data-slide-content]') : [];
+      if (slides.length < 2) return;
+
+      let activeIndex = 0;
+      let timer = null;
+      let transitionTimer = null;
+      const intervalMs = Math.max(2, parseInt(carousel.dataset.interval || '3', 10)) * 1000;
+      const slideMs = 500;
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const resetSlidePosition = (slide) => {
+        slide.style.transition = 'none';
+        slide.classList.remove('is-leaving', 'is-entering', 'is-entering-from');
+        void slide.offsetHeight;
+        slide.style.transition = '';
+      };
+
+      const setSlide = (nextIndex) => {
+        if (nextIndex === activeIndex) return;
+
+        const currentSlide = slides[activeIndex];
+        const nextSlide = slides[nextIndex];
+        const previousIndex = activeIndex;
+
+        if (dots[activeIndex]) {
+          dots[activeIndex].classList.remove('is-active');
+          dots[activeIndex].setAttribute('aria-selected', 'false');
+        }
+
+        if (!prefersReducedMotion) {
+          nextSlide.classList.add('is-entering-from');
+          void nextSlide.offsetHeight;
+          nextSlide.classList.remove('is-entering-from');
+        }
+
+        currentSlide.classList.remove('is-active');
+        currentSlide.classList.add('is-leaving');
+        nextSlide.classList.add('is-active');
+
+        contentPanels.forEach((panel) => {
+          const panelIndex = parseInt(panel.dataset.slideContent || '-1', 10);
+          if (panelIndex === nextIndex) {
+            panel.classList.add('is-active');
+            panel.classList.remove('is-leaving');
+          } else if (panelIndex === previousIndex) {
+            panel.classList.remove('is-active');
+            panel.classList.add('is-leaving');
+          } else {
+            panel.classList.remove('is-active', 'is-leaving');
+          }
+        });
+
+        activeIndex = nextIndex;
+
+        if (dots[activeIndex]) {
+          dots[activeIndex].classList.add('is-active');
+          dots[activeIndex].setAttribute('aria-selected', 'true');
+        }
+
+        clearTimeout(transitionTimer);
+        transitionTimer = setTimeout(() => {
+          resetSlidePosition(currentSlide);
+          contentPanels.forEach((panel) => {
+            panel.classList.remove('is-leaving');
+          });
+        }, slideMs);
+      };
+
+      const nextSlide = () => {
+        setSlide((activeIndex + 1) % slides.length);
+      };
+
+      const startTimer = () => {
+        if (prefersReducedMotion) return;
+        clearInterval(timer);
+        timer = setInterval(nextSlide, intervalMs);
+      };
+
+      dots.forEach((dot) => {
+        const goToDot = (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          const targetIndex = parseInt(dot.dataset.slide || '0', 10);
+          if (Number.isNaN(targetIndex) || targetIndex === activeIndex) return;
+          setSlide(targetIndex);
+          startTimer();
+        };
+
+        dot.addEventListener('click', goToDot);
+        dot.addEventListener('touchend', goToDot, { passive: false });
+      });
+
+      startTimer();
+    });
+  }
+
+  initHeroCarousel();
+  document.addEventListener('shopify:section:load', (event) => {
+    initHeroCarousel(event.target);
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Custom hero (Spiritual)",
+  "tag": "section",
+  "class": "custom-hero-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Slide 1 — Offerte"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Slide 1 image",
+      "info": "If empty, uses theme placeholder sg-hero-placeholder-offerte.svg."
+    },
+    {
+      "type": "text",
+      "id": "image_1_url",
+      "label": "Slide 1 image URL",
+      "info": "Optional. Overrides the image picker when set."
+    },
+    {
+      "type": "text",
+      "id": "slide_1_eyebrow",
+      "label": "Slide 1 eyebrow",
+      "default": "Spiritual green"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_1_heading",
+      "label": "Slide 1 heading",
+      "default": "Offerte"
+    },
+    {
+      "type": "text",
+      "id": "slide_1_button_label",
+      "label": "Slide 1 button",
+      "default": "Vai alla pagina"
+    },
+    {
+      "type": "url",
+      "id": "slide_1_button_link",
+      "label": "Slide 1 button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 2 — Consulenza Online"
+    },
+    {
+      "type": "text",
+      "id": "image_2_url",
+      "label": "Slide 2 image URL",
+      "info": "If empty, uses theme placeholder sg-hero-placeholder-consulenza.svg."
+    },
+    {
+      "type": "text",
+      "id": "slide_2_eyebrow",
+      "label": "Slide 2 eyebrow",
+      "default": "I nostri servizi"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_2_heading",
+      "label": "Slide 2 heading",
+      "default": "Consulenza\nonline"
+    },
+    {
+      "type": "text",
+      "id": "slide_2_button_label",
+      "label": "Slide 2 button",
+      "default": "Vai alla pagina"
+    },
+    {
+      "type": "url",
+      "id": "slide_2_button_link",
+      "label": "Slide 2 button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 3 — Più Venduti"
+    },
+    {
+      "type": "text",
+      "id": "image_3_url",
+      "label": "Slide 3 image URL",
+      "info": "If empty, uses theme placeholder sg-hero-placeholder-piu-venduti.svg."
+    },
+    {
+      "type": "text",
+      "id": "slide_3_eyebrow",
+      "label": "Slide 3 eyebrow",
+      "default": "Spiritual green"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_3_heading",
+      "label": "Slide 3 heading",
+      "default": "Più venduti"
+    },
+    {
+      "type": "text",
+      "id": "slide_3_button_label",
+      "label": "Slide 3 button",
+      "default": "Vai alla pagina"
+    },
+    {
+      "type": "url",
+      "id": "slide_3_button_link",
+      "label": "Slide 3 button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 4 — Novità"
+    },
+    {
+      "type": "text",
+      "id": "image_4_url",
+      "label": "Slide 4 image URL",
+      "info": "If empty, uses theme placeholder sg-hero-placeholder-novita.svg."
+    },
+    {
+      "type": "text",
+      "id": "slide_4_eyebrow",
+      "label": "Slide 4 eyebrow",
+      "default": "Scopri"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_4_heading",
+      "label": "Slide 4 heading",
+      "default": "Novità"
+    },
+    {
+      "type": "text",
+      "id": "slide_4_button_label",
+      "label": "Slide 4 button",
+      "default": "Vai alla pagina"
+    },
+    {
+      "type": "url",
+      "id": "slide_4_button_link",
+      "label": "Slide 4 button link"
+    },
+    {
+      "type": "range",
+      "id": "carousel_interval",
+      "label": "Carousel interval (seconds)",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "default": 3
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom hero (Spiritual)",
+      "category": "Banners"
+    }
+  ]
+}
+{% endschema %}

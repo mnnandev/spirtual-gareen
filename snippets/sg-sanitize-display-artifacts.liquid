@@ -1,0 +1,36 @@
+{%- doc -%}
+  Remove stray import artifacts from displayed plain text (brackets, shortcodes).
+
+  @param {string} text - Raw text
+{%- enddoc -%}
+
+{%- liquid
+  assign cleaned = text | default: '' | strip
+
+  if cleaned != blank
+    if cleaned contains '[fusion_' or cleaned contains 'fusion_builder_' or cleaned contains 'builder_container' or cleaned contains 'hundred_percent='
+      assign cleaned = cleaned | replace: '[fusion_', '' | replace: '[/fusion_', '' | replace: 'fusion_builder_', '' | replace: 'builder_container', ''
+      assign cleaned = cleaned | replace: ']', '' | replace: '[', '' | strip
+    endif
+
+    if cleaned == ']' or cleaned == '[' or cleaned == '[]' or cleaned == ']['
+      assign cleaned = ''
+    endif
+
+    assign cleaned_start = cleaned | slice: 0, 2
+    if cleaned_start == '</' and cleaned.size < 16
+      assign cleaned = ''
+    endif
+
+    assign bracket_only = cleaned | replace: '[', '' | replace: ']', '' | replace: ' ', '' | strip
+    if bracket_only == blank and cleaned != blank
+      assign cleaned = ''
+    endif
+
+    if cleaned.size < 2
+      assign cleaned = ''
+    endif
+  endif
+
+  echo cleaned
+-%}

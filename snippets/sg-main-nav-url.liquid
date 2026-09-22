@@ -1,0 +1,85 @@
+{%- doc -%}
+  Spiritual Green main navigation URL resolver.
+
+  @param {string} key - categorie | novita | best-seller | offerte | estate | consulenza | gift-card | contatti
+{%- enddoc -%}
+
+{% liquid
+  assign shop_fallback = routes.all_products_collection_url
+  if collections['all-products'] != blank
+    assign shop_fallback = collections['all-products'].url
+  elsif collections.all != blank
+    assign shop_fallback = collections.all.url
+  endif
+
+  case key
+    when 'categorie', 'shop'
+      echo shop_fallback
+    when 'novita'
+      if collections.novita != blank
+        echo collections.novita.url
+      else
+        echo routes.search_url
+        echo '?q='
+        echo 'novita' | url_encode
+        echo '&type=product'
+      endif
+    when 'best-seller', 'piu-venduti'
+      if collections['piu-venduti'] != blank
+        echo collections['piu-venduti'].url
+      elsif collections['best-seller'] != blank
+        echo collections['best-seller'].url
+      else
+        echo shop_fallback
+      endif
+    when 'offerte'
+      if collections.offerte != blank
+        echo collections.offerte.url
+      else
+        echo routes.search_url
+        echo '?q='
+        echo 'offerte' | url_encode
+        echo '&type=product'
+      endif
+    when 'estate'
+      if collections.estate != blank
+        echo collections.estate.url
+      else
+        echo routes.search_url
+        echo '?q='
+        echo 'estate' | url_encode
+        echo '&type=product'
+      endif
+    when 'consulenza'
+      if pages['consulenza-online'] != blank
+        echo pages['consulenza-online'].url
+      else
+        echo '/pages/consulenza-online'
+      endif
+    when 'gift-card'
+      assign sg_gift_url = ''
+      if pages['gift-card'] != blank
+        assign sg_gift_url = pages['gift-card'].url
+      endif
+
+      if sg_gift_url == blank
+        echo '/pages/gift-card'
+      else
+        echo sg_gift_url
+      endif
+    when 'chi-siamo'
+      if pages['chi-siamo'] != blank
+        echo pages['chi-siamo'].url
+      elsif pages.about != blank
+        echo pages.about.url
+      else
+        echo routes.root_url
+      endif
+    when 'contatti'
+      if pages.contact != blank
+        echo pages.contact.url
+      else
+        echo '/pages/contact'
+      endif
+  endcase
+%}

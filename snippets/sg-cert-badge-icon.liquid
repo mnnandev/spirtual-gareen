@@ -1,0 +1,77 @@
+{% liquid
+  assign icon = icon | default: 'natural'
+%}
+
+{% case icon %}
+  {% when 'natural' %}
+    <svg class="sg-cert-badge__svg" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M32 48c-8-6-12-14-12-22 0-6 4-10 10-10 3 0 6 1 8 3 2-2 5-3 8-3 6 0 10 4 10 10 0 8-4 16-12 22z" fill="currentColor" opacity="0.14"/>
+      <path d="M32 48V30" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M32 30c-7-8-14-10-18-6s-1 12 6 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M32 30c7-8 14-10 18-6s1 12-6 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M26 38c2 1 4 1 6 0M32 34c2 1 4 1 6 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity="0.7"/>
+    </svg>
+  {% when 'chemicals-free' %}
+    <svg class="sg-cert-badge__svg" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M27 18h10l9 24H18l9-24z" fill="currentColor" opacity="0.12"/>
+      <path d="M27 18h10l9 24H18l9-24z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M22 34h20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cx="29" cy="40" r="2.2" fill="currentColor"/>
+      <circle cx="35" cy="37" r="1.8" fill="currentColor" opacity="0.85"/>
+      <circle cx="39" cy="42" r="1.6" fill="currentColor" opacity="0.7"/>
+      <path d="M18 46l28-28" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+    </svg>
+  {% when 'organic' %}
+    <svg class="sg-cert-badge__svg" viewBox="0 0 64 64" aria-hidden="true">
+      <ellipse cx="32" cy="44" rx="14" ry="4" fill="currentColor" opacity="0.1"/>
+      <path d="M32 46V28" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M32 28c-9-2-15 4-16 12-1 6 3 10 8 10 3 0 6-1 8-3" fill="currentColor" opacity="0.16"/>
+      <path d="M32 28c9-2 15 4 16 12 1 6-3 10-8 10-3 0-6-1-8-3" fill="currentColor" opacity="0.1"/>
+      <path d="M32 28c-9-2-15 4-16 12-1 6 3 10 8 10 3 0 6-1 8-3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M32 28c9-2 15 4 16 12 1 6-3 10-8 10-3 0-6-1-8-3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M32 22c0-4 2-7 5-8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  {% when 'vegan' %}
+    <svg class="sg-cert-badge__svg" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M22 42c-7-11-2-24 10-28 4 9 2 19-6 25" fill="currentColor" opacity="0.14"/>
+      <path d="M42 42c7-11 2-24-10-28-4 9-2 19 6 25" fill="currentColor" opacity="0.14"/>
+      <path d="M22 42c-7-11-2-24 10-28 4 9 2 19-6 25" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M42 42c7-11 2-24-10-28-4 9-2 19 6 25" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M32 20v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  {% when 'gluten-free' %}
+    <svg class="sg-cert-badge__svg" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M32 14v34" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M24 20c4 2 6 8 4 14M40 20c-4 2-6 8-4 14M26 30c3 1 5 4 4 8M38 30c-3 1-5 4-4 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M18 46l28-28" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+    </svg>
+  {% when 'cruelty-free' %}
+    <svg class="sg-cert-badge__svg" viewBox="0 0 64 64" aria-hidden="true">
+      <ellipse cx="32" cy="40" rx="13" ry="10" fill="currentColor" opacity="0.16"/>
+      <circle cx="26" cy="30" r="5.5" fill="currentColor" opacity="0.9"/>
+      <circle cx="38" cy="30" r="5.5" fill="currentColor" opacity="0.9"/>
+      <path d="M32 22v5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M28 36c2 3 6 5 8 5s6-2 8-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  {% when 'no-animal-testing' %}
+    <svg class="sg-cert-badge__svg" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="34" r="14" fill="currentColor" opacity="0.12"/>
+      <ellipse cx="32" cy="40" rx="12" ry="9" fill="currentColor" opacity="0.85"/>
+      <circle cx="26" cy="30" r="5" fill="currentColor"/>
+      <circle cx="38" cy="30" r="5" fill="currentColor"/>
+      <path d="M18 46l28-28" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+    </svg>
+  {% when 'paraben-free' %}
+    <svg class="sg-cert-badge__svg" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M32 18c-8 8-12 16-10 24 2 6 8 10 10 10s8-4 10-10c2-8-2-16-10-24z" fill="currentColor" opacity="0.14"/>
+      <path d="M32 18c-8 8-12 16-10 24 2 6 8 10 10 10s8-4 10-10c2-8-2-16-10-24z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M32 26v16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M28 34h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  {% else %}
+    <svg class="sg-cert-badge__svg" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="15" fill="currentColor" opacity="0.12"/>
+      <circle cx="32" cy="32" r="15" fill="none" stroke="currentColor" stroke-width="2.2"/>
+      <path d="M32 22v20M22 32h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+{% endcase %}

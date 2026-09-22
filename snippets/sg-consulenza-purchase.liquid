@@ -1,0 +1,38 @@
+{%- doc -%}
+  Consulenza purchase block — Shopify product form + PayPal express.
+  Used on online consultation pages when a consultation product is configured.
+
+  @param {product} product - Consultation product
+  @param {string} [heading]
+  @param {string} [button_label]
+  @param {string} [form_id]
+{%- enddoc -%}
+
+{%- if product != blank -%}
+  {%- liquid
+    assign sg_variant = product.selected_or_first_available_variant
+    assign sg_form_id = form_id | default: 'sg-consulenza-purchase'
+    assign sg_heading = heading | default: 'Acquista la consulenza'
+    assign sg_btn = button_label | default: 'Aggiungi al carrello'
+  -%}
+
+  {%- if sg_variant != blank and sg_variant.available -%}
+    <div class="sg-consulenza-purchase" data-sg-consulenza-purchase>
+      {% if sg_heading != blank %}
+        <h3 class="sg-consulenza-purchase__heading">{{ sg_heading }}</h3>
+      {% endif %}
+      <p class="sg-consulenza-purchase__price">{{ sg_variant.price | money }}</p>
+
+      {% form 'product', product, id: sg_form_id, class: 'sg-consulenza-purchase__form' %}
+        <input type="hidden" name="id" value="{{ sg_variant.id }}">
+        <input type="hidden" name="quantity" value="1">
+
+        <button type="submit" name="add" class="sg-consulenza-purchase__submit button button--primary">
+          {{ sg_btn }}
+        </button>
+
+        {% render 'sg-express-checkout', form: form, class: 'sg-express-checkout--consulenza' %}
+      {% endform %}
+    </div>
+  {%- endif -%}
+{%- endif -%}

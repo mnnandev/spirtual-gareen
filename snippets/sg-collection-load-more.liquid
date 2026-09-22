@@ -1,0 +1,25 @@
+{%- doc -%}
+  Show more button for collection grid (loads next page via AJAX).
+
+  @param {object} paginate - Pagination object
+  @param {string} [label] - Button label
+  @param {string} section_id - Section id for section renderer
+{%- enddoc -%}
+
+{%- if paginate.pages > 1 and paginate.next -%}
+  <script src="{{ 'sg-collection-load-more.js' | asset_url }}" type="module" fetchpriority="low"></script>
+
+  <sg-collection-load-more class="sg-collection-load-more">
+    <button
+      type="button"
+      class="sg-collection-load-more__button"
+      data-sg-load-more
+    >
+      {% if label != blank %}
+        {{ label }}
+      {% else %}
+        {{ 'actions.show_more' | t }}
+      {% endif %}
+    </button>
+  </sg-collection-load-more>
+{%- endif -%}
